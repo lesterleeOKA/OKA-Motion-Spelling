@@ -1,0 +1,227 @@
+
+.canvasWrapper {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  position: relative;
+}
+
+.canvasWrapper > .optionArea {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvasWrapper > .optionArea > .optionWrapper {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 80%;
+  height: 80%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0px 0px 10px 0px #000;
+  transition: opacity 0.1s ease;
+  opacity: 0;
+  background-position: center;
+  background-size: cover;
+  background: white;
+}
+
+.questionWrapper{
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 3.5%;
+  box-shadow: 0px 0px 10px 0px #000;
+  transition: opacity 0.1s ease;
+  opacity: 1;
+  text-align: center;
+  font-size: -webkit-xxx-large;
+  width: 300px;
+  height: 75px;
+}
+.answerWrapper{
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 3.5%;
+  box-shadow: 0px 0px 10px 0px #000;
+  transition: opacity 0.1s ease;
+  opacity: 1;
+  text-align: center;
+  font-size: -webkit-xxx-large;
+  width: 300px;
+  height: 75px;
+}
+
+.correct {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url(../images/ans_tick.png);
+}
+.wrong {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url(../images/ans_cross.png);
+}
+
+
+
+.canvasWrapper > .optionArea > .optionWrapper.show {
+  position: absolute;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation-name: fallingAnimation;
+  animation-duration: var(--fallingSpeed); /* Set a default duration */
+  animation-timing-function: linear;
+}
+
+.canvasWrapper > .optionArea > .optionWrapper > .option {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  height: 90%;
+  text-align: center;
+  font-size: var(--font-size);
+  background: transparent;
+  border: none;
+}
+
+:root {
+  --fallingSpeed: 9s;
+  --top-height: 0px;
+  --bottom-height: 200px;
+  --font-size: 3vw;
+}
+
+.fadeIn {
+  animation: fade-In;
+  animation-duration: 1s;
+}
+
+.fadeOut {
+  animation: fade-Out;
+  animation-duration: 1s;
+}
+
+@keyframes fallingAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--top-height));
+  }
+  5% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--bottom-height));
+  }
+}
+
+@keyframes fade-In{
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-Out{
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.canvasWrapper > .optionArea > .optionWrapper > .selectCount {
+  position: absolute;
+  font-weight: bold;
+  font-size: calc(min(15vh, 15vw));
+  color: #FCC946;
+  text-shadow: 0px 0px 12px black;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", cursive;
+  opacity: 0;
+}
+
+@property --p{
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.canvasWrapper > .optionArea > .optionWrapper.show.touch:not(.showColorBorder) {
+  animation: optionBlinkInnerYellow 0.2s;
+  animation-iteration-count: infinite;
+}
+
+.canvasWrapper > .optionArea > .optionWrapper.show.touch:not(.showColorBorder) > .selectCount {
+  opacity: 1;
+}
+/*.canvasWrapper > .optionArea > .optionWrapper.show.touch:not(.showColorBorder)::after {
+  counter-reset: selectCount calc(3 - (var(--p) / 50));
+  content: counter(selectCount);
+  font-size: calc(min(15vh, 15vw));
+  position: absolute;
+  font-weight: bold;
+  color: #FCC946;
+  text-shadow: 0px 0px 12px black;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", cursive;
+}*/
+
+.canvasWrapper > .optionArea > .optionWrapper.showColorBorder::after {
+  content: '';
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.canvasWrapper > .optionArea > .optionWrapper.correct.showColorBorder {
+  background-color: #84BD3B;
+}
+.canvasWrapper > .optionArea > .optionWrapper.correct.showColorBorder::after {
+  background-image: url(../images/ans_tick.png);
+}
+.canvasWrapper > .optionArea > .optionWrapper.wrong.showColorBorder,
+.canvasWrapper > .optionArea > .optionWrapper.wrong.showColorBorder {
+  background-color: #EE4865;
+}
+.canvasWrapper > .optionArea > .optionWrapper.wrong.showColorBorder::after,
+.canvasWrapper > .optionArea > .optionWrapper.wrong.showColorBorder::after {
+  background-image: url(../images/ans_cross.png);
+}
+
+@keyframes optionBlinkInnerYellow {
+  0% {
+    box-shadow: 0px 0px 10px 0px #000000, inset 0 0 0 10px #FCC946;
+  }
+  50% {
+    box-shadow: 0px 0px 10px 0px #000000, inset 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0px 0px 10px 0px #000000, inset 0 0 0 10px #FCC946;
+  }
+}
+@keyframes optionBlinkYellow { 50% { border-color:#FCC946; }  }
+
+@keyframes p {
+  from{--p:0}
+  to{--p:100}
+}
