@@ -4,7 +4,8 @@ import Sound from './sound';
 
 export default {
   fallingId: 0,
-  questionWord: '',
+  questionType: null,
+  question: '',
   itemDistance: 200,
   score: 0,
   time: 0,
@@ -29,7 +30,8 @@ export default {
     //View.showTips('tipsReady');
     this.fallingId = 0;
     View.timeText.innerText = this.remainingTime;
-    this.questionWord = '';
+    this.questionType = null;
+    this.question = '';
     this.itemDistance = 200;
     this.score = 0;
     this.time = 0;
@@ -50,6 +52,22 @@ export default {
     this.redBoxY = (View.canvas.height / 5) * 3;
     this.redBoxWidth = View.canvas.width / 3;
     this.redBoxHeight = (View.canvas.height / 5) * 2;
+  },
+
+  QUESTION_TYPE: {
+    Spelling: [
+      { question: 'apple', correctAnswer: 'apple'},
+      { question: 'banana', correctAnswer: 'banana'},
+      { question: 'cherry', correctAnswer: 'cherry'},
+      { question: 'orange', correctAnswer: 'orange'},
+      { question: 'pear', correctAnswer: 'pear'}
+    ],
+    MultipleChoice: [
+      { question: 'What is the color of apple?', answers: ['red', 'blue', 'purple', 'black'], correctAnswer: 'red' },
+      { question: 'What is the color of banana?', answers: ['red', 'yellow', 'purple', 'black'], correctAnswer: 'yellow'}
+    ]
+    //Listening:2,
+    //Photo:3
   },
 
   addScore(mark) {
@@ -196,7 +214,7 @@ export default {
     });
   },
 
-  getRandomWord(string) {
+  getRandomQuestions(string) {
     const randomIndex = Math.floor(Math.random() * string.length);
     return string[randomIndex];
   },
@@ -221,6 +239,19 @@ export default {
     }
   },
   /////////////////////////////////////////QUestions///////////////////////////////
+  randQuestionType() {
+    const questionTypeKeys = Object.keys(this.QUESTION_TYPE);
+    const randomIndex = Math.floor(Math.random() * questionTypeKeys.length);
+    const selectedType = questionTypeKeys[randomIndex];
+    const questions = this.QUESTION_TYPE[selectedType];
+    const randomQuestionIndex = Math.floor(Math.random() * questions.length);
+    return {
+      type: selectedType,
+      question: questions[randomQuestionIndex].question,
+      answers: questions[randomQuestionIndex].answers,
+      correctAnswer: questions[randomQuestionIndex].correctAnswer
+    };
+  },
   generateCharArray(word) {
     var chars = word.split('');
     for (let i = chars.length - 1; i > 0; i--) {
@@ -229,16 +260,42 @@ export default {
     }
     return chars;
   },
+  randomizeAnswers(array) {
+    if (!Array.isArray(array) || array.length === 0) {
+      return [];
+    }
+    return array.slice().sort(() => Math.random() - 0.5);
+  },
+
+  randomOptions(){
+    console.log('question class', this.questionType);
+    //console.log('question', this.questionType.question);
+    //console.log('question type', this.questionType.type);
+    //console.log('question answers', this.questionType.answers);
+
+    switch(this.questionType.type){
+      case 'Spelling':
+        var array = this.generateCharArray(this.question);
+        this.answerLength = array.length;
+        return array;
+      case 'MultipleChoice':
+        this.answerLength = 1;
+        return this.randomizeAnswers(this.questionType.answers);
+    }
+  },
   setQuestions() {
-    this.questionWord = this.getRandomWord(this.defaultStrings);
-    this.randomPair = this.generateCharArray(this.questionWord);
-    this.answerLength = this.randomPair.length;
+    this.questionType = this.randQuestionType();
+    this.question = this.questionType.question;
+    this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
+    var questionText = document.createElement('span');
+    questionText.classList.add('questionText');
+    questionText.textContent = this.questionType.question;
+    this.questionWrapper.appendChild(questionText);
     this.answerWrapper = document.createElement('span');
     this.questionWrapper.classList.add('questionWrapper');
     this.answerWrapper.classList.add('answerWrapper');
-    this.questionWrapper.textContent = this.questionWord;
-    this.questionWrapper.value = this.questionWord;
+    this.questionWrapper.value = this.question;
     View.stageImg.appendChild(this.questionWrapper);
     View.stageImg.appendChild(this.answerWrapper);
   },
@@ -251,7 +308,7 @@ export default {
     }
   },
   finishedGame() {
-    this.questionWord = '';
+    this.question = '';
     this.fallingItems.splice(0);
     View.stageImg.innerHTML = '';
     View.optionArea.innerHTML = '';
@@ -279,7 +336,7 @@ export default {
   },
 
   resetFillWord() {
-    this.randomPair = this.generateCharArray(this.questionWord);
+    this.randomPair = this.randomOptions();
     this.answerWrapper.classList.remove('correct');
     this.answerWrapper.classList.remove('wrong');
     this.answerWrapper.textContent = '';
@@ -289,17 +346,15 @@ export default {
   },
 
   checkAnswer(answer) {
-    if (this.questionWrapper) {
-      if (answer === this.questionWrapper.textContent) {
-        //答岩1分，答錯唔扣分
-        this.addScore(1);
-        this.answerWrapper.classList.add('correct');
-        State.changeState('playing', 'ansCorrect');
-      } else {
-        //this.addScore(-1);
-        this.answerWrapper.classList.add('wrong');
-        State.changeState('playing', 'ansWrong');
-      }
+    if (answer === this.questionType.correctAnswer) {
+      //答岩1分，答錯唔扣分
+      this.addScore(1);
+      this.answerWrapper.classList.add('correct');
+      State.changeState('playing', 'ansCorrect');
+    } else {
+      //this.addScore(-1);
+      this.answerWrapper.classList.add('wrong');
+      State.changeState('playing', 'ansWrong');
     }
   },
 
