@@ -128,10 +128,6 @@ export default {
     });
     requestAnimationFrame(this.updateFallingItems.bind(this));
   },
-  getRandomSpeed(minSpeed, maxSpeed) {
-    const speed = Math.random() * (maxSpeed - minSpeed) + minSpeed;
-    return speed;
-  },
   generateUniqueId() {
     return Math.random().toString(16).slice(2);
   },
@@ -141,14 +137,12 @@ export default {
       const word = char;
       const generatePosition = () => {
         const x = this.generatePositionX(isLeft);
-        const speed = this.getRandomSpeed(0.5, 2);
         const id = this.generateUniqueId();
         const optionWrapper = this.createOptionWrapper(word, id);
         const newFallingItem = {
           x,
           optionWrapper,
           id,
-          speed
         };
         return newFallingItem;
       };
@@ -251,6 +245,10 @@ export default {
   showQuestions(status) {
     View.stageImg.style.display = status ? '' : 'none';
     View.optionArea.style.display = status ? '' : 'none';
+    if(!status){
+      this.fallingItems.splice(0);
+      View.optionArea.innerHTML = '';
+    }
   },
   finishedGame() {
     this.questionWord = '';
