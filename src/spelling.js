@@ -9,8 +9,9 @@ export default {
   itemDistance: 200,
   score: 0,
   time: 0,
-  remainingTime: 60,
+  remainingTime: 1000,
   optionSize: 0,
+  fallingOption: null,
   timer: null,
   timerRunning: false,
   nextQuestion: true,
@@ -30,6 +31,7 @@ export default {
 
   init() {
     //View.showTips('tipsReady');
+    this.startedGame = false;
     this.fallingId = 0;
     View.timeText.innerText = this.remainingTime;
     this.questionType = null;
@@ -92,8 +94,24 @@ export default {
       this.showQuestions(true);
       this.timerRunning = true;
       this.countTime();
+      this.falling();
     }
   },
+
+  falling() {
+    if (this.fallingItems.length < this.randomPair.length) {
+      if (this.fallingId < this.fallingItems.length) {
+        this.fallingId += 1;
+      }
+      else {
+        this.fallingId = 0;
+      }
+      this.createRandomItem(this.randomPair[this.fallingId]);
+    }
+    this.fallingOption = setTimeout(this.falling.bind(this), 2000);
+  },
+
+
   countTime() {
     if (this.timerRunning) {
       if (this.nextQuestion) {
@@ -103,27 +121,18 @@ export default {
       this.time--;
       View.timeText.innerText = this.time;
 
-      if (this.fallingItems.length < this.randomPair.length) {
-        if (this.fallingId < this.fallingItems.length) {
-          this.fallingId += 1;
-        }
-        else {
-          this.fallingId = 0;
-        }
-        this.createRandomItem(this.randomPair[this.fallingId]);
-      }
-
       if (this.time <= 0) {
         this.stopCountTime();
         State.changeState('finished');
       } else {
-        this.timer = setTimeout(this.countTime.bind(this), 2000);
+        this.timer = setTimeout(this.countTime.bind(this), 1000);
       }
     }
   },
   stopCountTime() {
     if (this.timerRunning) {
       clearInterval(this.timer);
+      clearInterval(this.fallingOption);
       this.timerRunning = false;
       this.showQuestions(false);
     }
@@ -230,9 +239,11 @@ export default {
     item.optionWrapper.addEventListener('animationend', () => {
       item.optionWrapper.classList.remove('show');
       setTimeout(() => {
+        if (this.nextQuestion)
+          return;
         this.handleItemReachedBottom(item.optionWrapper);
         item.optionWrapper.classList.add('show');
-      }, 2000);
+      }, 3000);
     });
   },
 
@@ -249,7 +260,7 @@ export default {
     const index = this.fallingItems.indexOf(item);
     if (index > -1) {
       this.fallingItems.splice(index, 1);
-      View.optionArea.removeChild(item.optionWrapper);
+      View.optionArea.removeChild(item);
     }
   },
   removeFallingItemByIndex(id) {
@@ -345,6 +356,9 @@ export default {
         option.classList.remove('show');
         option.classList.add('fadeOut');
         View.optionArea.removeChild(option);
+        //console.log("remove id: ", option.id);
+        //this.removeFallingItemByIndex(option.id)
+
         this.fillwordTime += 1;
         if (State.isSoundOn) {
           Sound.stopAll('bgm');
@@ -361,6 +375,10 @@ export default {
 
   resetFillWord() {
     this.randomPair = this.randomOptions();
+    this.clearWrapper();
+  },
+
+  clearWrapper() {
     this.answerWrapper.classList.remove('correct');
     this.answerWrapper.classList.remove('wrong');
     this.answerWrapper.textContent = '';
@@ -383,9 +401,11 @@ export default {
   },
 
   moveToNextQuestion() {
-    this.resetFillWord();
-    this.nextQuestion = true;
+    this.questionType = null;
+    this.randomPair = [];
+    this.clearWrapper();
     View.stageImg.innerHTML = '';
+    this.nextQuestion = true;
   }
 
 }
