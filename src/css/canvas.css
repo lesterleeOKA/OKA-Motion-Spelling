@@ -33,6 +33,29 @@
   background: white;
 }
 
+.buttonWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  background-image: url(../images/listen.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  cursor: pointer;
+  transform: scale(1);
+  background-color: rgba(255, 255, 255, 0);
+  border:none;
+}
+.buttonWrapper.clicked {
+  transform: scale(0.95);
+}
+
+.buttonWrapper.not-clicked {
+  transform: scale(1);
+}
+
 .questionText{
   position: relative;
   text-align: center;

@@ -1,12 +1,12 @@
 import View from './view';
 import State from './state';
 import Sound from './sound';
+import { listeners } from 'process';
 
 export default {
   fallingId: 0,
   questionType: null,
   question: '',
-  itemDistance: 200,
   score: 0,
   time: 0,
   remainingTime: 1000,
@@ -17,7 +17,6 @@ export default {
   nextQuestion: true,
   randomPair: [],
   fallingItems: [],
-  defaultStrings: [],
   answerLength: 0,
   questionWrapper: null,
   answerWrapper: null,
@@ -28,6 +27,7 @@ export default {
   redBoxHeight: 0,
   leftCount: 0,
   rightCount: 0,
+  fallingDelay: 0,
 
   init() {
     //View.showTips('tipsReady');
@@ -36,7 +36,6 @@ export default {
     View.timeText.innerText = this.remainingTime;
     this.questionType = null;
     this.question = '';
-    this.itemDistance = 200;
     this.score = 0;
     this.time = 0;
     this.timerRunning = false;
@@ -49,7 +48,6 @@ export default {
     this.questionWrapper = null;
     this.answerWrapper = null;
     View.scoreBoard.className = "scoreBoard";
-    this.defaultStrings = ['apple', 'banana', 'cherry', 'orange', 'pear'];
     this.answerLength = 0;
     this.optionSize = View.canvas.width / 8;
     this.redBoxX = View.canvas.width / 3;
@@ -58,6 +56,34 @@ export default {
     this.redBoxHeight = (View.canvas.height / 5) * 2;
     this.leftCount = 0;
     this.rightCount = 0;
+    this.fallingDelay = 2000;
+    document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+  },
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      this.pauseGame();
+    } else {
+      this.resumeGame();
+    }
+  },
+
+  pauseGame() {
+    if (this.timerRunning) {
+      clearTimeout(this.timer);
+      cancelAnimationFrame(this.fallingOption);
+      this.timerRunning = false;
+      this.showQuestions(false);
+    }
+  },
+
+  resumeGame() {
+    if (this.startedGame && !this.timerRunning) {
+      this.showQuestions(true);
+      this.timerRunning = true;
+      this.countTime();
+      this.startFalling();
+    }
   },
 
   QUESTION_TYPE: {
@@ -71,8 +97,30 @@ export default {
     MultipleChoice: [
       { question: 'What is the color of apple?', answers: ['red', 'blue', 'purple', 'black'], correctAnswer: 'red' },
       { question: 'What is the color of banana?', answers: ['red', 'yellow', 'purple', 'black'], correctAnswer: 'yellow' }
-    ]
-    //Listening:2,
+    ],
+    Listening: [
+      //p3 questions
+      { key: 'p3u2-c1', question: 'general', correctAnswer: 'general' },
+      { key: 'p3u2-c2', question: 'maths', correctAnswer: 'maths' },
+      { key: 'p3u2-c3', question: 'english', correctAnswer: 'english' },
+      { key: 'p3u2-c4', question: 'physical', correctAnswer: 'physical' },
+      { key: 'p3u2-c5', question: 'science', correctAnswer: 'science' },
+      { key: 'p3u2-c6', question: 'history', correctAnswer: 'history' },
+      { key: 'p3u2-c7', question: 'arts', correctAnswer: 'arts' },
+      { key: 'p3u2-c8', question: 'geography', correctAnswer: 'geography' },
+      { key: 'p3u2-c9', question: 'computer', correctAnswer: 'computer' },
+      { key: 'p3u2-c10', question: 'music', correctAnswer: 'music' },
+      { key: 'p3u2-c11', question: 'religious', correctAnswer: 'religious' },
+      { key: 'p3u2-c12', question: 'project', correctAnswer: 'project' },
+      { key: 'p3u2-c13', question: 'dictate', correctAnswer: 'dictate' },
+      { key: 'p3u2-c14', question: 'visual', correctAnswer: 'visual' },
+      { key: 'p3u2-c15', question: 'internet', correctAnswer: 'internet' },
+      { key: 'p3u2-c16', question: 'outing', correctAnswer: 'outing' },
+      { key: 'p3u2-c17', question: 'attention', correctAnswer: 'attention' },
+      { key: 'p3u2-c18', question: 'listen', correctAnswer: 'listen' },
+      { key: 'p3u2-c19', question: 'learn', correctAnswer: 'learn' },
+      { key: 'p3u2-c20', question: 'improve', correctAnswer: 'improve' },
+    ],
     //Photo:3
   },
 
@@ -94,23 +142,34 @@ export default {
       this.showQuestions(true);
       this.timerRunning = true;
       this.countTime();
-      this.falling();
+      this.startFalling();
     }
   },
 
-  falling() {
-    if (this.fallingItems.length < this.randomPair.length) {
-      if (this.fallingId < this.fallingItems.length) {
-        this.fallingId += 1;
-      }
-      else {
-        this.fallingId = 0;
-      }
-      this.createRandomItem(this.randomPair[this.fallingId]);
-    }
-    this.fallingOption = setTimeout(this.falling.bind(this), 2000);
-  },
+  startFalling() {
+    const falling = (timestamp) => {
+      if (!this.lastFallingTime) this.lastFallingTime = timestamp;
 
+      const elapsed = timestamp - this.lastFallingTime;
+
+      if (elapsed >= this.fallingDelay) {
+        if (this.fallingItems.length < this.randomPair.length) {
+          if (this.fallingId < this.fallingItems.length) {
+            this.fallingId += 1;
+          } else {
+            this.fallingId = 0;
+          }
+          this.createRandomItem(this.randomPair[this.fallingId]);
+        }
+        this.lastFallingTime = timestamp;
+      }
+
+      if (this.timerRunning) {
+        this.fallingOption = requestAnimationFrame(falling);
+      }
+    };
+    this.fallingOption = requestAnimationFrame(falling);
+  },
 
   countTime() {
     if (this.timerRunning) {
@@ -132,7 +191,7 @@ export default {
   stopCountTime() {
     if (this.timerRunning) {
       clearInterval(this.timer);
-      clearInterval(this.fallingOption);
+      cancelAnimationFrame(this.fallingOption);
       this.timerRunning = false;
       this.showQuestions(false);
     }
@@ -177,7 +236,6 @@ export default {
         };
         return newFallingItem;
       };
-
       const newFallingItem = generatePosition();
       this.fallingItems.push(newFallingItem);
       this.renderFallingItem(newFallingItem);
@@ -280,6 +338,7 @@ export default {
     const randomQuestionIndex = Math.floor(Math.random() * questions.length);
     return {
       type: selectedType,
+      key: selectedType === 'Listening' ? questions[randomQuestionIndex].key : '',
       question: questions[randomQuestionIndex].question,
       answers: questions[randomQuestionIndex].answers,
       correctAnswer: questions[randomQuestionIndex].correctAnswer
@@ -308,6 +367,7 @@ export default {
 
     switch (this.questionType.type) {
       case 'Spelling':
+      case 'Listening':
         var array = this.generateCharArray(this.question);
         this.answerLength = array.length;
         return array;
@@ -322,10 +382,44 @@ export default {
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
     this.questionWrapper.style.width = this.redBoxWidth + 'px';
-    var questionText = document.createElement('span');
-    questionText.classList.add('questionText');
-    questionText.textContent = this.questionType.question;
-    this.questionWrapper.appendChild(questionText);
+
+    switch (this.questionType.type) {
+      case 'Spelling':
+      case 'MultipleChoice':
+        var questionText = document.createElement('span');
+        questionText.classList.add('questionText');
+        questionText.textContent = this.questionType.question;
+        this.questionWrapper.appendChild(questionText);
+        break;
+      case 'Listening':
+        this.playWordAudio(this.questionType.key);
+        this.buttonWrapper = document.createElement('button');
+        this.buttonWrapper.classList.add('buttonWrapper');
+        this.buttonWrapper.addEventListener('mousedown', () => {
+          this.buttonWrapper.classList.add('clicked');
+          this.buttonWrapper.classList.remove('not-clicked');
+          this.playWordAudio(this.questionType.key);
+        });
+
+        this.buttonWrapper.addEventListener('mouseup', () => {
+          this.buttonWrapper.classList.remove('clicked');
+          this.buttonWrapper.classList.add('not-clicked');
+        });
+        this.buttonWrapper.addEventListener('touchstart', (event) => {
+          event.preventDefault(); // Prevent default touch behavior
+          this.buttonWrapper.classList.add('clicked');
+          this.buttonWrapper.classList.remove('not-clicked');
+          this.playWordAudio(this.questionType.key);
+        });
+
+        this.buttonWrapper.addEventListener('touchend', (event) => {
+          event.preventDefault(); // Prevent default touch behavior
+          this.buttonWrapper.classList.remove('clicked');
+          this.buttonWrapper.classList.add('not-clicked');
+        });
+        this.questionWrapper.appendChild(this.buttonWrapper);
+        break;
+    }
     this.answerWrapper = document.createElement('span');
     this.answerWrapper.style.width = this.redBoxWidth + 'px';
     this.questionWrapper.classList.add('questionWrapper');
@@ -334,6 +428,15 @@ export default {
     View.stageImg.appendChild(this.questionWrapper);
     View.stageImg.appendChild(this.answerWrapper);
   },
+
+  playWordAudio(key) {
+    // Add your button click event handler logic here
+    if (State.isSoundOn) {
+      Sound.stopAll('bgm');
+      Sound.play(key);
+    }
+  },
+
   showQuestions(status) {
     View.stageImg.style.display = status ? '' : 'none';
     View.optionArea.style.display = status ? '' : 'none';
@@ -405,7 +508,8 @@ export default {
     this.randomPair = [];
     this.clearWrapper();
     View.stageImg.innerHTML = '';
-    this.nextQuestion = true;
+    setTimeout(() => {
+      this.nextQuestion = true;
+    }, 1000);
   }
-
 }
