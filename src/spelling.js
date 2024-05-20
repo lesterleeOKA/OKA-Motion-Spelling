@@ -291,7 +291,7 @@ export default {
     View.optionArea.appendChild(item.optionWrapper);
     item.optionWrapper.classList.add("show");
     item.optionWrapper.style.left = item.x + 'px';
-    item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.1)}px`);
+    item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.05 * this.answerLength)}px`);
     item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height}px`);
 
     item.optionWrapper.addEventListener('animationend', () => {

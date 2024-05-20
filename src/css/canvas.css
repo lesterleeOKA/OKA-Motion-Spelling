@@ -133,7 +133,7 @@
 }
 
 :root {
-  --fallingSpeed: 9s;
+  --fallingSpeed: 10s;
   --top-height: 0px;
   --bottom-height: 200px;
   --font-size: 3vh;
