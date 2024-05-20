@@ -9,7 +9,7 @@ export default {
   itemDistance: 200,
   score: 0,
   time: 0,
-  remainingTime: 1000,
+  remainingTime: 60,
   optionSize: 0,
   timer: null,
   timerRunning: false,
@@ -25,6 +25,8 @@ export default {
   redBoxY: 0,
   redBoxWidth: 0,
   redBoxHeight: 0,
+  leftCount: 0,
+  rightCount: 0,
 
   init() {
     //View.showTips('tipsReady');
@@ -52,19 +54,21 @@ export default {
     this.redBoxY = (View.canvas.height / 5) * 3;
     this.redBoxWidth = View.canvas.width / 3;
     this.redBoxHeight = (View.canvas.height / 5) * 2;
+    this.leftCount = 0;
+    this.rightCount = 0;
   },
 
   QUESTION_TYPE: {
     Spelling: [
-      { question: 'apple', correctAnswer: 'apple'},
-      { question: 'banana', correctAnswer: 'banana'},
-      { question: 'cherry', correctAnswer: 'cherry'},
-      { question: 'orange', correctAnswer: 'orange'},
-      { question: 'pear', correctAnswer: 'pear'}
+      { question: 'apple', correctAnswer: 'apple' },
+      { question: 'banana', correctAnswer: 'banana' },
+      { question: 'cherry', correctAnswer: 'cherry' },
+      { question: 'orange', correctAnswer: 'orange' },
+      { question: 'pear', correctAnswer: 'pear' }
     ],
     MultipleChoice: [
       { question: 'What is the color of apple?', answers: ['red', 'blue', 'purple', 'black'], correctAnswer: 'red' },
-      { question: 'What is the color of banana?', answers: ['red', 'yellow', 'purple', 'black'], correctAnswer: 'yellow'}
+      { question: 'What is the color of banana?', answers: ['red', 'yellow', 'purple', 'black'], correctAnswer: 'yellow' }
     ]
     //Listening:2,
     //Photo:3
@@ -151,7 +155,7 @@ export default {
   },
   createRandomItem(char) {
     if (char && char.length !== 0) {
-      var isLeft = Math.round(Math.random()) === 0 ? true : false;
+      const isLeft = this.getBalancedRandom();
       const word = char;
       const generatePosition = () => {
         const x = this.generatePositionX(isLeft);
@@ -168,6 +172,24 @@ export default {
       const newFallingItem = generatePosition();
       this.fallingItems.push(newFallingItem);
       this.renderFallingItem(newFallingItem);
+    }
+  },
+
+  getBalancedRandom() {
+    if (this.leftCount > this.rightCount) {
+      this.rightCount++;
+      return false;
+    } else if (this.rightCount > this.leftCount) {
+      this.leftCount++;
+      return true;
+    } else {
+      const isLeft = Math.round(Math.random()) === 0;
+      if (isLeft) {
+        this.leftCount++;
+      } else {
+        this.rightCount++;
+      }
+      return isLeft;
     }
   },
 
@@ -219,7 +241,7 @@ export default {
     return string[randomIndex];
   },
   handleItemReachedBottom(item) {
-    var isLeft = Math.round(Math.random()) === 0 ? true : false;
+    const isLeft = this.getBalancedRandom();
     item.x = this.generatePositionX(isLeft);
     item.style.left = item.x + 'px';
   },
@@ -267,13 +289,13 @@ export default {
     return array.slice().sort(() => Math.random() - 0.5);
   },
 
-  randomOptions(){
+  randomOptions() {
     console.log('question class', this.questionType);
     //console.log('question', this.questionType.question);
     //console.log('question type', this.questionType.type);
     //console.log('question answers', this.questionType.answers);
 
-    switch(this.questionType.type){
+    switch (this.questionType.type) {
       case 'Spelling':
         var array = this.generateCharArray(this.question);
         this.answerLength = array.length;
@@ -288,11 +310,13 @@ export default {
     this.question = this.questionType.question;
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
+    this.questionWrapper.style.width = this.redBoxWidth + 'px';
     var questionText = document.createElement('span');
     questionText.classList.add('questionText');
     questionText.textContent = this.questionType.question;
     this.questionWrapper.appendChild(questionText);
     this.answerWrapper = document.createElement('span');
+    this.answerWrapper.style.width = this.redBoxWidth + 'px';
     this.questionWrapper.classList.add('questionWrapper');
     this.answerWrapper.classList.add('answerWrapper');
     this.questionWrapper.value = this.question;
@@ -302,7 +326,7 @@ export default {
   showQuestions(status) {
     View.stageImg.style.display = status ? '' : 'none';
     View.optionArea.style.display = status ? '' : 'none';
-    if(!status){
+    if (!status) {
       this.fallingItems.splice(0);
       View.optionArea.innerHTML = '';
     }
