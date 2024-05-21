@@ -27,7 +27,7 @@ export default {
     });
   },
   play(key, loop = false, volume = null) {
-    console.log('Play sound: ' + key);
+    //console.log('Play sound: ' + key);
     if (!this.audios[key]) return;
     let audio = this.audios[key];
     if (!audio.audioBuffer) return false;

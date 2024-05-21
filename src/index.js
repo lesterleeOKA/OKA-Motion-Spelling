@@ -6,6 +6,7 @@ import View from './view';
 import State from './state';
 import Sound from './sound';
 import { setupStats } from './stats_panel';
+import { loadLevel } from './level';
 
 let detector
 let rafId;
@@ -166,41 +167,53 @@ function init() {
     State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
   });
 
+
+  const levelKey = loadLevel();
+  const defaultAudios = [
+    ['bgm', require('./audio/bgm.mp3'), false, 0.5],
+    ['btnClick', require('./audio/btnClick.wav')],
+    ['countDown', require('./audio/countDown.wav')],
+    ['instruction', require('./audio/instruction.mp3')],
+    ['prepare', require('./audio/prepare.mp3')],
+    ['start', require('./audio/start.mp3')],
+    ['dontMove', require('./audio/dontMove.mp3')],
+    ['finished', require('./audio/finished.mp3')],
+    ['outBox', require('./audio/outBox.mp3')],
+    ['poseValid', require('./audio/poseValid.mp3')],
+    ['ansCorrect', require('./audio/ansCorrect.mp3')],
+    ['ansWrong', require('./audio/ansWrong.mp3')],
+  ];
+
+  // Additional audio files that may be conditionally preloaded
+  const additionalAudios = [
+    ['p3u2-c1', require('./audio/p3/u2/p3u2-c1.mp3')],
+    ['p3u2-c2', require('./audio/p3/u2/p3u2-c2.mp3')],
+    ['p3u2-c3', require('./audio/p3/u2/p3u2-c3.mp3')],
+    ['p3u2-c4', require('./audio/p3/u2/p3u2-c4.mp3')],
+    ['p3u2-c5', require('./audio/p3/u2/p3u2-c5.mp3')],
+    ['p3u2-c6', require('./audio/p3/u2/p3u2-c6.mp3')],
+    ['p3u2-c7', require('./audio/p3/u2/p3u2-c7.mp3')],
+    ['p3u2-c8', require('./audio/p3/u2/p3u2-c8.mp3')],
+    ['p3u2-c9', require('./audio/p3/u2/p3u2-c9.mp3')],
+    ['p3u2-c10', require('./audio/p3/u2/p3u2-c10.mp3')],
+    ['p3u2-c11', require('./audio/p3/u2/p3u2-c11.mp3')],
+    ['p3u2-c12', require('./audio/p3/u2/p3u2-c12.mp3')],
+    ['p3u2-c13', require('./audio/p3/u2/p3u2-c13.mp3')],
+    ['p3u2-c14', require('./audio/p3/u2/p3u2-c14.mp3')],
+    ['p3u2-c15', require('./audio/p3/u2/p3u2-c15.mp3')],
+    ['p3u2-c16', require('./audio/p3/u2/p3u2-c16.mp3')],
+    ['p3u2-c17', require('./audio/p3/u2/p3u2-c17.mp3')],
+    ['p3u2-c18', require('./audio/p3/u2/p3u2-c18.mp3')],
+    ['p3u2-c19', require('./audio/p3/u2/p3u2-c19.mp3')],
+    ['p3u2-c20', require('./audio/p3/u2/p3u2-c20.mp3')],
+  ];
+
+  const filteredAdditionalAudios = levelKey === 'all'
+    ? additionalAudios
+    : additionalAudios.filter(([key]) => levelKey && key.includes(levelKey));
+  const audiosToPreload = [...defaultAudios, ...filteredAdditionalAudios];
   return Promise.all([
-    Sound.preloadAudios([
-      ['bgm', require('./audio/bgm.mp3'), false, 0.5],
-      ['btnClick', require('./audio/btnClick.wav')],
-      ['countDown', require('./audio/countDown.wav')],
-      ['instruction', require('./audio/instruction.mp3')],
-      ['prepare', require('./audio/prepare.mp3')],
-      ['start', require('./audio/start.mp3')],
-      ['dontMove', require('./audio/dontMove.mp3')],
-      ['finished', require('./audio/finished.mp3')],
-      ['outBox', require('./audio/outBox.mp3')],
-      ['poseValid', require('./audio/poseValid.mp3')],
-      ['ansCorrect', require('./audio/ansCorrect.mp3')],
-      ['ansWrong', require('./audio/ansWrong.mp3')],
-      ['p3u2-c1', require('./audio/p3u2-c1.mp3')],
-      ['p3u2-c2', require('./audio/p3u2-c2.mp3')],
-      ['p3u2-c3', require('./audio/p3u2-c3.mp3')],
-      ['p3u2-c4', require('./audio/p3u2-c4.mp3')],
-      ['p3u2-c5', require('./audio/p3u2-c5.mp3')],
-      ['p3u2-c6', require('./audio/p3u2-c6.mp3')],
-      ['p3u2-c7', require('./audio/p3u2-c7.mp3')],
-      ['p3u2-c8', require('./audio/p3u2-c8.mp3')],
-      ['p3u2-c9', require('./audio/p3u2-c9.mp3')],
-      ['p3u2-c10', require('./audio/p3u2-c10.mp3')],
-      ['p3u2-c11', require('./audio/p3u2-c11.mp3')],
-      ['p3u2-c12', require('./audio/p3u2-c12.mp3')],
-      ['p3u2-c13', require('./audio/p3u2-c13.mp3')],
-      ['p3u2-c14', require('./audio/p3u2-c14.mp3')],
-      ['p3u2-c15', require('./audio/p3u2-c15.mp3')],
-      ['p3u2-c16', require('./audio/p3u2-c16.mp3')],
-      ['p3u2-c17', require('./audio/p3u2-c17.mp3')],
-      ['p3u2-c18', require('./audio/p3u2-c18.mp3')],
-      ['p3u2-c19', require('./audio/p3u2-c19.mp3')],
-      ['p3u2-c20', require('./audio/p3u2-c20.mp3')],
-    ]),
+    Sound.preloadAudios(audiosToPreload),
     Camera.getVideo()
   ]);
 }

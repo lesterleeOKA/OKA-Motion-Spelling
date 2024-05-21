@@ -1,7 +1,7 @@
 import View from './view';
 import State from './state';
 import Sound from './sound';
-import { listeners } from 'process';
+import { questionType } from './question';
 
 export default {
   fallingId: 0,
@@ -17,6 +17,7 @@ export default {
   nextQuestion: true,
   randomPair: [],
   fallingItems: [],
+  answeredNum: 0,
   answerLength: 0,
   questionWrapper: null,
   answerWrapper: null,
@@ -48,6 +49,7 @@ export default {
     this.questionWrapper = null;
     this.answerWrapper = null;
     View.scoreBoard.className = "scoreBoard";
+    this.answeredNum = 0;
     this.answerLength = 0;
     this.optionSize = View.canvas.width / 8;
     this.redBoxX = View.canvas.width / 3;
@@ -86,44 +88,6 @@ export default {
     }
   },
 
-  QUESTION_TYPE: {
-    Spelling: [
-      { question: 'apple', correctAnswer: 'apple' },
-      { question: 'banana', correctAnswer: 'banana' },
-      { question: 'cherry', correctAnswer: 'cherry' },
-      { question: 'orange', correctAnswer: 'orange' },
-      { question: 'pear', correctAnswer: 'pear' }
-    ],
-    MultipleChoice: [
-      { question: 'What is the color of apple?', answers: ['red', 'blue', 'purple', 'black'], correctAnswer: 'red' },
-      { question: 'What is the color of banana?', answers: ['red', 'yellow', 'purple', 'black'], correctAnswer: 'yellow' }
-    ],
-    Listening: [
-      //p3 questions
-      { key: 'p3u2-c1', question: 'general', correctAnswer: 'general' },
-      { key: 'p3u2-c2', question: 'maths', correctAnswer: 'maths' },
-      { key: 'p3u2-c3', question: 'english', correctAnswer: 'english' },
-      { key: 'p3u2-c4', question: 'physical', correctAnswer: 'physical' },
-      { key: 'p3u2-c5', question: 'science', correctAnswer: 'science' },
-      { key: 'p3u2-c6', question: 'history', correctAnswer: 'history' },
-      { key: 'p3u2-c7', question: 'arts', correctAnswer: 'arts' },
-      { key: 'p3u2-c8', question: 'geography', correctAnswer: 'geography' },
-      { key: 'p3u2-c9', question: 'computer', correctAnswer: 'computer' },
-      { key: 'p3u2-c10', question: 'music', correctAnswer: 'music' },
-      { key: 'p3u2-c11', question: 'religious', correctAnswer: 'religious' },
-      { key: 'p3u2-c12', question: 'project', correctAnswer: 'project' },
-      { key: 'p3u2-c13', question: 'dictate', correctAnswer: 'dictate' },
-      { key: 'p3u2-c14', question: 'visual', correctAnswer: 'visual' },
-      { key: 'p3u2-c15', question: 'internet', correctAnswer: 'internet' },
-      { key: 'p3u2-c16', question: 'outing', correctAnswer: 'outing' },
-      { key: 'p3u2-c17', question: 'attention', correctAnswer: 'attention' },
-      { key: 'p3u2-c18', question: 'listen', correctAnswer: 'listen' },
-      { key: 'p3u2-c19', question: 'learn', correctAnswer: 'learn' },
-      { key: 'p3u2-c20', question: 'improve', correctAnswer: 'improve' },
-    ],
-    //Photo:3
-  },
-
   addScore(mark) {
     let newScore = this.score + mark;
     if (newScore < 0) newScore = 0;
@@ -149,9 +113,7 @@ export default {
   startFalling() {
     const falling = (timestamp) => {
       if (!this.lastFallingTime) this.lastFallingTime = timestamp;
-
       const elapsed = timestamp - this.lastFallingTime;
-
       if (elapsed >= this.fallingDelay) {
         if (this.fallingItems.length < this.randomPair.length) {
           if (this.fallingId < this.fallingItems.length) {
@@ -272,7 +234,6 @@ export default {
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },
-
   createOptionWrapper(text, id) {
     let optionWrapper = document.createElement('div');
     optionWrapper.classList.add('optionWrapper');
@@ -293,26 +254,22 @@ export default {
     item.optionWrapper.style.left = item.x + 'px';
     item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.05 * this.answerLength)}px`);
     item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height}px`);
-
-    item.optionWrapper.addEventListener('animationend', () => {
-      item.optionWrapper.classList.remove('show');
-      setTimeout(() => {
-        if (this.nextQuestion)
-          return;
-        this.handleItemReachedBottom(item.optionWrapper);
-        item.optionWrapper.classList.add('show');
-      }, 3000);
-    });
+    item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item.optionWrapper));
   },
-
   getRandomQuestions(string) {
     const randomIndex = Math.floor(Math.random() * string.length);
     return string[randomIndex];
   },
-  handleItemReachedBottom(item) {
-    const isLeft = this.getBalancedRandom();
-    item.x = this.generatePositionX(isLeft);
-    item.style.left = item.x + 'px';
+  resetFallingItem(optionWrapper) {
+    optionWrapper.classList.remove('show');
+    setTimeout(() => {
+      if (this.nextQuestion)
+        return;
+      const isLeft = this.getBalancedRandom();
+      optionWrapper.x = this.generatePositionX(isLeft);
+      optionWrapper.style.left = optionWrapper.x + 'px';
+      optionWrapper.classList.add('show');
+    }, 3000);
   },
   removeFallingItem(item) {
     const index = this.fallingItems.indexOf(item);
@@ -329,19 +286,46 @@ export default {
       View.optionArea.removeChild(item.optionWrapper);
     }
   },
-  /////////////////////////////////////////QUestions///////////////////////////////
+  /////////////////////////////////////////Random Questions///////////////////////////////
   randQuestionType() {
-    const questionTypeKeys = Object.keys(this.QUESTION_TYPE);
+    const questionField = questionType();
+    if (questionField === null)
+      return null;
+
+    const questionTypeKeys = Object.keys(questionField);
     const randomIndex = Math.floor(Math.random() * questionTypeKeys.length);
     const selectedType = questionTypeKeys[randomIndex];
-    const questions = this.QUESTION_TYPE[selectedType];
-    const randomQuestionIndex = Math.floor(Math.random() * questions.length);
+    let questions = questionField[selectedType];
+
+    if (questionTypeKeys.length > 1) {
+      this.answeredNum = Math.floor(Math.random() * questions.length);
+    }
+    else {
+      if (this.answeredNum === 0) {
+        questions = questions.sort(() => Math.random() - 0.5);
+      }
+    }
+
+    const _key = selectedType === 'Listening' ? questions[this.answeredNum].key : '';
+    const _question = questions[this.answeredNum].question;
+    const _answers = questions[this.answeredNum].answers;
+    const _correctAnswer = questions[this.answeredNum].correctAnswer;
+
+    if (questionTypeKeys.length === 1) {
+      if (this.answeredNum < questions.length - 1) {
+        this.answeredNum += 1;
+      }
+      else {
+        this.answeredNum = 0;
+      }
+    }
+    //console.log("answered count", this.answeredNum);
     return {
       type: selectedType,
-      key: selectedType === 'Listening' ? questions[randomQuestionIndex].key : '',
-      question: questions[randomQuestionIndex].question,
-      answers: questions[randomQuestionIndex].answers,
-      correctAnswer: questions[randomQuestionIndex].correctAnswer
+      key: _key,
+      question: _question,
+      answers: _answers,
+      correctAnswer: _correctAnswer
     };
   },
   generateCharArray(word) {
@@ -361,14 +345,11 @@ export default {
 
   randomOptions() {
     console.log('question class', this.questionType);
-    //console.log('question', this.questionType.question);
-    //console.log('question type', this.questionType.type);
-    //console.log('question answers', this.questionType.answers);
-
     switch (this.questionType.type) {
       case 'Spelling':
       case 'Listening':
-        var array = this.generateCharArray(this.question);
+      case 'FillingBlank':
+        var array = this.generateCharArray(this.questionType.correctAnswer);
         this.answerLength = array.length;
         return array;
       case 'MultipleChoice':
@@ -378,6 +359,9 @@ export default {
   },
   setQuestions() {
     this.questionType = this.randQuestionType();
+    if (this.questionType === null)
+      return;
+
     this.question = this.questionType.question;
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
@@ -391,6 +375,7 @@ export default {
         questionText.textContent = this.questionType.question;
         this.questionWrapper.appendChild(questionText);
         break;
+      case 'FillingBlank':
       case 'Listening':
         this.playWordAudio(this.questionType.key);
         this.buttonWrapper = document.createElement('button');
@@ -451,17 +436,16 @@ export default {
     View.stageImg.innerHTML = '';
     View.optionArea.innerHTML = '';
   },
-
   fillWord(option) {
     if (this.answerWrapper) {
       if (this.fillwordTime < this.answerLength) {
         this.answerWrapper.textContent += option.getAttribute('word');
-        option.classList.remove('show');
-        option.classList.add('fadeOut');
-        View.optionArea.removeChild(option);
-        //console.log("remove id: ", option.id);
-        //this.removeFallingItemByIndex(option.id)
-
+        //option.classList.remove('show');
+        //option.classList.add('fadeOut');
+        if (View.optionArea.contains(option)) {
+          this.resetFallingItem(option);
+        }
+        //View.optionArea.removeChild(option);
         this.fillwordTime += 1;
         if (State.isSoundOn) {
           Sound.stopAll('bgm');
@@ -475,21 +459,18 @@ export default {
       }
     }
   },
-
   resetFillWord() {
     this.randomPair = this.randomOptions();
     this.clearWrapper();
   },
-
   clearWrapper() {
     this.answerWrapper.classList.remove('correct');
     this.answerWrapper.classList.remove('wrong');
     this.answerWrapper.textContent = '';
     this.fillwordTime = 0;
-    this.fallingItems.splice(0);
-    View.optionArea.innerHTML = '';
+    //this.fallingItems.splice(0);
+    //View.optionArea.innerHTML = '';
   },
-
   checkAnswer(answer) {
     if (answer === this.questionType.correctAnswer) {
       //答岩1分，答錯唔扣分
@@ -502,7 +483,6 @@ export default {
       State.changeState('playing', 'ansWrong');
     }
   },
-
   moveToNextQuestion() {
     this.questionType = null;
     this.randomPair = [];
