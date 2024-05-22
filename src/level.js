@@ -1,4 +1,4 @@
-const LEVEL_KEY = 'p3u1';
+const LEVEL_KEY = 'all';
 
 function loadLevel() {
   var levelKey = LEVEL_KEY;

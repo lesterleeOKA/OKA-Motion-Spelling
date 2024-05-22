@@ -92,7 +92,7 @@ const questionType = () => {
       questionField = QUESTION_TYPE;
       break;
   }
-  console.log(questionField);
+  //console.log(questionField);
   return questionField;
 }
 

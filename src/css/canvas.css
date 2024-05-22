@@ -57,13 +57,14 @@
 }
 
 .questionText{
-  position: relative;
-  text-align: center;
-  font-size: 4vh;
-  line-height: 1;
-  display: flex;
-  justify-content: center;
-  margin-top: 5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: left;
+  font-size: calc(14px + (24 - 16) * ((100vw - 320px) / (1200 - 320)));
+  line-height: 1.2;
+  width: 90%;
 }
 
 .questionWrapper{
@@ -76,12 +77,11 @@
   box-shadow: 0px 0px 10px 0px #000;
   transition: opacity 0.1s ease;
   opacity: 1;
-  width: 365px;
-  height: 75px;
+  height: 12vh;
 }
 .answerWrapper{
   position: fixed;
-  top: 25%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(255, 255, 255, 1);

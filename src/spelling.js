@@ -370,14 +370,13 @@ export default {
     switch (this.questionType.type) {
       case 'Spelling':
       case 'MultipleChoice':
+      case 'FillingBlank':
         var questionText = document.createElement('span');
         questionText.classList.add('questionText');
         questionText.textContent = this.questionType.question;
         this.questionWrapper.appendChild(questionText);
         break;
-      case 'FillingBlank':
       case 'Listening':
-        this.playWordAudio(this.questionType.key);
         this.buttonWrapper = document.createElement('button');
         this.buttonWrapper.classList.add('buttonWrapper');
         this.buttonWrapper.addEventListener('mousedown', () => {
@@ -405,6 +404,10 @@ export default {
         this.questionWrapper.appendChild(this.buttonWrapper);
         break;
     }
+
+    if (this.questionType.key && this.questionType.key.trim() !== '')
+      this.playWordAudio(this.questionType.key);
+
     this.answerWrapper = document.createElement('span');
     this.answerWrapper.style.width = this.redBoxWidth + 'px';
     this.questionWrapper.classList.add('questionWrapper');
@@ -488,6 +491,8 @@ export default {
     this.randomPair = [];
     this.clearWrapper();
     View.stageImg.innerHTML = '';
+    this.fallingItems.splice(0);
+    View.optionArea.innerHTML = '';
     setTimeout(() => {
       this.nextQuestion = true;
     }, 1000);
