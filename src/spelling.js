@@ -1,7 +1,7 @@
 import View from './view';
 import State from './state';
 import Sound from './sound';
-import { questionType } from './question';
+import QuestionManager from './question';
 
 export default {
   fallingId: 0,
@@ -99,6 +99,7 @@ export default {
   startCountTime() {
     if (!this.startedGame) {
       this.time = this.remainingTime;
+      QuestionManager.loadQuestionData()
       this.startedGame = true;
     }
 
@@ -288,7 +289,7 @@ export default {
   },
   /////////////////////////////////////////Random Questions///////////////////////////////
   randQuestionType() {
-    const questionField = questionType();
+    const questionField = QuestionManager.questionType();
     if (questionField === null)
       return null;
 
@@ -306,10 +307,11 @@ export default {
       }
     }
 
-    const _key = selectedType === 'Listening' ? questions[this.answeredNum].key : '';
+    const _QID = selectedType === 'Listening' ? questions[this.answeredNum].QID : '';
     const _question = questions[this.answeredNum].question;
     const _answers = questions[this.answeredNum].answers;
     const _correctAnswer = questions[this.answeredNum].correctAnswer;
+    const _media = questions[this.answeredNum].media;
 
     if (questionTypeKeys.length === 1) {
       if (this.answeredNum < questions.length - 1) {
@@ -322,10 +324,11 @@ export default {
     //console.log("answered count", this.answeredNum);
     return {
       type: selectedType,
-      key: _key,
+      QID: _QID,
       question: _question,
       answers: _answers,
-      correctAnswer: _correctAnswer
+      correctAnswer: _correctAnswer,
+      media: _media,
     };
   },
   generateCharArray(word) {
@@ -349,6 +352,7 @@ export default {
       case 'Spelling':
       case 'Listening':
       case 'FillingBlank':
+      case 'Picture':
         var array = this.generateCharArray(this.questionType.correctAnswer);
         this.answerLength = array.length;
         return array;
@@ -371,6 +375,7 @@ export default {
       case 'Spelling':
       case 'MultipleChoice':
       case 'FillingBlank':
+      case 'Picture':
         var questionText = document.createElement('span');
         questionText.classList.add('questionText');
         questionText.textContent = this.questionType.question;
@@ -382,7 +387,7 @@ export default {
         this.buttonWrapper.addEventListener('mousedown', () => {
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
-          this.playWordAudio(this.questionType.key);
+          this.playWordAudio(this.questionType.QID);
         });
 
         this.buttonWrapper.addEventListener('mouseup', () => {
@@ -393,7 +398,7 @@ export default {
           event.preventDefault(); // Prevent default touch behavior
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
-          this.playWordAudio(this.questionType.key);
+          this.playWordAudio(this.questionType.QID);
         });
 
         this.buttonWrapper.addEventListener('touchend', (event) => {
@@ -405,8 +410,8 @@ export default {
         break;
     }
 
-    if (this.questionType.key && this.questionType.key.trim() !== '')
-      this.playWordAudio(this.questionType.key);
+    if (this.questionType.QID && this.questionType.QID.trim() !== '')
+      this.playWordAudio(this.questionType.QID);
 
     this.answerWrapper = document.createElement('span');
     this.answerWrapper.style.width = this.redBoxWidth + 'px';
@@ -417,11 +422,11 @@ export default {
     View.stageImg.appendChild(this.answerWrapper);
   },
 
-  playWordAudio(key) {
+  playWordAudio(QID) {
     // Add your button click event handler logic here
     if (State.isSoundOn) {
       Sound.stopAll('bgm');
-      Sound.play(key);
+      Sound.play(QID);
     }
   },
 
@@ -443,12 +448,18 @@ export default {
     if (this.answerWrapper) {
       if (this.fillwordTime < this.answerLength) {
         this.answerWrapper.textContent += option.getAttribute('word');
-        //option.classList.remove('show');
-        //option.classList.add('fadeOut');
-        if (View.optionArea.contains(option)) {
-          this.resetFallingItem(option);
+
+        if (this.questionType.type === "MultipleChoice") {
+          if (View.optionArea.contains(option)) {
+            this.resetFallingItem(option);
+          }
         }
-        //View.optionArea.removeChild(option);
+        else {
+          option.classList.remove('show');
+          option.classList.add('fadeOut');
+          View.optionArea.removeChild(option);
+        }
+
         this.fillwordTime += 1;
         if (State.isSoundOn) {
           Sound.stopAll('bgm');
@@ -471,8 +482,8 @@ export default {
     this.answerWrapper.classList.remove('wrong');
     this.answerWrapper.textContent = '';
     this.fillwordTime = 0;
-    //this.fallingItems.splice(0);
-    //View.optionArea.innerHTML = '';
+    this.fallingItems.splice(0);
+    View.optionArea.innerHTML = '';
   },
   checkAnswer(answer) {
     if (answer === this.questionType.correctAnswer) {
@@ -491,8 +502,6 @@ export default {
     this.randomPair = [];
     this.clearWrapper();
     View.stageImg.innerHTML = '';
-    this.fallingItems.splice(0);
-    View.optionArea.innerHTML = '';
     setTimeout(() => {
       this.nextQuestion = true;
     }, 1000);

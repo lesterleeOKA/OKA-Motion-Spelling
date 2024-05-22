@@ -61,7 +61,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: left;
+  text-align: center;
   font-size: calc(14px + (24 - 16) * ((100vw - 320px) / (1200 - 320)));
   line-height: 1.2;
   width: 90%;
