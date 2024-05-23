@@ -9,7 +9,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 1000,
+  remainingTime: 60,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -99,7 +99,7 @@ export default {
   startCountTime() {
     if (!this.startedGame) {
       this.time = this.remainingTime;
-      QuestionManager.loadQuestionData()
+      QuestionManager.loadQuestionData();
       this.startedGame = true;
     }
 
@@ -297,7 +297,9 @@ export default {
     const randomIndex = Math.floor(Math.random() * questionTypeKeys.length);
     const selectedType = questionTypeKeys[randomIndex];
     let questions = questionField[selectedType];
-
+    //console.log("randomIndex", randomIndex);
+    //console.log("selectedType", selectedType);
+    //console.log("questions", questions);
     if (questionTypeKeys.length > 1) {
       this.answeredNum = Math.floor(Math.random() * questions.length);
     }

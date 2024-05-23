@@ -97,9 +97,9 @@ const QuestionManager = {
   QUESTION_TYPE: Object.freeze({
     Spelling: [],
     MultipleChoice: [],
-    FillingBlank: [],
+    //FillingBlank: [],
     Listening: [],
-    Picture: [],
+    //Picture: [],
   }),
 
   loadQuestionData: function () {
@@ -107,9 +107,9 @@ const QuestionManager = {
       this.QUESTION_TYPE = {
         Spelling: questions.Spelling,
         MultipleChoice: questions.MultipleChoice,
-        FillingBlank: questions.FillingBlank,
+        //FillingBlank: questions.FillingBlank,
         Listening: questions.Listening,
-        Picture: questions.Picture,
+        //Picture: questions.Picture,
       };
     } catch (error) {
       console.error('Error loading JSON data:', error);
@@ -120,33 +120,43 @@ const QuestionManager = {
     let level = loadLevel();
     let question = null;
     let questionField = null;
-    switch (level) {
-      case 'p3u1':
-        question = { MultipleChoice: this.QUESTION_TYPE.MultipleChoice };
-        questionField = Object.freeze(question);
-        break;
-      case 'p2u2':
-        question = {
-          FillingBlank: this.QUESTION_TYPE.FillingBlank.filter(item => item.QID.includes(level)),
-        };
-        if (question.FillingBlank.length > 0) questionField = Object.freeze(question);
-        break;
-      case 'p3u2':
-        question = {
-          Listening: this.QUESTION_TYPE.Listening.filter(item => item.QID.includes(level)),
-        };
-        if (question.Listening.length > 0) questionField = Object.freeze(question);
-        break;
-      case 'p5u1':
-        question = {
-          Picture: this.QUESTION_TYPE.Picture.filter(item => item.QID.includes(level)),
-        };
-        if (question.Picture.length > 0) questionField = Object.freeze(question);
-        break;
-      case 'all':
-        questionField = this.QUESTION_TYPE;
-        break;
+    if (level.includes('p1u1') || level.includes('p2u2') || level.includes('p3u1') || level.includes('p3u2') || level.includes('p5u1')) {
+      switch (level) {
+        case 'p1u1':
+          question = {
+            Spelling: this.QUESTION_TYPE.Spelling.filter(item => item.QID.includes(level)),
+          };
+          if (question.Spelling.length > 0) questionField = Object.freeze(question);
+          break;
+        case 'p2u2':
+          question = {
+            FillingBlank: this.QUESTION_TYPE.FillingBlank.filter(item => item.QID.includes(level)),
+          };
+          if (question.FillingBlank.length > 0) questionField = Object.freeze(question);
+          break;
+        case 'p3u1':
+          question = { MultipleChoice: this.QUESTION_TYPE.MultipleChoice };
+          questionField = Object.freeze(question);
+          break;
+        case 'p3u2':
+          question = {
+            Listening: this.QUESTION_TYPE.Listening.filter(item => item.QID.includes(level)),
+          };
+          if (question.Listening.length > 0) questionField = Object.freeze(question);
+          break;
+        case 'p5u1':
+          question = {
+            Picture: this.QUESTION_TYPE.Picture.filter(item => item.QID.includes(level)),
+          };
+          if (question.Picture.length > 0) questionField = Object.freeze(question);
+          break;
+      }
     }
+    else {
+      console.log("All Type Question mode");
+      questionField = this.QUESTION_TYPE;
+    }
+    console.log(questionField);
     return questionField;
   }
 };
