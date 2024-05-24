@@ -95,21 +95,13 @@ import questions from './questions.json'
 
 const QuestionManager = {
   QUESTION_TYPE: Object.freeze({
-    Spelling: [],
-    MultipleChoice: [],
-    //FillingBlank: [],
-    Listening: [],
-    //Picture: [],
+    QA: []
   }),
 
   loadQuestionData: function () {
     try {
       this.QUESTION_TYPE = {
-        Spelling: questions.Spelling,
-        MultipleChoice: questions.MultipleChoice,
-        //FillingBlank: questions.FillingBlank,
-        Listening: questions.Listening,
-        //Picture: questions.Picture,
+        QA: questions.QA
       };
     } catch (error) {
       console.error('Error loading JSON data:', error);
@@ -120,42 +112,15 @@ const QuestionManager = {
     let level = loadLevel();
     let question = null;
     let questionField = null;
-    if (level.includes('p1u1') || level.includes('p2u2') || level.includes('p3u1') || level.includes('p3u2') || level.includes('p5u1')) {
-      switch (level) {
-        case 'p1u1':
-          question = {
-            Spelling: this.QUESTION_TYPE.Spelling.filter(item => item.QID.includes(level)),
-          };
-          if (question.Spelling.length > 0) questionField = Object.freeze(question);
-          break;
-        case 'p2u2':
-          question = {
-            FillingBlank: this.QUESTION_TYPE.FillingBlank.filter(item => item.QID.includes(level)),
-          };
-          if (question.FillingBlank.length > 0) questionField = Object.freeze(question);
-          break;
-        case 'p3u1':
-          question = { MultipleChoice: this.QUESTION_TYPE.MultipleChoice };
-          questionField = Object.freeze(question);
-          break;
-        case 'p3u2':
-          question = {
-            Listening: this.QUESTION_TYPE.Listening.filter(item => item.QID.includes(level)),
-          };
-          if (question.Listening.length > 0) questionField = Object.freeze(question);
-          break;
-        case 'p5u1':
-          question = {
-            Picture: this.QUESTION_TYPE.Picture.filter(item => item.QID.includes(level)),
-          };
-          if (question.Picture.length > 0) questionField = Object.freeze(question);
-          break;
-      }
+    if (level !== '') {
+      question = {
+        QA: this.QUESTION_TYPE.QA.filter(item => item.QID.includes(level)),
+      };
     }
     else {
-      console.log("All Type Question mode");
-      questionField = this.QUESTION_TYPE;
+      question = { QA: this.QUESTION_TYPE.QA };
     }
+    if (question.QA.length > 0) questionField = Object.freeze(question);
     console.log(questionField);
     return questionField;
   }

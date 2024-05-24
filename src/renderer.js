@@ -106,7 +106,7 @@ export class RendererCanvas2d {
 
       //檢查是否有選到圖
       let optionWrappers = document.querySelectorAll('.canvasWrapper > .optionArea > .optionWrapper.show');
-
+      let canvasWrapper = document.querySelector('.canvasWrapper');
       if (State.state == 'playing' && ['waitAns'].includes(State.stateType)) {
         let checkKeypoints = pose.keypoints.filter(k => ['right_index', 'left_index'].includes(k.name) && k.score > passScore);
         let touchingWord = [];
@@ -115,16 +115,18 @@ export class RendererCanvas2d {
           for (let option of optionWrappers) {
 
             const optionRect = option.getBoundingClientRect();
+            const canvasWrapperRect = canvasWrapper.getBoundingClientRect();
+
             if (
-              point.x > optionRect.left &&
-              point.x < optionRect.right &&
-              point.y > optionRect.top &&
-              point.y < optionRect.bottom
+              point.x > (optionRect.left - canvasWrapperRect.left) &&
+              point.x < (optionRect.right - canvasWrapperRect.left) &&
+              point.y > (optionRect.top - canvasWrapperRect.top) &&
+              point.y < (optionRect.bottom - canvasWrapperRect.top)
             ) {
               touchingWord.push(option);
             }
-            /*
-            if (
+            //console.log(point);
+            /*if (
               point.x > option.offsetLeft &&
               point.x < (option.offsetLeft + option.offsetWidth) &&
               point.y > option.offsetTop &&
@@ -132,14 +134,13 @@ export class RendererCanvas2d {
             ) {
               touchingWord.push(option);
             }*/
-
           }
         }
 
         for (let option of optionWrappers) {
           if (touchingWord.includes(option) && !option.classList.contains('touch')) {
             State.setPoseState('selectedImg', option);
-            //console.log("touch ", option);
+            // console.log("touch ", option);
             Game.fillWord(option);
           }
         }

@@ -1,155 +1,202 @@
 {
-   "Spelling":[
+   "QA":[
       {
          "QID":"p1u1-j1",
+         "type":"Spelling",
          "question":"apple",
          "correctAnswer":"apple"
       },
       {
          "QID":"p1u1-j2",
+         "type":"Spelling",
          "question":"banana",
          "correctAnswer":"banana"
       },
       {
          "QID":"p1u1-j3",
+         "type":"Spelling",
          "question":"cherry",
          "correctAnswer":"cherry"
       },
       {
          "QID":"p1u1-j4",
+         "type":"Spelling",
          "question":"orange",
          "correctAnswer":"orange"
       },
       {
          "QID":"p1u1-j5",
+         "type":"Spelling",
          "question":"pear",
          "correctAnswer":"pear"
-      }
-   ],
-   "MultipleChoice":[
-      {
-         "QID":"p3u1-e1",
-         "question":"What is the color of apple?",
-         "answers":[
-            "red",
-            "blue",
-            "purple",
-            "black"
-         ],
-         "correctAnswer":"red"
       },
       {
-        "QID": "p3u1-e2",
-        "questio": "What is the color of banana?",
-        "answers": [
-          "red",
-          "yellow",
-          "purple",
-          "black"
+        "QID":"p1u1-j6",
+        "type":"Spelling",
+        "question":"mango",
+        "correctAnswer":"mango"
+      },
+      {
+        "QID":"p1u1-j7",
+        "type":"Spelling",
+        "question":"lemon",
+        "correctAnswer":"lemon"
+      },
+      {
+        "QID":"p1u1-j8",
+        "type":"Spelling",
+        "question":"plum",
+        "correctAnswer":"plum"
+      },
+      {
+        "QID":"p1u1-j9",
+        "type":"Spelling",
+        "question":"peach",
+        "correctAnswer":"peach"
+      },
+      {
+        "QID":"p3u1-e1",
+        "type":"MultipleChoice",
+        "question":"What is the color of apple?",
+        "answers":[
+           "red",
+           "blue",
+           "purple",
+           "black"
         ],
-        "correctAnswer": "yellow"
-      }
-   ],
-   "Listening":[
-      {
-         "QID":"p3u2-c1",
-         "question":"general",
-         "correctAnswer":"general"
+        "correctAnswer":"red"
+     },
+     {
+       "QID": "p3u1-e2",
+       "type":"MultipleChoice",
+       "question": "What is the color of banana?",
+       "answers": [
+         "red",
+         "yellow",
+         "purple",
+         "black"
+       ],
+       "correctAnswer": "yellow"
+     },
+     {
+      "QID":"p3u2-c1",
+      "type":"Listening",
+      "question":"general",
+      "correctAnswer":"general"
       },
       {
-         "QID":"p3u2-c2",
-         "question":"maths",
-         "correctAnswer":"maths"
+          "QID":"p3u2-c2",
+          "type":"Listening",
+          "question":"maths",
+          "correctAnswer":"maths"
       },
       {
-         "QID":"p3u2-c3",
-         "question":"english",
-         "correctAnswer":"english"
+          "QID":"p3u2-c3",
+          "type":"Listening",
+          "question":"english",
+          "correctAnswer":"english"
       },
       {
-         "QID":"p3u2-c4",
-         "question":"physical",
-         "correctAnswer":"physical"
+          "QID":"p3u2-c4",
+          "type":"Listening",
+          "question":"physical",
+          "correctAnswer":"physical"
       },
       {
-         "QID":"p3u2-c5",
-         "question":"science",
-         "correctAnswer":"science"
+          "QID":"p3u2-c5",
+          "type":"Listening",
+          "question":"science",
+          "correctAnswer":"science"
       },
       {
-         "QID":"p3u2-c6",
-         "question":"history",
-         "correctAnswer":"history"
+          "QID":"p3u2-c6",
+          "type":"Listening",
+          "question":"history",
+          "correctAnswer":"history"
       },
       {
-         "QID":"p3u2-c7",
-         "question":"arts",
-         "correctAnswer":"arts"
+          "QID":"p3u2-c7",
+          "type":"Listening",
+          "question":"arts",
+          "correctAnswer":"arts"
       },
       {
-         "QID":"p3u2-c8",
-         "question":"geography",
-         "correctAnswer":"geography"
+          "QID":"p3u2-c8",
+          "type":"Listening",
+          "question":"geography",
+          "correctAnswer":"geography"
       },
       {
-         "QID":"p3u2-c9",
-         "question":"computer",
-         "correctAnswer":"computer"
+          "QID":"p3u2-c9",
+          "type":"Listening",
+          "question":"computer",
+          "correctAnswer":"computer"
       },
       {
-         "QID":"p3u2-c10",
-         "question":"music",
-         "correctAnswer":"music"
+          "QID":"p3u2-c10",
+          "type":"Listening",
+          "question":"music",
+          "correctAnswer":"music"
       },
       {
-         "QID":"p3u2-c11",
-         "question":"religious",
-         "correctAnswer":"religious"
+          "QID":"p3u2-c11",
+          "type":"Listening",
+          "question":"religious",
+          "correctAnswer":"religious"
       },
       {
-         "QID":"p3u2-c12",
-         "question":"project",
-         "correctAnswer":"project"
+          "QID":"p3u2-c12",
+          "type":"Listening",
+          "question":"project",
+          "correctAnswer":"project"
       },
       {
-         "QID":"p3u2-c13",
-         "question":"dictate",
-         "correctAnswer":"dictate"
+          "QID":"p3u2-c13",
+          "type":"Listening",
+          "question":"dictate",
+          "correctAnswer":"dictate"
       },
       {
-         "QID":"p3u2-c14",
-         "question":"visual",
-         "correctAnswer":"visual"
+          "QID":"p3u2-c14",
+          "type":"Listening",
+          "question":"visual",
+          "correctAnswer":"visual"
       },
       {
-         "QID":"p3u2-c15",
-         "question":"internet",
-         "correctAnswer":"internet"
+          "QID":"p3u2-c15",
+          "type":"Listening",
+          "question":"internet",
+          "correctAnswer":"internet"
       },
       {
-         "QID":"p3u2-c16",
-         "question":"outing",
-         "correctAnswer":"outing"
+          "QID":"p3u2-c16",
+          "type":"Listening",
+          "question":"outing",
+          "correctAnswer":"outing"
       },
       {
-         "QID":"p3u2-c17",
-         "question":"attention",
-         "correctAnswer":"attention"
+          "QID":"p3u2-c17",
+          "type":"Listening",
+          "question":"attention",
+          "correctAnswer":"attention"
       },
       {
-         "QID":"p3u2-c18",
-         "question":"listen",
-         "correctAnswer":"listen"
+          "QID":"p3u2-c18",
+          "type":"Listening",
+          "question":"listen",
+          "correctAnswer":"listen"
       },
       {
-         "QID":"p3u2-c19",
-         "question":"learn",
-         "correctAnswer":"learn"
+          "QID":"p3u2-c19",
+          "type":"Listening",
+          "question":"learn",
+          "correctAnswer":"learn"
       },
       {
-         "QID":"p3u2-c20",
-         "question":"improve",
-         "correctAnswer":"improve"
+          "QID":"p3u2-c20",
+          "type":"Listening",
+          "question":"improve",
+          "correctAnswer":"improve"
       }
    ]
 }

@@ -115,7 +115,7 @@
   justify-content: center;
   align-items: center;
   animation-name: fallingAnimation;
-  animation-duration: var(--fallingSpeed); /* Set a default duration */
+  animation-duration: var(--fallingSpeed);
   animation-timing-function: linear;
 }
 

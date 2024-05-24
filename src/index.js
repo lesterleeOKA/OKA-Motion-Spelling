@@ -208,7 +208,7 @@ function init() {
     ['p3u2-c20', require('./audio/p3/u2/p3u2-c20.mp3')],
   ];
 
-  const filteredAdditionalAudios = levelKey === 'all'
+  const filteredAdditionalAudios = levelKey === ''
     ? additionalAudios
     : additionalAudios.filter(([key]) => levelKey && key.includes(levelKey));
   const audiosToPreload = [...defaultAudios, ...filteredAdditionalAudios];

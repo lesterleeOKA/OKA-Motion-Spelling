@@ -6,10 +6,11 @@ import QuestionManager from './question';
 export default {
   fallingId: 0,
   questionType: null,
+  randomQuestion: null,
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 60,
+  remainingTime: 120,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -36,6 +37,7 @@ export default {
     this.fallingId = 0;
     View.timeText.innerText = this.remainingTime;
     this.questionType = null;
+    this.randomQuestion = null;
     this.question = '';
     this.score = 0;
     this.time = 0;
@@ -100,6 +102,7 @@ export default {
     if (!this.startedGame) {
       this.time = this.remainingTime;
       QuestionManager.loadQuestionData();
+      this.questionType = QuestionManager.questionType();
       this.startedGame = true;
     }
 
@@ -288,44 +291,29 @@ export default {
     }
   },
   /////////////////////////////////////////Random Questions///////////////////////////////
-  randQuestionType() {
-    const questionField = QuestionManager.questionType();
-    if (questionField === null)
-      return null;
-
-    const questionTypeKeys = Object.keys(questionField);
-    const randomIndex = Math.floor(Math.random() * questionTypeKeys.length);
-    const selectedType = questionTypeKeys[randomIndex];
-    let questions = questionField[selectedType];
-    //console.log("randomIndex", randomIndex);
-    //console.log("selectedType", selectedType);
-    //console.log("questions", questions);
-    if (questionTypeKeys.length > 1) {
-      this.answeredNum = Math.floor(Math.random() * questions.length);
+  randQuestion() {
+    let questions = this.questionType.QA;
+    if (this.answeredNum === 0) {
+      questions = questions.sort(() => Math.random() - 0.5);
     }
-    else {
-      if (this.answeredNum === 0) {
-        questions = questions.sort(() => Math.random() - 0.5);
-      }
-    }
-
-    const _QID = selectedType === 'Listening' ? questions[this.answeredNum].QID : '';
+    console.log("questions", questions);
+    const _type = questions[this.answeredNum].type;
+    const _QID = questions[this.answeredNum].QID;
     const _question = questions[this.answeredNum].question;
     const _answers = questions[this.answeredNum].answers;
     const _correctAnswer = questions[this.answeredNum].correctAnswer;
     const _media = questions[this.answeredNum].media;
 
-    if (questionTypeKeys.length === 1) {
-      if (this.answeredNum < questions.length - 1) {
-        this.answeredNum += 1;
-      }
-      else {
-        this.answeredNum = 0;
-      }
+    if (this.answeredNum < questions.length - 1) {
+      this.answeredNum += 1;
     }
+    else {
+      this.answeredNum = 0;
+    }
+
     //console.log("answered count", this.answeredNum);
     return {
-      type: selectedType,
+      type: _type,
       QID: _QID,
       question: _question,
       answers: _answers,
@@ -349,38 +337,38 @@ export default {
   },
 
   randomOptions() {
-    console.log('question class', this.questionType);
-    switch (this.questionType.type) {
+    console.log('question class', this.randomQuestion);
+    switch (this.randomQuestion.type) {
       case 'Spelling':
       case 'Listening':
       case 'FillingBlank':
       case 'Picture':
-        var array = this.generateCharArray(this.questionType.correctAnswer);
+        var array = this.generateCharArray(this.randomQuestion.correctAnswer);
         this.answerLength = array.length;
         return array;
       case 'MultipleChoice':
         this.answerLength = 1;
-        return this.randomizeAnswers(this.questionType.answers);
+        return this.randomizeAnswers(this.randomQuestion.answers);
     }
   },
   setQuestions() {
-    this.questionType = this.randQuestionType();
-    if (this.questionType === null)
+    this.randomQuestion = this.randQuestion();
+    if (this.randomQuestion === null)
       return;
 
-    this.question = this.questionType.question;
+    this.question = this.randomQuestion.question;
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
     this.questionWrapper.style.width = this.redBoxWidth + 'px';
 
-    switch (this.questionType.type) {
+    switch (this.randomQuestion.type) {
       case 'Spelling':
       case 'MultipleChoice':
       case 'FillingBlank':
       case 'Picture':
         var questionText = document.createElement('span');
         questionText.classList.add('questionText');
-        questionText.textContent = this.questionType.question;
+        questionText.textContent = this.randomQuestion.question;
         this.questionWrapper.appendChild(questionText);
         break;
       case 'Listening':
@@ -389,7 +377,7 @@ export default {
         this.buttonWrapper.addEventListener('mousedown', () => {
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
-          this.playWordAudio(this.questionType.QID);
+          this.playWordAudio(this.randomQuestion.QID);
         });
 
         this.buttonWrapper.addEventListener('mouseup', () => {
@@ -400,7 +388,7 @@ export default {
           event.preventDefault(); // Prevent default touch behavior
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
-          this.playWordAudio(this.questionType.QID);
+          this.playWordAudio(this.randomQuestion.QID);
         });
 
         this.buttonWrapper.addEventListener('touchend', (event) => {
@@ -412,8 +400,10 @@ export default {
         break;
     }
 
-    if (this.questionType.QID && this.questionType.QID.trim() !== '')
-      this.playWordAudio(this.questionType.QID);
+    if (this.randomQuestion.QID && this.randomQuestion.QID.trim() !== '') {
+      this.playWordAudio(this.randomQuestion.QID);
+      console.log('audio', this.randomQuestion.QID);
+    }
 
     this.answerWrapper = document.createElement('span');
     this.answerWrapper.style.width = this.redBoxWidth + 'px';
@@ -488,7 +478,7 @@ export default {
     View.optionArea.innerHTML = '';
   },
   checkAnswer(answer) {
-    if (answer === this.questionType.correctAnswer) {
+    if (answer === this.randomQuestion.correctAnswer) {
       //答岩1分，答錯唔扣分
       this.addScore(1);
       this.answerWrapper.classList.add('correct');
@@ -500,7 +490,7 @@ export default {
     }
   },
   moveToNextQuestion() {
-    this.questionType = null;
+    this.randomQuestion = null;
     this.randomPair = [];
     this.clearWrapper();
     View.stageImg.innerHTML = '';
