@@ -21,23 +21,21 @@
   position: relative;
   top: 0px;
   left: 0px;
-  width: 80%;
-  height: 80%;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
-  box-shadow: 0px 0px 10px 0px #000;
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
   transition: opacity 0.1s ease;
   opacity: 0;
+  background: url(../images/spelling/fruit1.png);
   background-position: center;
   background-size: cover;
-  background: white;
 }
 
 .buttonWrapper {
   position: relative;
   display: flex;
   justify-content: center;
-  background-image: url(../images/listen.png);
+  background-image: url(../images/spelling/playBtn.png);
   background-repeat: no-repeat;
   background-size: contain;
   width: 100%;
@@ -56,45 +54,39 @@
   transform: scale(1);
 }
 
-.questionText{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  font-size: calc(14px + (24 - 16) * ((100vw - 320px) / (1200 - 320)));
-  line-height: 1.2;
-  width: 90%;
-}
-
 .questionWrapper{
   position: fixed;
-  top: 15%;
+  top: 13%;
   left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 3.5%;
-  box-shadow: 0px 0px 10px 0px #000;
+  transform: translate(-50%, 50%);
   transition: opacity 0.1s ease;
-  opacity: 1;
-  height: 12vh;
+  text-align: center;
+  font-size: var(--question-font-size);
+  line-height: 3.5vh;
+  font-family: "Arzachel", system-ui;
+  font-weight: bolder;
+  width: calc(min(30.7vh, 30.7vw));
+  height: calc(min(7vh, 7vw));
+  color: rgb(192 134 97);
 }
 .answerWrapper{
   position: fixed;
-  top: 30%;
+  top: 23%;
   left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 3.5%;
-  box-shadow: 0px 0px 10px 0px #000;
+  transform: translate(-50%, 50%);
   transition: opacity 0.1s ease;
-  opacity: 1;
   text-align: center;
-  font-size: -webkit-xxx-large;
-  width: 365px;
-  height: 75px;
+  background-color: rgb(192 134 97);
+  border-radius: 4%;
+  font-size: calc(min(3.5vh, 3.5vw));
+  font-family: "Arzachel", system-ui;
+  font-weight: bolder;
+  width: calc(min(30.7vh, 30.7vw));
+  height: calc(min(4.7vh, 4.7vw));
+  color: white;
+  padding-bottom: 8px;
+  filter: drop-shadow(0px 5px 5px rgba(0, 0, 0, 0.5));
 }
-
 .correct {
   background-repeat: no-repeat;
   background-size: contain;
@@ -105,8 +97,6 @@
   background-size: contain;
   background-image: url(../images/ans_cross.png);
 }
-
-
 
 .canvasWrapper > .optionArea > .optionWrapper.show {
   position: absolute;
@@ -128,8 +118,13 @@
   height: 90%;
   text-align: center;
   font-size: var(--font-size);
+  font-family: "Arzachel", system-ui;
+  font-weight: bolder;
   background: transparent;
   border: none;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
 }
 
 :root {
@@ -137,6 +132,7 @@
   --top-height: 0px;
   --bottom-height: 200px;
   --font-size: 3vh;
+  --question-font-size:3vh;
 }
 
 .fadeIn {
@@ -179,7 +175,6 @@
     opacity: 0;
   }
 }
-
 .canvasWrapper > .optionArea > .optionWrapper > .selectCount {
   position: absolute;
   font-weight: bold;

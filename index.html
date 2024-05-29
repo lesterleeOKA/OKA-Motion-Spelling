@@ -11,11 +11,12 @@
   <link rel="stylesheet" href="src/css/game.css">
   <link rel="stylesheet" href="src/css/exit.css">
   <link rel="stylesheet" href="src/css/finished.css">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
 </head>
 <body>
   <div class="loadingBarWrapper">
-    <img class="loadingText"></img>
+    <div class="loadingFont">Loading...</div>
     <div id="loadingBar" class="loadingBar">
       <div class="brownBar"></div>
       <div class="greenBar" id="greenBar"></div>
@@ -41,7 +42,8 @@
     <!--<img class="schoolLogo"></img>-->
     <!--<div class="gameTitle"></div>-->
     <!--<div class="instructionBoard"></div>-->
-    <img class="startBtn"></img>
+    <img class="startBtn" alt="Start Button">
+    <span class="startBtnText">Start</span>
   </div>
 
   <div class="gameWrapper">
@@ -58,13 +60,13 @@
         <link rel="preload" as="image" href="./src/images/stageStar3.png">
         <img class="stageStar"></img>
       </div>-->
-      <div class="scoreWrapper">
-        <img class="scoreBoard"></img>
-        <div class="scoreText"></div>
-      </div>
       <div class="timeWrapper">
         <img class="timeBoard"></img>
         <div class="timeText">10</div>
+      </div>
+      <div class="scoreWrapper">
+        <img class="scoreBoard"></img>
+        <div class="scoreText"></div>
       </div>
     </div>
     <div class="topRightControl">
@@ -74,14 +76,18 @@
       <img class="exitBtn"></img>
     </div>
     <img class="count"></img>
-    <div class="stage"></div>
+    <div class="questionBoard"></div>
   </div>
 
   <div class="exitWrapper">
     <div class="exitBoard">
       <div class="btnWrapper">
-        <img class="continueBtn"></img>
-        <img class="backHomeBtn"></img>
+        <div class="continueBtn">
+          <div class="continueText">Continue</div>
+        </div>
+        <div class="backHomeBtn">
+          <div class="backHomeText">Home</div>
+        </div>
       </div>
     </div>
   </div>
@@ -91,9 +97,9 @@
       <img class="finishedBoard"></img>
       <div class="scoreTimeWrapper">
         <div class="row score">
-          <div class="label">成績：</div>
+          <div class="label">Score：</div>
           <img class="icon"></img>
-          <div class="value"></div>
+          <div class="value">0</div>
         </div>
         <!--<div class="row time">
           <div class="label">時間：</div>
@@ -102,13 +108,17 @@
         </div>-->
       </div>
       <div class="finishedBtnWrapper">
-        <img class="playAgainBtn"></img>
-        <img class="backHomeBtn"></img>
+        <div class="playAgainBtn">
+          <div class="playAgainText">Replay</div>
+        </div>
+        <div class="backHomeBtn">
+          <div class="playAgainText">Home</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="version">Ver:1</div>
+  <div class="version">Ver:1.01</div>
   <!--<div class="debug"></div>-->
   <div class="debug" id="stats"></div>
 </body>

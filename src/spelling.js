@@ -4,6 +4,13 @@ import Sound from './sound';
 import QuestionManager from './question';
 
 export default {
+  optionImages: [
+    require("./images/spelling/fruit1.png"),
+    require("./images/spelling/fruit2.png"),
+    require("./images/spelling/fruit3.png"),
+    require("./images/spelling/fruit4.png"),
+    require("./images/spelling/fruit5.png"),
+  ],
   fallingId: 0,
   questionType: null,
   randomQuestion: null,
@@ -35,7 +42,7 @@ export default {
     //View.showTips('tipsReady');
     this.startedGame = false;
     this.fallingId = 0;
-    View.timeText.innerText = this.remainingTime;
+    this.updateTimerDisplay(this.remainingTime);
     this.questionType = null;
     this.randomQuestion = null;
     this.question = '';
@@ -61,6 +68,8 @@ export default {
     this.leftCount = 0;
     this.rightCount = 0;
     this.fallingDelay = 2000;
+    View.stageImg.innerHTML = '';
+    View.optionArea.innerHTML = '';
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
   },
 
@@ -73,7 +82,7 @@ export default {
   },
 
   pauseGame() {
-    if (this.timerRunning) {
+    if (this.timerRunning && this.startedGame) {
       clearTimeout(this.timer);
       cancelAnimationFrame(this.fallingOption);
       this.timerRunning = false;
@@ -125,7 +134,8 @@ export default {
           } else {
             this.fallingId = 0;
           }
-          this.createRandomItem(this.randomPair[this.fallingId]);
+          var optionImageId = this.fallingId % this.optionImages.length;
+          this.createRandomItem(this.randomPair[this.fallingId], this.optionImages[optionImageId]);
         }
         this.lastFallingTime = timestamp;
       }
@@ -144,11 +154,12 @@ export default {
         this.nextQuestion = false;
       }
       this.time--;
-      View.timeText.innerText = this.time;
+      this.updateTimerDisplay(this.time);
 
       if (this.time <= 0) {
         this.stopCountTime();
         State.changeState('finished');
+        this.startedGame = false;
       } else {
         this.timer = setTimeout(this.countTime.bind(this), 1000);
       }
@@ -162,6 +173,14 @@ export default {
       this.showQuestions(false);
     }
   },
+  updateTimerDisplay(countdownTime) {
+    // Calculate the minutes and seconds
+    const minutes = Math.floor(countdownTime / 60);
+    const seconds = countdownTime % 60;
+    const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    console.log("count", timeString);
+    View.timeText.innerText = timeString;
+  },
   getTranslateYValue(transformStyle) {
     const translateYRegex = /translateY\((-?\d+\.?\d*)px\)/;
     const match = transformStyle.match(translateYRegex);
@@ -170,31 +189,17 @@ export default {
     }
     return 0;
   },
-  updateFallingItems() {
-    // console.log(this.fallingItems);
-    this.fallingItems.forEach((item) => {
-      const element = document.getElementById(item.id);
-      const transformStyle = window.getComputedStyle(element).getPropertyValue('transform');
-      const translateYValue = this.getTranslateYValue(transformStyle);
-      const bottomHeight = View.canvas.height;
-
-      if (translateYValue >= bottomHeight) {
-        this.handleItemReachedBottom(item);
-      }
-    });
-    requestAnimationFrame(this.updateFallingItems.bind(this));
-  },
   generateUniqueId() {
     return Math.random().toString(16).slice(2);
   },
-  createRandomItem(char) {
+  createRandomItem(char, optionImage) {
     if (char && char.length !== 0) {
       const isLeft = this.getBalancedRandom();
       const word = char;
       const generatePosition = () => {
         const x = this.generatePositionX(isLeft);
         const id = this.generateUniqueId();
-        const optionWrapper = this.createOptionWrapper(word, id);
+        const optionWrapper = this.createOptionWrapper(word, id, optionImage);
         const newFallingItem = {
           x,
           optionWrapper,
@@ -207,7 +212,6 @@ export default {
       this.renderFallingItem(newFallingItem);
     }
   },
-
   getBalancedRandom() {
     if (this.leftCount > this.rightCount) {
       this.rightCount++;
@@ -238,17 +242,21 @@ export default {
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },
-  createOptionWrapper(text, id) {
+  createOptionWrapper(text, id, optionImage) {
     let optionWrapper = document.createElement('div');
     optionWrapper.classList.add('optionWrapper');
     optionWrapper.style.width = `${this.optionSize}px`;
     optionWrapper.style.height = `${this.optionSize}px`;
+    if (optionImage !== '' && optionImage !== 'undefined')
+      optionWrapper.style.backgroundImage = `url(${optionImage})`;
     optionWrapper.id = id;
     optionWrapper.setAttribute('word', text);
     let option = document.createElement('input');
     option.classList.add('option');
     option.type = 'text';
     option.value = text;
+    let fontSize = `calc(min(max(4vh, 20vh - ${text.length} * 5.2vh), 8vh))`;
+    option.style.setProperty('--font-size', fontSize);
     optionWrapper.appendChild(option);
     return optionWrapper;
   },
@@ -256,7 +264,7 @@ export default {
     View.optionArea.appendChild(item.optionWrapper);
     item.optionWrapper.classList.add("show");
     item.optionWrapper.style.left = item.x + 'px';
-    item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.05 * this.answerLength)}px`);
+    item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.01 * this.answerLength)}px`);
     item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height}px`);
     item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item.optionWrapper));
   },
@@ -359,7 +367,10 @@ export default {
     this.question = this.randomQuestion.question;
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
-    this.questionWrapper.style.width = this.redBoxWidth + 'px';
+    this.questionWrapper.classList.add('questionWrapper');
+    let questionBg = document.createElement('div');
+    questionBg.classList.add('questionBg');
+    View.stageImg.appendChild(questionBg);
 
     switch (this.randomQuestion.type) {
       case 'Spelling':
@@ -367,9 +378,11 @@ export default {
       case 'FillingBlank':
       case 'Picture':
         var questionText = document.createElement('span');
-        questionText.classList.add('questionText');
         questionText.textContent = this.randomQuestion.question;
         this.questionWrapper.appendChild(questionText);
+        let fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        this.questionWrapper.style.setProperty('--question-font-size', fontSize);
+        //View.stageImg.appendChild(questionText);
         break;
       case 'Listening':
         this.buttonWrapper = document.createElement('button');
@@ -406,12 +419,11 @@ export default {
     }
 
     this.answerWrapper = document.createElement('span');
-    this.answerWrapper.style.width = this.redBoxWidth + 'px';
-    this.questionWrapper.classList.add('questionWrapper');
     this.answerWrapper.classList.add('answerWrapper');
-    this.questionWrapper.value = this.question;
     View.stageImg.appendChild(this.questionWrapper);
     View.stageImg.appendChild(this.answerWrapper);
+    View.stageImg.classList.add('fadeIn');
+    View.stageImg.style.opacity = 1;
   },
 
   playWordAudio(QID) {

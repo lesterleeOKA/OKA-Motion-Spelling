@@ -40,7 +40,10 @@ export default {
   },
   //-----------------------------------------------------------------------------------------------
   changeState(state, stateType = '') {
-    console.log(state, stateType);
+    if (this.state === 'finished')
+      return;
+
+    console.log(state, stateType, this.lastState);
     if (this.state == state) {
       this.stateLastFor = +new Date() - this.stateLastAt;
       if (this.stateType == stateType) return;
@@ -53,6 +56,7 @@ export default {
     this.stateType = stateType;
 
     if (state == 'instruction') {
+      Game.init();
       View.hideTopLeftControl();
       View.hideTips();
       View.hideCanvas();
@@ -108,9 +112,9 @@ export default {
             Sound.stopAll('bgm');
             Sound.play('ansWrong');
           }
+          this.changeState('playing', 'wrong');
           setTimeout(() => {
             this.setPoseState('selectedImg', '');
-            this.changeState('playing', 'wrong');
             Game.resetFillWord();
           }, 2000);
           break;
@@ -119,11 +123,10 @@ export default {
             Sound.stopAll('bgm');
             Sound.play('ansCorrect');
           }
+          this.changeState('playing', 'waitAns');
           setTimeout(() => {
             this.setPoseState('selectedImg', '');
-            this.changeState('playing', 'waitAns');
-
-            if (state == 'playing')
+            if (state === 'playing')
               Game.moveToNextQuestion();
           }, 2000);
           break;
@@ -148,6 +151,8 @@ export default {
         Sound.stopAll('bgm');
         Sound.play('finished');
       }
+      Game.stopCountTime();
+      return;
     }
 
     if (state != 'playing') {

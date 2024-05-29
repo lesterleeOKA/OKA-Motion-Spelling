@@ -1,4 +1,6 @@
 import * as posedetection from '@tensorflow-models/pose-detection';
+//import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+//import * as mpSelfieSegmentation from '@mediapipe/selfie_segmentation';
 import Camera from './camera';
 import { RendererCanvas2d } from './renderer';
 import Util from './util';
@@ -9,10 +11,13 @@ import { setupStats } from './stats_panel';
 import { loadLevel } from './level';
 
 let detector
+//let segmenter
 let rafId;
 let stats;
 let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
+//const canvas = document.createElement('canvas');
+//const ctx = canvas.getContext('2d');
 
 async function createDetector() {
   const runtime = 'mediapipe';
@@ -23,6 +28,14 @@ async function createDetector() {
     //solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
   });
 }
+
+/*async function createSegmentationModel() {
+  const runtime = 'mediapipe';
+  return bodySegmentation.createSegmenter(bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation, {
+    runtime,
+    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@${mpSelfieSegmentation.VERSION}`,
+  });
+}*/
 
 /*async function createDetector() {
   let modelType = posedetection.movenet.modelType.SINGLEPOSE_LIGHTNING;
@@ -49,10 +62,16 @@ async function checkGuiUpdate() {
     detector.dispose();
   }
 
+  /* if (segmenter != null) {
+     segmenter.dispose();
+   }*/
+
   try {
     detector = await createDetector();
+    //segmenter = await createSegmentationModel();
   } catch (error) {
     detector = null;
+    // segmenter = null;
     alert(error);
   }
 
@@ -68,6 +87,7 @@ async function renderResult() {
   }
 
   let poses = null;
+  // let segmentation = null;
 
   // Detector can be null if initialization failed (for example when loading
   // from a URL that does not exist).
@@ -75,10 +95,28 @@ async function renderResult() {
     beginEstimatePosesStats();
     try {
       poses = await detector.estimatePoses(Camera.video, { maxPoses: 1, flipHorizontal: false });
+
+      /*if (segmenter === null) return;
+
+      if (segmenter.segmentPeople != null) {
+        segmentation = await segmenter.segmentPeople(Camera.video, {
+          flipHorizontal: false,
+          multiSegmentation: false,
+          segmentBodyParts: true,
+          segmentationThreshold: 40,
+        });
+      } else {
+        segmentation = await segmenter.estimatePoses(
+          Camera.video, { flipHorizontal: false });
+        segmentation = segmentation.map(
+          singleSegmentation => singleSegmentation.segmentation);
+      }*/
       //console.log(poses[0]);
     } catch (error) {
       detector.dispose();
       detector = null;
+      //segmenter.dispose();
+      //segmenter = null;
       alert(error);
     }
 
@@ -86,6 +124,7 @@ async function renderResult() {
   }
 
   View.renderer.draw([Camera.video, poses, false]);
+
 }
 
 function beginEstimatePosesStats() {
@@ -144,6 +183,7 @@ function init() {
 
   View.backHomeBtnOfFinished.addEventListener(clickHandler, () => {
     if (State.isSoundOn) Sound.play('btnClick');
+    State.state = '';
     State.changeState('instruction');
   });
 
@@ -152,12 +192,14 @@ function init() {
       Sound.play('btnClick');
       Sound.play('bgm', true);
     }
+    State.state = '';
     State.changeState('prepare');
   });
 
   View.backHomeBtnOfExit.addEventListener(clickHandler, () => {
     if (State.isSoundOn) Sound.play('btnClick');
     View.hideExit();
+    State.state = '';
     State.changeState('instruction');
   });
 
@@ -176,7 +218,6 @@ function init() {
     ['instruction', require('./audio/instruction.mp3')],
     ['prepare', require('./audio/prepare.mp3')],
     ['start', require('./audio/start.mp3')],
-    ['dontMove', require('./audio/dontMove.mp3')],
     ['finished', require('./audio/finished.mp3')],
     ['outBox', require('./audio/outBox.mp3')],
     ['poseValid', require('./audio/poseValid.mp3')],
