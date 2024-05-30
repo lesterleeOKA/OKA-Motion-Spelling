@@ -460,7 +460,7 @@ export default {
         }
         else {
           option.classList.remove('show');
-          option.classList.add('fadeOut');
+          //option.classList.add('fadeOut');
           View.optionArea.removeChild(option);
         }
 
