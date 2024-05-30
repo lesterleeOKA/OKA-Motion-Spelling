@@ -17,7 +17,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 120,
+  remainingTime: 180,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -67,7 +67,7 @@ export default {
     this.redBoxHeight = (View.canvas.height / 5) * 2;
     this.leftCount = 0;
     this.rightCount = 0;
-    this.fallingDelay = 2000;
+    this.fallingDelay = 1000;
     View.stageImg.innerHTML = '';
     View.optionArea.innerHTML = '';
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
@@ -281,7 +281,7 @@ export default {
       optionWrapper.x = this.generatePositionX(isLeft);
       optionWrapper.style.left = optionWrapper.x + 'px';
       optionWrapper.classList.add('show');
-    }, 3000);
+    }, this.randomPair.length * 250);
   },
   removeFallingItem(item) {
     const index = this.fallingItems.indexOf(item);

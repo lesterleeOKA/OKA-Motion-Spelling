@@ -85,7 +85,7 @@
   left: 50%;
   transform: translate(-50%, -70%);
   font-family: "Arzachel", system-ui;
-  font-weight: bolder;
+  font-weight: 800;
   font-size: calc(min(4.5vh, 4.5vw));
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -96,7 +96,7 @@
   position: absolute;
   top: 30%;
   font-family: "Arzachel", system-ui;
-  font-weight: bolder;
+  font-weight: 800;
   width: 90%;
   font-size: calc(min(4.5vh, 4.5vw));
   color: #fff;

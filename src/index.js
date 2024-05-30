@@ -162,52 +162,56 @@ function init() {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-  const clickHandler = ('ontouchstart' in document.documentElement ? "touchend" : "click");
+  const clickHandler = ('ontouchstart' in document.documentElement) ? 'touchend' : 'click';
 
-  View.startBtn.addEventListener(clickHandler, () => {
+  // Button event handling function
+  function handleButtonClick(e) {
     if (State.isSoundOn) Sound.play('btnClick');
-    State.changeState('prepare');
-  });
 
-  View.exitBtn.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) Sound.play('btnClick');
-    State.gamePauseData.state = State.state;
-    State.gamePauseData.stateType = State.stateType;
-    State.changeState('pause');
-  });
-
-  View.musicBtn.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) Sound.play('btnClick');
-    toggleSound();
-  });
-
-  View.backHomeBtnOfFinished.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) Sound.play('btnClick');
-    State.state = '';
-    State.changeState('instruction');
-  });
-
-  View.playAgainBtn.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) {
-      Sound.play('btnClick');
-      Sound.play('bgm', true);
+    switch (e.currentTarget) {
+      case View.startBtn:
+        State.changeState('prepare');
+        break;
+      case View.exitBtn:
+        State.gamePauseData.state = State.state;
+        State.gamePauseData.stateType = State.stateType;
+        State.changeState('pause');
+        break;
+      case View.musicBtn:
+        toggleSound();
+        break;
+      case View.backHomeBtnOfFinished:
+        State.state = '';
+        State.changeState('instruction');
+        break;
+      case View.playAgainBtn:
+        State.state = '';
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+          Sound.play('bgm', true);
+        }
+        State.changeState('prepare');
+        break;
+      case View.backHomeBtnOfExit:
+        View.hideExit();
+        State.state = '';
+        State.changeState('instruction');
+        break;
+      case View.continuebtn:
+        View.hideExit();
+        State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
+        break;
     }
-    State.state = '';
-    State.changeState('prepare');
-  });
+  }
 
-  View.backHomeBtnOfExit.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) Sound.play('btnClick');
-    View.hideExit();
-    State.state = '';
-    State.changeState('instruction');
-  });
-
-  View.continuebtn.addEventListener(clickHandler, () => {
-    if (State.isSoundOn) Sound.play('btnClick');
-    View.hideExit();
-    State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
-  });
+  // Attach the click/touchend event listeners to the buttons
+  View.startBtn.addEventListener(clickHandler, handleButtonClick);
+  View.exitBtn.addEventListener(clickHandler, handleButtonClick);
+  View.musicBtn.addEventListener(clickHandler, handleButtonClick);
+  View.backHomeBtnOfFinished.addEventListener(clickHandler, handleButtonClick);
+  View.playAgainBtn.addEventListener(clickHandler, handleButtonClick);
+  View.backHomeBtnOfExit.addEventListener(clickHandler, handleButtonClick);
+  View.continuebtn.addEventListener(clickHandler, handleButtonClick);
 
 
   const levelKey = loadLevel();
