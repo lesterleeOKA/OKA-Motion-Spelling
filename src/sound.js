@@ -1,6 +1,15 @@
 export default {
-  audioContext: new (window.AudioContext || window.webkitAudioContext)(),
+  audioContext: null,
   audios: {},
+  init() {
+    try {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      console.log("Your browser support the Web Audio API");
+    } catch (error) {
+      alert("Your browser does not support the Web Audio API. Audio playback will not be available.");
+      console.error("Error initializing AudioContext:", error);
+    }
+  },
   preloadAudio(key, url, createAudioContext = false, volume = 1) {
     return new Promise((resolve, reject) => {
       let audio = { volume: volume, audioBuffer: null, audioContext: createAudioContext, }

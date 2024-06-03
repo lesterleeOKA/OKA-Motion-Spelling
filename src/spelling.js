@@ -260,17 +260,17 @@ export default {
     optionWrapper.appendChild(option);
     return optionWrapper;
   },
+  getRandomQuestions(string) {
+    const randomIndex = Math.floor(Math.random() * string.length);
+    return string[randomIndex];
+  },
   renderFallingItem(item) {
     View.optionArea.appendChild(item.optionWrapper);
     item.optionWrapper.classList.add("show");
     item.optionWrapper.style.left = item.x + 'px';
-    item.optionWrapper.style.setProperty('--top-height', `${-(View.canvas.height * 0.01 * this.answerLength)}px`);
-    item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height}px`);
+    /*item.optionWrapper.style.setProperty('--top-height', `${0}px`);*/
+    item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
     item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item.optionWrapper));
-  },
-  getRandomQuestions(string) {
-    const randomIndex = Math.floor(Math.random() * string.length);
-    return string[randomIndex];
   },
   resetFallingItem(optionWrapper) {
     optionWrapper.classList.remove('show');
@@ -280,8 +280,10 @@ export default {
       const isLeft = this.getBalancedRandom();
       optionWrapper.x = this.generatePositionX(isLeft);
       optionWrapper.style.left = optionWrapper.x + 'px';
+      /*optionWrapper.style.setProperty('--top-height', `${0}px`);*/
+      optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
       optionWrapper.classList.add('show');
-    }, this.randomPair.length * 250);
+    }, this.randomPair.length * 225);
   },
   removeFallingItem(item) {
     const index = this.fallingItems.indexOf(item);
@@ -472,7 +474,7 @@ export default {
         if (this.fillwordTime == this.answerLength) {
           setTimeout(() => {
             this.checkAnswer(this.answerWrapper.textContent);
-          }, 1000);
+          }, 300);
         }
       }
     }
