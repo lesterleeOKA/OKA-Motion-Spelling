@@ -103,6 +103,8 @@ export class RendererCanvas2d {
         return false;
       }
 
+      let resetBtn = document.querySelector('.resetBtn');
+
       //檢查是否有選到圖
       let optionWrappers = document.querySelectorAll('.canvasWrapper > .optionArea > .optionWrapper.show');
       let canvasWrapper = document.querySelector('.canvasWrapper');
@@ -111,6 +113,27 @@ export class RendererCanvas2d {
         let touchingWord = [];
 
         for (let point of checkKeypoints) {
+          if (resetBtn) {
+            if (
+              point.x > resetBtn.offsetLeft * 2 &&
+              point.x < (resetBtn.offsetLeft * 2 + resetBtn.offsetWidth * 2) &&
+              point.y > resetBtn.offsetTop &&
+              point.y < (resetBtn.offsetTop + resetBtn.offsetHeight)
+            ) {
+              if (State.isSoundOn) {
+                Sound.stopAll('bgm');
+                Sound.play('btnClick');
+              }
+              resetBtn.classList.add('active');
+              for (let option of optionWrappers) option.classList.remove('touch');
+              Game.resetFillWord();
+              //console.log("reset word");
+            } else {
+              resetBtn.classList.remove('active');
+            }
+          }
+
+
           for (let option of optionWrappers) {
 
             const optionRect = option.getBoundingClientRect();

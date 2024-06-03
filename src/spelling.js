@@ -371,8 +371,11 @@ export default {
     this.questionWrapper = document.createElement('div');
     this.questionWrapper.classList.add('questionWrapper');
     let questionBg = document.createElement('div');
+    let resetBtn = document.createElement('div');
     questionBg.classList.add('questionBg');
+    resetBtn.classList.add('resetBtn');
     View.stageImg.appendChild(questionBg);
+    View.stageImg.appendChild(resetBtn);
 
     switch (this.randomQuestion.type) {
       case 'Spelling':
