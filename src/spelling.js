@@ -178,7 +178,7 @@ export default {
     const minutes = Math.floor(countdownTime / 60);
     const seconds = countdownTime % 60;
     const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    console.log("count", timeString);
+    //console.log("count", timeString);
     View.timeText.innerText = timeString;
   },
   getTranslateYValue(transformStyle) {
@@ -347,7 +347,7 @@ export default {
   },
 
   randomOptions() {
-    console.log('question class', this.randomQuestion);
+    //console.log('question class', this.randomQuestion);
     switch (this.randomQuestion.type) {
       case 'Spelling':
       case 'Listening':
@@ -363,6 +363,7 @@ export default {
   },
   setQuestions() {
     this.randomQuestion = this.randQuestion();
+    console.log(this.randomQuestion);
     if (this.randomQuestion === null)
       return;
 
@@ -371,11 +372,15 @@ export default {
     this.questionWrapper = document.createElement('div');
     this.questionWrapper.classList.add('questionWrapper');
     let questionBg = document.createElement('div');
-    let resetBtn = document.createElement('div');
     questionBg.classList.add('questionBg');
-    resetBtn.classList.add('resetBtn');
     View.stageImg.appendChild(questionBg);
-    View.stageImg.appendChild(resetBtn);
+
+    console.log("this.randomQuestion.answers", this.randomQuestion.answers);
+    if (this.randomQuestion.answers === undefined) {
+      let resetBtn = document.createElement('div');
+      resetBtn.classList.add('resetBtn');
+      View.stageImg.appendChild(resetBtn);
+    }
 
     switch (this.randomQuestion.type) {
       case 'Spelling':
@@ -429,6 +434,18 @@ export default {
     View.stageImg.appendChild(this.answerWrapper);
     View.stageImg.classList.add('fadeIn');
     View.stageImg.style.opacity = 1;
+  },
+
+  motionTriggerPlayAudio(_play) {
+    if (_play) {
+      this.buttonWrapper.classList.add('clicked');
+      this.buttonWrapper.classList.remove('not-clicked');
+      this.playWordAudio(this.randomQuestion.QID);
+    }
+    else {
+      this.buttonWrapper.classList.add('not-clicked');
+      this.buttonWrapper.classList.remove('clicked');
+    }
   },
 
   playWordAudio(QID) {

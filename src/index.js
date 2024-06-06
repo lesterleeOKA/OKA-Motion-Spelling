@@ -230,6 +230,17 @@ function init() {
 
   // Additional audio files that may be conditionally preloaded
   const additionalAudios = [
+    /////////////////////p1u3//////////////////////////
+    ['p1u3-a2', require('./audio/p1/u3/p1u3-a2.mp3')],
+    ['p1u3-a3', require('./audio/p1/u3/p1u3-a3.mp3')],
+    ['p1u3-a4', require('./audio/p1/u3/p1u3-a4.mp3')],
+    ['p1u3-a5', require('./audio/p1/u3/p1u3-a5.mp3')],
+    ['p1u3-a6', require('./audio/p1/u3/p1u3-a6.mp3')],
+    ['p1u3-a7', require('./audio/p1/u3/p1u3-a7.mp3')],
+    ['p1u3-a8', require('./audio/p1/u3/p1u3-a8.mp3')],
+    ['p1u3-a9', require('./audio/p1/u3/p1u3-a9.mp3')],
+    ['p1u3-a10', require('./audio/p1/u3/p1u3-a10.mp3')],
+    /////////////////////p3u2//////////////////////////
     ['p3u2-c1', require('./audio/p3/u2/p3u2-c1.mp3')],
     ['p3u2-c2', require('./audio/p3/u2/p3u2-c2.mp3')],
     ['p3u2-c3', require('./audio/p3/u2/p3u2-c3.mp3')],

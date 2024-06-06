@@ -100,6 +100,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .backHomeBtn:active {
@@ -109,6 +110,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .playAgainBtn {
@@ -118,6 +120,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .playAgainBtn:active {
@@ -127,6 +130,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .playAgainText,

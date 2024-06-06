@@ -84,18 +84,17 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  cursor: pointer;
   animation-name: startBtnAnimation;
   animation-timing-function: ease;
   animation-iteration-count: infinite;
   animation-duration: 1s;
+  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
 }
 .instructionWrapper > .startBtn > .startBtnText {
   transform: translateY(-5%);

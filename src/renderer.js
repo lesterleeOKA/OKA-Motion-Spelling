@@ -103,6 +103,7 @@ export class RendererCanvas2d {
         return false;
       }
 
+      let questionBoard = document.querySelector('.questionBg');
       let resetBtn = document.querySelector('.resetBtn');
 
       //檢查是否有選到圖
@@ -113,20 +114,41 @@ export class RendererCanvas2d {
         let touchingWord = [];
 
         for (let point of checkKeypoints) {
+
+          if (questionBoard && Game.randomQuestion.type === 'Listening') {
+            if (
+              point.x > questionBoard.offsetLeft * 2 &&
+              point.x < (questionBoard.offsetLeft * 2 + questionBoard.offsetWidth * 2) &&
+              point.y > questionBoard.offsetTop &&
+              point.y < (questionBoard.offsetTop + questionBoard.offsetHeight
+              )
+            ) {
+              //console.log('touch question board!!!!!!!!!!!!!!!!!!!!!!');
+              Game.motionTriggerPlayAudio(true);
+            }
+            else {
+              Game.motionTriggerPlayAudio(false);
+            }
+          }
+
+
           if (resetBtn) {
             if (
               point.x > resetBtn.offsetLeft * 2 &&
               point.x < (resetBtn.offsetLeft * 2 + resetBtn.offsetWidth * 2) &&
               point.y > resetBtn.offsetTop &&
-              point.y < (resetBtn.offsetTop + resetBtn.offsetHeight)
+              point.y < (resetBtn.offsetTop + resetBtn.offsetHeight
+              )
             ) {
+
               if (State.isSoundOn) {
                 Sound.stopAll('bgm');
                 Sound.play('btnClick');
               }
-              resetBtn.classList.add('active');
+
               for (let option of optionWrappers) option.classList.remove('touch');
               Game.resetFillWord();
+              resetBtn.classList.add('active');
               //console.log("reset word");
             } else {
               resetBtn.classList.remove('active');

@@ -49,6 +49,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .exitWrapper > .exitBoard  > .btnWrapper > .continueBtn:active {
@@ -58,6 +59,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .exitWrapper > .exitBoard  > .btnWrapper > .backHomeBtn {
@@ -67,6 +69,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .exitWrapper > .exitBoard  > .btnWrapper > .backHomeBtn:active {
@@ -76,6 +79,7 @@
   height: 100%;
   /*cursor: pointer;*/
   background-repeat: no-repeat;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .continueText,

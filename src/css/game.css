@@ -212,7 +212,6 @@
 .gameWrapper > .topRightControl > .musicBtn {
   width: calc(min(9vh, 9vw));
   margin-right: calc(min(3vh, 3vw));
-  cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -235,7 +234,6 @@
   content: url(../images/exitBtn.png);
   width: calc(min(9vh, 9vw));
   margin-right: calc(min(3vh, 3vw));
-  cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
