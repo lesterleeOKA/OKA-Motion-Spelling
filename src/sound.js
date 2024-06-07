@@ -53,6 +53,10 @@ export default {
     gainNode.connect(audioContext.destination);
     source.start(0);
 
+    source.addEventListener('ended', () => {
+      source.stop();
+    });
+
     audio.gainNode = gainNode
     return true
 

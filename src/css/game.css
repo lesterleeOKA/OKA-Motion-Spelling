@@ -155,7 +155,7 @@
 }
 .gameWrapper > .topLeftControl > .scoreWrapper > .scoreBoard {
   height: calc(min(11.7vh, 11.7vw));
-  margin-left: calc(min(3vh, 3vw));
+  /*margin-left: calc(min(3vh, 3vw));*/
   content: url(../images/public_score_P1_en.png);
 }
 /*-----------------------------------------------------------------------------------------------*/
@@ -283,8 +283,8 @@
 
 .gameWrapper > .questionBoard {
   position: absolute;
-  width: calc(min(38.7vh, 38.7vw));
-  height: calc(min(35.7vh, 35.7vw));
+  width: calc(min(45vh, 45vw));
+  height: calc(min(39vh, 39vw));
   top: calc(min(1vh, 2vw));
   opacity: 0;
 }
@@ -294,4 +294,13 @@
   height: auto;
   content: url(../images/spelling/board1.png);
   filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+}
+
+.questionImgBg {
+  width: 95%;
+  height: 100%;
+  content: url(../images/exitBoard_new.png);
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+  display: block;
+  margin: 0 auto;
 }

@@ -13,6 +13,7 @@ export class RendererCanvas2d {
     this.lastPoseValidValue = false;
     this.modelType = posedetection.SupportedModels.BlazePose;
     this.scoreThreshold = 0.65;
+    this.triggerAudio = false;
   }
 
   draw(rendererParams) {
@@ -124,10 +125,14 @@ export class RendererCanvas2d {
               )
             ) {
               //console.log('touch question board!!!!!!!!!!!!!!!!!!!!!!');
-              Game.motionTriggerPlayAudio(true);
+              if (!this.triggerAudio) {
+                Game.motionTriggerPlayAudio(true);
+                this.triggerAudio = true;
+              }
             }
             else {
               Game.motionTriggerPlayAudio(false);
+              this.triggerAudio = false;
             }
           }
 

@@ -2,6 +2,7 @@ import View from './view';
 import State from './state';
 import Sound from './sound';
 import QuestionManager from './question';
+import { imageFiles } from './mediaFile';
 
 export default {
   optionImages: [
@@ -17,7 +18,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 180,
+  remainingTime: 10000,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -37,6 +38,7 @@ export default {
   leftCount: 0,
   rightCount: 0,
   fallingDelay: 0,
+  finishedCreateOptions: false,
 
   init() {
     //View.showTips('tipsReady');
@@ -71,6 +73,7 @@ export default {
     View.stageImg.innerHTML = '';
     View.optionArea.innerHTML = '';
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+    this.finishedCreateOptions = false;
   },
 
   handleVisibilityChange() {
@@ -118,6 +121,7 @@ export default {
     if (!this.timerRunning) {
       this.showQuestions(true);
       this.timerRunning = true;
+      this.finishedCreateOptions = false;
       this.countTime();
       this.startFalling();
     }
@@ -127,15 +131,22 @@ export default {
     const falling = (timestamp) => {
       if (!this.lastFallingTime) this.lastFallingTime = timestamp;
       const elapsed = timestamp - this.lastFallingTime;
+
       if (elapsed >= this.fallingDelay) {
-        if (this.fallingItems.length < this.randomPair.length) {
-          if (this.fallingId < this.fallingItems.length) {
-            this.fallingId += 1;
-          } else {
-            this.fallingId = 0;
+        if (!this.finishedCreateOptions) {
+          if (this.fallingItems.length < this.randomPair.length) {
+            if (this.fallingId < this.fallingItems.length) {
+              this.fallingId += 1;
+            } else {
+              this.fallingId = 0;
+            }
+            var optionImageId = this.fallingId % this.optionImages.length;
+            this.createRandomItem(this.randomPair[this.fallingId], this.optionImages[optionImageId]);
           }
-          var optionImageId = this.fallingId % this.optionImages.length;
-          this.createRandomItem(this.randomPair[this.fallingId], this.optionImages[optionImageId]);
+        }
+        else {
+          this.finishedCreateOptions = true;
+          console.log("finished created all");
         }
         this.lastFallingTime = timestamp;
       }
@@ -202,11 +213,13 @@ export default {
         const optionWrapper = this.createOptionWrapper(word, id, optionImage);
         const newFallingItem = {
           x,
+          size: this.optionSize,
           optionWrapper,
           id,
         };
         return newFallingItem;
       };
+
       const newFallingItem = generatePosition();
       this.fallingItems.push(newFallingItem);
       this.renderFallingItem(newFallingItem);
@@ -231,13 +244,13 @@ export default {
   },
 
   generatePositionX(isLeft) {
+    let newX;
     if (isLeft) {
-      return Math.round(this.getRandomInt(0, this.redBoxX - this.optionSize));
+      newX = Math.round(this.getRandomInt(0, this.redBoxX - this.optionSize));
+    } else {
+      newX = Math.round(this.getRandomInt((this.redBoxX + this.redBoxWidth + 20), View.canvas.width - this.optionSize));
     }
-    else {
-      return Math.round(this.getRandomInt((this.redBoxX + this.redBoxWidth),
-        View.canvas.width - this.optionSize));
-    }
+    return newX;
   },
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -270,21 +283,38 @@ export default {
     item.optionWrapper.style.left = item.x + 'px';
     /*item.optionWrapper.style.setProperty('--top-height', `${0}px`);*/
     item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
-    item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item.optionWrapper));
+    item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item));
   },
-  resetFallingItem(optionWrapper) {
+  resetFallingItem(item) {
+    var optionWrapper = item.optionWrapper;
     optionWrapper.classList.remove('show');
+    if (this.nextQuestion)
+      return;
+
+    let isLeft = this.getBalancedRandom();
+    optionWrapper.x = this.generatePositionX(isLeft);
+
+    let itemLength;
+
+    if (this.finishedCreateOptions) {
+      itemLength = this.fallingItems.length;
+    }
+    else {
+      itemLength = this.randomPair.length;
+    }
+    let delay = itemLength * 300;
+
+
+    //console.log("delay", delay, itemLength);
     setTimeout(() => {
-      if (this.nextQuestion)
-        return;
-      const isLeft = this.getBalancedRandom();
-      optionWrapper.x = this.generatePositionX(isLeft);
       optionWrapper.style.left = optionWrapper.x + 'px';
-      /*optionWrapper.style.setProperty('--top-height', `${0}px`);*/
       optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
+      //optionWrapper.style.setProperty('--fallingSpeed', `${5 + this.randomPair.length}s`);
       optionWrapper.classList.add('show');
-    }, this.randomPair.length * 225);
+    }, delay);
+
   },
+
   removeFallingItem(item) {
     const index = this.fallingItems.indexOf(item);
     if (index > -1) {
@@ -370,23 +400,16 @@ export default {
     this.question = this.randomQuestion.question;
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
-    this.questionWrapper.classList.add('questionWrapper');
     let questionBg = document.createElement('div');
-    questionBg.classList.add('questionBg');
-    View.stageImg.appendChild(questionBg);
-
-    console.log("this.randomQuestion.answers", this.randomQuestion.answers);
-    if (this.randomQuestion.answers === undefined) {
-      let resetBtn = document.createElement('div');
-      resetBtn.classList.add('resetBtn');
-      View.stageImg.appendChild(resetBtn);
-    }
 
     switch (this.randomQuestion.type) {
       case 'Spelling':
       case 'MultipleChoice':
       case 'FillingBlank':
-      case 'Picture':
+        this.questionWrapper.classList.add('questionWrapper');
+        questionBg.classList.add('questionBg');
+        View.stageImg.appendChild(questionBg);
+
         var questionText = document.createElement('span');
         questionText.textContent = this.randomQuestion.question;
         this.questionWrapper.appendChild(questionText);
@@ -395,6 +418,9 @@ export default {
         //View.stageImg.appendChild(questionText);
         break;
       case 'Listening':
+        this.questionWrapper.classList.add('questionWrapper');
+        questionBg.classList.add('questionBg');
+        View.stageImg.appendChild(questionBg);
         this.buttonWrapper = document.createElement('button');
         this.buttonWrapper.classList.add('buttonWrapper');
         this.buttonWrapper.addEventListener('mousedown', () => {
@@ -421,6 +447,30 @@ export default {
         });
         this.questionWrapper.appendChild(this.buttonWrapper);
         break;
+      case 'Picture':
+        this.questionWrapper.classList.add('questionImageWrapper');
+        questionBg.classList.add('questionImgBg');
+        View.stageImg.appendChild(questionBg);
+        let currentImagePath = '';
+        if (imageFiles && imageFiles.length > 0) {
+          let imageFile = imageFiles.find(([name]) => name === this.randomQuestion.QID);
+          if (imageFile) {
+            currentImagePath = imageFile[1];
+          }
+        }
+        var imageElement = document.createElement('img');
+        imageElement.src = currentImagePath;
+        imageElement.alt = 'image';
+        imageElement.classList.add('questionImage');
+        this.questionWrapper.appendChild(imageElement);
+        break;
+    }
+
+    console.log("this.randomQuestion.answers", this.randomQuestion.answers);
+    if (this.randomQuestion.answers === undefined) {
+      let resetBtn = document.createElement('div');
+      resetBtn.classList.add('resetBtn');
+      View.stageImg.appendChild(resetBtn);
     }
 
     if (this.randomQuestion.QID && this.randomQuestion.QID.trim() !== '') {
@@ -483,7 +533,9 @@ export default {
         else {
           option.classList.remove('show');
           //option.classList.add('fadeOut');
-          View.optionArea.removeChild(option);
+          //this.removeFallingItem()
+          //View.optionArea.removeChild(option);
+          this.removeFallingItem(option);
         }
 
         this.fillwordTime += 1;
@@ -504,6 +556,10 @@ export default {
     this.clearWrapper();
   },
   clearWrapper() {
+    this.finishedCreateOptions = false;
+    this.fallingId = 0;
+    this.leftCount = 0;
+    this.rightCount = 0;
     this.answerWrapper.classList.remove('correct');
     this.answerWrapper.classList.remove('wrong');
     this.answerWrapper.textContent = '';
