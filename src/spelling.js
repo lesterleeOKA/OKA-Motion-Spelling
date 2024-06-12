@@ -18,7 +18,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 10000,
+  remainingTime: 300,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -332,6 +332,9 @@ export default {
   },
   /////////////////////////////////////////Random Questions///////////////////////////////
   randQuestion() {
+    if (this.questionType === null || this.questionType === undefined)
+      return null;
+
     let questions = this.questionType.QA;
     if (this.answeredNum === 0) {
       questions = questions.sort(() => Math.random() - 0.5);

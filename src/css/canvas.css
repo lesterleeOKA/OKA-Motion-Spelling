@@ -75,7 +75,7 @@
 }
 .questionImageWrapper{
   position: fixed;
-  top: -11%;
+  top: -10%;
   left: 50%;
   transform: translate(-50%, 50%);
   transition: opacity 0.1s ease;
@@ -85,7 +85,7 @@
   font-family: "Arzachel", system-ui;
   font-weight: bolder;
   width: calc(min(30.7vh, 30.7vw));
-  height: calc(min(28vh, 28vw));
+  height: calc(min(26vh, 26vw));
   color: rgb(192 134 97);
   display: flex;
   flex-direction: column;
@@ -113,7 +113,7 @@
 }
 .answerWrapper{
   position: fixed;
-  top: 30%;
+  top: 29%;
   left: 50%;
   transform: translate(-50%, 50%);
   transition: opacity 0.1s ease;

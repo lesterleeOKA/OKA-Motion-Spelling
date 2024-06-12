@@ -14,7 +14,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
 </head>
-<body>
+<body id="bgImage">
   <div class="loadingBarWrapper">
     <div class="loadingText"></div>
     <div id="loadingBar" class="loadingBar">
@@ -28,13 +28,12 @@
   <div class="canvasWrapper">
     <canvas></canvas>
     <video id="video" playsinline style="
-      -webkit-transform: scaleX(-1);
-      transform: scaleX(-1);
-      visibility: hidden;
-      display: none;
-      ">
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    visibility: hidden;
+    display: none;
+    ">
     </video>
-
     <div class="optionArea"></div>
   </div>
 
