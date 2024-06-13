@@ -16,6 +16,7 @@
 </head>
 <body id="bgImage">
   <div class="loadingBarWrapper">
+    <div class="loadingCharacter"></div>
     <div class="loadingText"></div>
     <div id="loadingBar" class="loadingBar">
       <div class="brownBar"></div>
@@ -39,14 +40,17 @@
 
   <div class="instructionWrapper">
     <!--<img class="schoolLogo"></img>-->
-    <div class="gameTextTitle">
+    <!--<div class="gameTextTitle">
       Motion Spelling
-    </div>
+    </div>-->
     <div class="instructionBoard">
-      <div class="instructionText">Instruction</div>
-      <div class="instructionContent">Let's collect the letters to spell the vocabulary.</div>
+      <div class="previewImage"></div>
+      <div class="instructionRule">
+        <div class="icon"></div>
+        <div class="instructionContent">Use your hands to collect the letters!</div>
+      </div>
+      <div class="startBtn" alt="Start Button"></div>
     </div>
-    <div class="startBtn" alt="Start Button"></div>
   </div>
 
   <div class="gameWrapper">
@@ -58,8 +62,9 @@
       <div class="rule-3">3)  Please do not leave your current position during the game.</div>
     </div>
     <div class="ansResult">
-      <div class="ans correct">答對了！</div>
-      <div class="ans wrong">還需努力！</div>
+      <!--<div class="ans correct">答對了！</div>
+      <div class="ans wrong">還需努力！</div>-->
+      <div class="wellDone"></div>
     </div>
     <!--<div class="outBoxBoardWrapper"><img class="outBoxBoard"></img></div>-->
     <div class="topLeftControl hide">
@@ -70,7 +75,7 @@
         <img class="stageStar"></img>
       </div>-->
       <div class="timeWrapper">
-        <img class="timeBoard"></img>
+        <div class="timeBoard"></div>
         <div class="timeText">10</div>
       </div>
       <div class="scoreWrapper">
@@ -80,6 +85,7 @@
     </div>
     <div class="topRightControl">
       <img class="tips hide"></img>
+      <img class="instructionBtn"></img>
       <img class="musicBtn on"></img>
       <!--<img class="switchCamBtn"></img>-->
       <img class="exitBtn"></img>

@@ -121,7 +121,7 @@ async function renderResult() {
       alert(error);
     }
 
-    endEstimatePosesStats();
+    //endEstimatePosesStats();
   }
 
   View.renderer.draw([Camera.video, poses, false]);

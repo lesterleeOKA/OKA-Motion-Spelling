@@ -1,3 +1,4 @@
+import { stat } from 'fs';
 import Game from './spelling';
 import State from './state';
 
@@ -80,7 +81,7 @@ export default {
   showCount(num) {
     this.countImg.className = "count c" + num;
     this.countImg.style.opacity = 1;
-    this.countImg.style.maxHeight = "calc(min(40vh, 40vw))";
+    //this.countImg.style.maxHeight = "calc(min(60vh, 60vw))";
     setTimeout(() => this.hideCount(), 600);
   },
   hideCount() {
@@ -164,6 +165,14 @@ export default {
     }
     if (result && State.selectedImg.value && !State.selectedImg.value.classList.contains('showColorBorder')) {
       State.selectedImg.value.classList.add('showColorBorder');
+    }
+  },
+
+  showCorrectEffect(status) {
+    let result = document.querySelector('.gameWrapper .ansResult .wellDone');
+    if (status) {
+      result.classList.add('show');
+      result.addEventListener('animationend', () => result.classList.remove('show'));
     }
   },
   //-----------------------------------------------------------------------------------------------

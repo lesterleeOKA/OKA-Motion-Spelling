@@ -576,6 +576,7 @@ export default {
       this.addScore(1);
       this.answerWrapper.classList.add('correct');
       State.changeState('playing', 'ansCorrect');
+      View.showCorrectEffect(true);
     } else {
       //this.addScore(-1);
       this.answerWrapper.classList.add('wrong');
