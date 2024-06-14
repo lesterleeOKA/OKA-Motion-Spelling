@@ -51,6 +51,27 @@ const audioFiles = [
   ['p3u2-c18', require('./audio/p3/u2/p3u2-c18.mp3')],
   ['p3u2-c19', require('./audio/p3/u2/p3u2-c19.mp3')],
   ['p3u2-c20', require('./audio/p3/u2/p3u2-c20.mp3')],
+  /////////////////////p3u5-c//////////////////////////
+  ['p3u5-c1', require('./audio/p3/u5/p3u5-c1.mp3')],
+  ['p3u5-c2', require('./audio/p3/u5/p3u5-c2.mp3')],
+  ['p3u5-c3', require('./audio/p3/u5/p3u5-c3.mp3')],
+  ['p3u5-c4', require('./audio/p3/u5/p3u5-c4.mp3')],
+  ['p3u5-c5', require('./audio/p3/u5/p3u5-c5.mp3')],
+  ['p3u5-c6', require('./audio/p3/u5/p3u5-c6.mp3')],
+  ['p3u5-c7', require('./audio/p3/u5/p3u5-c7.mp3')],
+  ['p3u5-c8', require('./audio/p3/u5/p3u5-c8.mp3')],
+  ['p3u5-c9', require('./audio/p3/u5/p3u5-c9.mp3')],
+  ['p3u5-c10', require('./audio/p3/u5/p3u5-c10.mp3')],
+  ['p3u5-c11', require('./audio/p3/u5/p3u5-c11.mp3')],
+  ['p3u5-c12', require('./audio/p3/u5/p3u5-c12.mp3')],
+  ['p3u5-c13', require('./audio/p3/u5/p3u5-c13.mp3')],
+  ['p3u5-c14', require('./audio/p3/u5/p3u5-c14.mp3')],
+  ['p3u5-c15', require('./audio/p3/u5/p3u5-c15.mp3')],
+  ['p3u5-c16', require('./audio/p3/u5/p3u5-c16.mp3')],
+  ['p3u5-c17', require('./audio/p3/u5/p3u5-c17.mp3')],
+  ['p3u5-c18', require('./audio/p3/u5/p3u5-c18.mp3')],
+  ['p3u5-c19', require('./audio/p3/u5/p3u5-c19.mp3')],
+  ['p3u5-c20', require('./audio/p3/u5/p3u5-c20.mp3')],
 ];
 
 

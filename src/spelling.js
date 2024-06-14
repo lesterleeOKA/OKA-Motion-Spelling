@@ -18,7 +18,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 300,
+  remainingTime: 180,
   optionSize: 0,
   fallingOption: null,
   timer: null,

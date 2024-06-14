@@ -19,8 +19,10 @@ export default {
     return new Promise((resolve, reject) => {
       if (!navigator.mediaDevices.getUserMedia && !navigator.mediaDevices) {
         const errMsg = 'Browser API navigator.mediaDevices.getUserMedia not available';
-        console.log(errMsg)
+        console.log(errMsg);
+        alert(errMsg);
         reject(errMsg);
+
       } else {
         console.log('start getUserMedia');
         navigator.mediaDevices.getUserMedia(this.constraints).then(stream => {

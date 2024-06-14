@@ -91,46 +91,36 @@
   opacity: 0;
   content: url(../images/spelling/ui_welldone.png);
   height: calc(min(50.44vh, 50.44vw));
-  z-index: 5;
  /* animation: dropAndDisappear 2s forwards; */
 }
 .gameWrapper > .ansResult > .wellDone.show{
   height: calc(min(50.44vh, 50.44vw));
   animation: dropAndDisappear 1s forwards;
+  z-index: 5;
+}
+
+:root {
+  --size-in-px: 80px;
+  --dropStartPoint: calc(var(--size-in-px) / var(--viewport-height) * 100vh);
+  --dropBottomPoint: 10vh;
 }
 
 @keyframes dropAndDisappear {
   0% {
     opacity: 0.5;
-    transform: translateY(-50vh);  /* Start at the original position */
+    transform: translateY(var(--dropStartPoint));  /* Start at the original position */
   }
-  50% {
+  25% {
     opacity: 1;
-    transform: translateY(10vh);  /* Drop the image halfway down */
-  }
-  75% {
-    opacity: 1;
-    transform: translateY(calc(10vh - 10px));  /* Slightly above the bottom */
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(calc(10vh + 10px));  /* Slightly below the bottom */
-  }
-  85% {
-    opacity: 1;
-    transform: translateY(calc(10vh - 5px));  /* Slightly above the bottom */
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(calc(10vh + 5px));  /* Slightly below the bottom */
+    transform: translateY(var(--dropBottomPoint));  /* Drop the image halfway down */
   }
   95% {
     opacity: 1;
-    transform: translateY(10vh);  /* Back to the bottom */
+    transform: translateY(var(--dropBottomPoint));  /* Back to the bottom */
   }
   100% {
     opacity: 0;  /* Make the image disappear */
-    transform: translateY(10vh);  /* Keep the image at the bottom */
+    transform: translateY(var(--dropBottomPoint));  /* Keep the image at the bottom */
   }
 }
 
@@ -266,6 +256,69 @@
 .gameWrapper > .topRightControl > .tips.tipsReady { content: url(../images/tipsReady.png); }
 .gameWrapper > .topRightControl > .tips.tipsStart { content: url(../images/tipsStart.png); }
 
+/*-----------------------------------------------------------------------------------------------*/
+.musicOnOffWrapper {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: -100vh;
+  left: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: top 0.5s ease, opacity 0.1s ease 0.5s;
+  opacity: 0;
+  pointer-events: none;
+  background-color: transparent;
+}
+.musicOnOffWrapper.show {
+  top: 0px;
+  opacity: 1;
+  transition: top 0.5s ease, opacity 0.1s ease, background-color 0.5s ease 0.5s;
+  pointer-events: all;
+  background-color: rgba(0,0,0,0.5);
+}
+.musicOnOffWrapper > .musicOnOffBoard {
+  background-image: url(../images/spelling/ui_board_sound.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: calc(min(45.5vh, 45.5vw));
+  height: calc(min(45.5vh, 45.5vw));
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-direction: column;
+  justify-content: start;
+}
+.musicOnOffWrapper > .musicOnOffBoard > .musicWrapper {
+  width: 65%;
+  height: calc(min(10vh, 10vw));
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: calc(min(25vh, 25vw));
+}
+.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .offBtn {
+  content: url(../images/spelling/btn_no.png);
+  height: calc(min(5vh, 5vw));
+  scale: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .offBtn:active {
+  scale: 0.8;
+  -webkit-tap-highlight-color: transparent;
+}
+.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .onBtn {
+  content: url(../images/spelling/btn_yes.png);
+  height: calc(min(5vh, 5vw));
+  scale: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .onBtn:active {
+  scale: 0.8;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .gameWrapper > .topRightControl > .musicBtn {
   width: calc(min(9vh, 9vw));
   margin-right: calc(min(3vh, 3vw));
@@ -288,7 +341,7 @@
 .gameWrapper > .topRightControl > .musicBtn.off {
   content: url(../images/musicBtnOff.png);
 }
-
+/*-----------------------------------------------------------------------------------------------*/
 .gameWrapper > .topRightControl > .exitBtn {
   content: url(../images/exitBtn.png);
   width: calc(min(9vh, 9vw));

@@ -20,13 +20,15 @@
   width: calc(min(15.7vh, 15.7vw));
 }
 
-.instructionWrapper > .gameTitle {
-  background-image: url(../images/gameTitle.png);
-  height: calc(min(16.5vh, 16.5vw));
-  width: 100%;
+.instructionWrapper > .instructionBoard> .gameTitle {
+  position: relative;
+  background-image: url(../images/spelling/title_mspell.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+  height: calc(min(25.5vh, 25.5vw));
+  width: 100%;
+  bottom: calc(min(8vh, 8vw));
 }
 .instructionWrapper > .gameTextTitle {
   font-family: "Arzachel", system-ui;
@@ -43,7 +45,7 @@
 }
 
 .instructionWrapper > .instructionBoard {
-  background-image: url(../images/instructionBoard_spelling.png);
+  background-image: url(../images/spelling/instructionBoard.png);
   height: calc(min(65vh, 65vw));
   width: 100%;
   background-repeat: no-repeat;
@@ -56,14 +58,15 @@
   flex-direction: column;
 }
 .instructionWrapper > .instructionBoard > .previewImage {
-  background-image: url(../images/screen_mpair.jpg);
+  background-image: url(../images/screen_mspell.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
   width: calc(min(38vh, 38vw));
   height: calc(min(26vh, 26vw));
   border-radius: calc(min(3vh, 3vw));
-  margin-bottom: calc(min(12vh, 12vw));
+  position: relative;
+  bottom: calc(min(19vh, 19vw));
 }
 .instructionWrapper > .instructionBoard > .instructionRule {
   display: flex;

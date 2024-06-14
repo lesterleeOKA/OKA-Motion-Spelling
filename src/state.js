@@ -8,6 +8,7 @@ export default {
   stateLastAt: +new Date(),
   stateLastFor: 0,
   stateType: '',
+  homePageUrl: 'https://dev.openknowledge.hk/RainbowOne/webapp/lester/OKA-Games/',
   isSoundOn: true,
   gamePauseData: {
     state: '',
@@ -84,25 +85,24 @@ export default {
     } else if (state == 'counting3') {
       View.hidePrepareBoard();
       View.showCount(3);
-      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 500);
+      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 250);
     } else if (state == 'counting2') {
       View.showCount(2);
-      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 500);
+      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 250);
     } else if (state == 'counting1') {
       View.showCount(1);
-      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 500);
+      if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 250);
     } else if (state == 'counting0') {
       View.showCount(0);
       if (this.isSoundOn) {
         Sound.stopAll('bgm');
-        //Sound.play('start');
+        setTimeout(() => Sound.play('start'), 250);
       }
     } else if (state == 'playing') {
       //View.showTips('tipsReady');
       View.showTopLeftControl();
       switch (stateType) {
         case 'showStage':
-          if (this.isSoundOn) setTimeout(() => Sound.play('countDown'), 500);
           setTimeout(() => this.changeState('playing', 'showQstImg'), 1000);
           break;
         case 'showQstImg':
@@ -136,7 +136,12 @@ export default {
           break;
       }
 
-    } else if (state == 'pause') {
+    } else if (state == 'showMusicOnOff') {
+      Sound.stopAll('bgm');
+      View.hidePrepareBoard();
+      View.showMusicOnOff();
+    }
+    else if (state == 'pause') {
       Sound.stopAll('bgm');
       View.hidePrepareBoard();
       View.showExit();
@@ -157,6 +162,9 @@ export default {
       }
       Game.stopCountTime();
       return;
+    }
+    else if (state == 'leave') {
+      window.open(this.homePageUrl, '_self');
     }
 
     if (state != 'playing') {

@@ -15,6 +15,7 @@ export default {
   countImg: document.querySelector('.gameWrapper > .count'),
   stageImg: document.querySelector('.gameWrapper > .questionBoard'),
   startBtn: document.querySelector('.startBtn'),
+  instructionBtn: document.querySelector('.gameWrapper > .topRightControl > .instructionBtn'),
   musicBtn: document.querySelector('.gameWrapper > .topRightControl > .musicBtn'),
   exitBtn: document.querySelector('.gameWrapper > .topRightControl > .exitBtn'),
   tips: document.querySelector('.gameWrapper > .topRightControl > .tips'),
@@ -26,6 +27,10 @@ export default {
   backHomeBtnOfFinished: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .backHomeBtn'),
   playAgainBtn: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .playAgainBtn'),
   backHomeBtnOfExit: document.querySelector('.exitWrapper > .exitBoard  > .btnWrapper > .backHomeBtn'),
+
+  musicOnOffWrapper: document.querySelector('.musicOnOffWrapper'),
+  onBtn: document.querySelector('.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .onBtn'),
+  offBtn: document.querySelector('.musicOnOffWrapper > .musicOnOffBoard  > .musicWrapper > .offBtn'),
   exitWrapper: document.querySelector('.exitWrapper'),
   continuebtn: document.querySelector('.exitWrapper > .exitBoard  > .btnWrapper > .continueBtn'),
   optionArea: document.querySelector('.canvasWrapper > .optionArea'),
@@ -119,6 +124,12 @@ export default {
       this.finishedScore.innerText = "0";
       //this.finishedTime.innerText = "";
     }, 1000);
+  },
+  showMusicOnOff() {
+    this.musicOnOffWrapper.classList.add("show");
+  },
+  hideMusicOnOff() {
+    this.musicOnOffWrapper.classList.remove("show");
   },
   //-----------------------------------------------------------------------------------------------
   showExit() {

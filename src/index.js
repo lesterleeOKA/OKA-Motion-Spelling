@@ -93,7 +93,7 @@ async function renderResult() {
   // Detector can be null if initialization failed (for example when loading
   // from a URL that does not exist).
   if (detector != null) {
-    beginEstimatePosesStats();
+    //beginEstimatePosesStats();
     try {
       poses = await detector.estimatePoses(Camera.video, { maxPoses: 1, flipHorizontal: false });
 
@@ -170,36 +170,85 @@ function init() {
     if (State.isSoundOn) Sound.play('btnClick');
     switch (e.currentTarget) {
       case View.startBtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         State.changeState('prepare');
         break;
       case View.exitBtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         State.gamePauseData.state = State.state;
         State.gamePauseData.stateType = State.stateType;
-        State.changeState('pause');
+        //State.changeState('pause');
+        setTimeout(() => {
+          State.changeState('leave');
+        }, 100);
         break;
       case View.musicBtn:
-        toggleSound();
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
+        State.gamePauseData.state = State.state;
+        State.gamePauseData.stateType = State.stateType;
+        State.changeState('showMusicOnOff');
+        //toggleSound();
+        break;
+      case View.instructionBtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         break;
       case View.backHomeBtnOfFinished:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         State.state = '';
-        State.changeState('instruction');
+        setTimeout(() => {
+          State.changeState('leave');
+        }, 200);
         break;
       case View.playAgainBtn:
-        State.state = '';
         if (State.isSoundOn) {
           Sound.play('btnClick');
           Sound.play('bgm', true);
         }
+        State.state = '';
         State.changeState('prepare');
         break;
       case View.backHomeBtnOfExit:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         View.hideExit();
         State.state = '';
-        State.changeState('instruction');
+        setTimeout(() => {
+          State.changeState('leave');
+        }, 200);
         break;
       case View.continuebtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
         View.hideExit();
         State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
+        break;
+      case View.offBtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
+        View.hideMusicOnOff();
+        State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
+        setSound(false);
+        break;
+      case View.onBtn:
+        if (State.isSoundOn) {
+          Sound.play('btnClick');
+        }
+        View.hideMusicOnOff();
+        State.changeState(State.gamePauseData.state, State.gamePauseData.stateType);
+        setSound(true);
         break;
     }
   }
@@ -208,17 +257,20 @@ function init() {
   View.startBtn.addEventListener(clickHandler, handleButtonClick);
   View.exitBtn.addEventListener(clickHandler, handleButtonClick);
   View.musicBtn.addEventListener(clickHandler, handleButtonClick);
+  View.instructionBtn.addEventListener(clickHandler, handleButtonClick);
   View.backHomeBtnOfFinished.addEventListener(clickHandler, handleButtonClick);
   View.playAgainBtn.addEventListener(clickHandler, handleButtonClick);
   View.backHomeBtnOfExit.addEventListener(clickHandler, handleButtonClick);
   View.continuebtn.addEventListener(clickHandler, handleButtonClick);
+  View.offBtn.addEventListener(clickHandler, handleButtonClick);
+  View.onBtn.addEventListener(clickHandler, handleButtonClick);
 
 
   const levelKey = loadLevel();
   const defaultAudios = [
-    ['bgm', require('./audio/bgm.mp3'), false, 0.5],
+    ['bgm', require('./audio/bgm_mspell.mp3'), false, 0.5],
     ['btnClick', require('./audio/btnClick.wav')],
-    ['countDown', require('./audio/countDown.wav')],
+    ['countDown', require('./audio/countDown.mp3')],
     ['instruction', require('./audio/instruction.mp3')],
     ['prepare', require('./audio/prepare.mp3')],
     ['start', require('./audio/start.mp3')],
@@ -317,6 +369,24 @@ function toggleSound() {
     View.musicBtn.classList.remove('on');
     View.musicBtn.classList.add('off');
     Sound.stopAll();
+  }
+}
+
+function setSound(status) {
+  //console.log('State.isSoundOn: ' + State.isSoundOn);
+
+  if (!State.isSoundOn && status) {
+    View.musicBtn.classList.add('on');
+    View.musicBtn.classList.remove('off');
+    Sound.play('bgm', true);
+    State.isSoundOn = status;
+  }
+
+  if (State.isSoundOn && !status) {
+    View.musicBtn.classList.remove('on');
+    View.musicBtn.classList.add('off');
+    Sound.stopAll();
+    State.isSoundOn = status;
   }
 }
 //-------------------------------------------------------------------------------------------------
