@@ -274,7 +274,9 @@ function init() {
     ['instruction', require('./audio/instruction.mp3')],
     ['prepare', require('./audio/prepare.mp3')],
     ['start', require('./audio/start.mp3')],
-    ['finished', require('./audio/finished.mp3')],
+    /*['finished', require('./audio/finished.mp3')],*/
+    ['passGame', require('./audio/passgame.mp3')],
+    ['failGame', require('./audio/failgame.mp3')],
     ['outBox', require('./audio/outBox.mp3')],
     ['poseValid', require('./audio/poseValid.mp3')],
     ['ansCorrect', require('./audio/ansCorrect.mp3')],

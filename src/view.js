@@ -23,6 +23,7 @@ export default {
   flagImg: document.querySelector('.gameWrapper > .flagWrapper > .flag'),
   finishedWrapper: document.querySelector('.finishedWrapper'),
   finishedBoardWrapper: document.querySelector('.finishedWrapper > .finishedBoardWrapper'),
+  finishedBoard: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBoard'),
   savePhotoBtn: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .savePhotoBtn'),
   backHomeBtnOfFinished: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .backHomeBtn'),
   playAgainBtn: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .finishedBtnWrapper > .playAgainBtn'),
@@ -124,6 +125,20 @@ export default {
       this.finishedScore.innerText = "0";
       //this.finishedTime.innerText = "";
     }, 1000);
+  },
+  showSuccess() {
+    this.finishedBoard.classList.remove("fail");
+    this.finishedBoard.classList.add("success");
+  },
+  hideSuccess() {
+    this.finishedBoard.classList.remove("success");
+  },
+  showFailure() {
+    this.finishedBoard.classList.remove("success");
+    this.finishedBoard.classList.add("fail");
+  },
+  hideFailure() {
+    this.finishedBoard.classList.remove("fail");
   },
   showMusicOnOff() {
     this.musicOnOffWrapper.classList.add("show");

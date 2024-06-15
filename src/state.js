@@ -158,7 +158,14 @@ export default {
       Sound.stopAll();
       if (this.isSoundOn) {
         Sound.stopAll('bgm');
-        Sound.play('finished');
+        if (Game.score >= 30) {
+          Sound.play('passGame');
+          //console.log("Play.........................p");
+        }
+        else {
+          Sound.play('failGame');
+          //console.log("Play.........................f");
+        }
       }
       Game.stopCountTime();
       return;
