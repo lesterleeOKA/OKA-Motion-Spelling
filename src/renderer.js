@@ -17,7 +17,7 @@ export class RendererCanvas2d {
   }
 
   draw(rendererParams) {
-    const [video, poses, isModelChanged] = rendererParams;
+    const [video, poses, isModelChanged, bodySegmentationCanvas] = rendererParams;
     this.videoWidth = video.width;
     this.videoHeight = video.height;
     this.ctx.canvas.width = this.videoWidth;
@@ -28,7 +28,7 @@ export class RendererCanvas2d {
     this.redBoxWidth = this.videoWidth / 3;
     this.redBoxHeight = this.videoHeight / 5 * 3;
 
-    this.drawCtx(video);
+    this.drawCtx(video, bodySegmentationCanvas);
     if (['prepare', 'counting3', 'counting2', 'counting1', 'counting0', 'playing', 'outBox'].includes(State.state)) {
       let isCurPoseValid = false;
       if (poses && poses.length > 0 && !isModelChanged) {
@@ -283,12 +283,12 @@ export class RendererCanvas2d {
     this.lastPoseValidValue = isCurPoseValid;
   }
 
-  drawCtx(video) {
+  drawCtx(video, bodySegmentationCanvas) {
     if (Camera.constraints.video.facingMode == 'user') {
       this.ctx.translate(this.videoWidth, 0);
       this.ctx.scale(-1, 1);
     }
-    this.ctx.drawImage(video, 0, 0, this.videoWidth, this.videoHeight);
+    this.ctx.drawImage(bodySegmentationCanvas ? bodySegmentationCanvas : video, 0, 0, this.videoWidth, this.videoHeight);
     if (Camera.constraints.video.facingMode == 'user') {
       this.ctx.translate(this.videoWidth, 0);
       this.ctx.scale(-1, 1);

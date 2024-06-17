@@ -20,6 +20,7 @@ export function setupStats() {
   stats.showPanel(stats.domElement.children.length - 1);
 
   const parent = document.getElementById('stats');
+
   parent.appendChild(stats.domElement);
 
   const statsPanes = parent.querySelectorAll('canvas');

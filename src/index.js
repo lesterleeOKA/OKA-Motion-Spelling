@@ -1,5 +1,5 @@
 import * as posedetection from '@tensorflow-models/pose-detection';
-//import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+import * as bodySegmentation from '@tensorflow-models/body-segmentation';
 //import * as mpSelfieSegmentation from '@mediapipe/selfie_segmentation';
 import Camera from './camera';
 import { RendererCanvas2d } from './renderer';
@@ -17,7 +17,7 @@ let rafId;
 let stats;
 let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
-//const canvas = document.createElement('canvas');
+const canvas = document.createElement('canvas');
 //const ctx = canvas.getContext('2d');
 
 async function createDetector() {
@@ -26,53 +26,25 @@ async function createDetector() {
     runtime,
     modelType: 'lite',
     solutionPath: `@mediapipe/pose@0.5.1675469404`,
+    enableSegmentation: true,
+    smoothSegmentation: true
     //solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
   });
 }
 
-/*async function createSegmentationModel() {
-  const runtime = 'mediapipe';
-  return bodySegmentation.createSegmenter(bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation, {
-    runtime,
-    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@${mpSelfieSegmentation.VERSION}`,
-  });
-}*/
-
-/*async function createDetector() {
-  let modelType = posedetection.movenet.modelType.SINGLEPOSE_LIGHTNING;
-  const modelConfig = { modelType };
-  return await posedetection.createDetector(posedetection.SupportedModels.MoveNet, modelConfig);
-}
-*/
-/*async function createDetector() {
-  const modelConfig = {
-    quantBytes: 4,
-    architecture: 'MobileNetV1',
-    outputStride: 16,
-    inputResolution: { width: 250, height: 250 },
-    multiplier: 0.75
-  };
-  return await posedetection.createDetector(posedetection.SupportedModels.PoseNet, modelConfig);
-}*/
-
-
 async function checkGuiUpdate() {
   window.cancelAnimationFrame(rafId);
+  canvas.width = 640;
+  canvas.height = 480;
 
   if (detector != null) {
     detector.dispose();
   }
 
-  /* if (segmenter != null) {
-     segmenter.dispose();
-   }*/
-
   try {
     detector = await createDetector();
-    //segmenter = await createSegmentationModel();
   } catch (error) {
     detector = null;
-    // segmenter = null;
     alert(error);
   }
 
@@ -88,30 +60,17 @@ async function renderResult() {
   }
 
   let poses = null;
-  // let segmentation = null;
+  let segmentation = null;
 
   // Detector can be null if initialization failed (for example when loading
   // from a URL that does not exist).
   if (detector != null) {
     //beginEstimatePosesStats();
     try {
-      poses = await detector.estimatePoses(Camera.video, { maxPoses: 1, flipHorizontal: false });
+      poses = await detector.estimatePoses(
+        Camera.video, { maxPoses: 1, flipHorizontal: false });
 
-      /*if (segmenter === null) return;
-
-      if (segmenter.segmentPeople != null) {
-        segmentation = await segmenter.segmentPeople(Camera.video, {
-          flipHorizontal: false,
-          multiSegmentation: false,
-          segmentBodyParts: true,
-          segmentationThreshold: 40,
-        });
-      } else {
-        segmentation = await segmenter.estimatePoses(
-          Camera.video, { flipHorizontal: false });
-        segmentation = segmentation.map(
-          singleSegmentation => singleSegmentation.segmentation);
-      }*/
+      //segmentation = poses.map(singleSegmentation => singleSegmentation.segmentation);
       //console.log(poses[0]);
     } catch (error) {
       detector.dispose();
@@ -120,12 +79,18 @@ async function renderResult() {
       //segmenter = null;
       alert(error);
     }
+    /*if (segmentation && segmentation.length > 0) {
+      const data = await bodySegmentation.toBinaryMask(
+        segmentation, { r: 0, g: 0, b: 0, a: 0 }, { r: 0, g: 0, b: 0, a: 255 },
+        false, 1);
 
+      await bodySegmentation.drawMask(
+        canvas, Camera.videoStream, data, 1, 15);
+    }*/
     //endEstimatePosesStats();
   }
-
-  View.renderer.draw([Camera.video, poses, false]);
-
+  View.renderer.draw([Camera.video, poses, false, null]);
+  //View.renderer.draw([Camera.video, poses, false, canvas]);
 }
 
 function beginEstimatePosesStats() {
@@ -306,9 +271,10 @@ async function app() {
   init().then(() => {
     Util.loadingStart();
     setTimeout(() => {
-      stats = setupStats();
-      Camera.setup();
+      //stats = setupStats();
+      Camera.initSetup();
       //(new FPSMeter({ ui: true })).start();
+      //stats = setupStats();
       createDetector().then((detector) => {
 
         //console.log(detector);

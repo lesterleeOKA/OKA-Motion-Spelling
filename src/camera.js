@@ -1,5 +1,6 @@
 
 export default {
+  videoStream: document.getElementById('videoStream'),
   video: document.getElementById('video'),
   constraints: {
     'audio': false,
@@ -27,8 +28,12 @@ export default {
         console.log('start getUserMedia');
         navigator.mediaDevices.getUserMedia(this.constraints).then(stream => {
           console.log('got stream from getUserMedia');
+          this.videoStream.srcObject = stream;
           this.video.srcObject = stream;
-          try { this.video.play() } catch (e) {
+          try {
+            this.videoStream.play();
+            this.video.play();
+          } catch (e) {
             console.log(e);
           }
           resolve(this.video);
@@ -47,6 +52,12 @@ export default {
         });
       }
     });
+  },
+
+  initSetup() {
+    videoStream.width = 640;
+    videoStream.height = 480;
+    this.setup();
   },
 
   setup() {
@@ -71,12 +82,6 @@ export default {
 
     video.width = videoWidth;
     video.height = videoHeight;
-
-    /*const canvasContainer = document.querySelector('.canvas-wrapper');
-    if (canvasContainer) {
-      canvasContainer.style.width = `${videoWidth}px`;
-      canvasContainer.style.height = `${videoHeight}px`;
-    }*/
   }
 
 };
