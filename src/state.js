@@ -8,7 +8,7 @@ export default {
   stateLastAt: +new Date(),
   stateLastFor: 0,
   stateType: '',
-  homePageUrl: 'https://dev.openknowledge.hk/RainbowOne/webapp/lester/OKA-Games/',
+  homePageUrl: window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/',
   isSoundOn: true,
   gamePauseData: {
     state: '',
