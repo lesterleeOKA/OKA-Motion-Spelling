@@ -5,13 +5,6 @@ import QuestionManager from './question';
 import { imageFiles } from './mediaFile';
 
 export default {
-  optionImages: [
-    require("./images/spelling/fruit1.png"),
-    require("./images/spelling/fruit2.png"),
-    require("./images/spelling/fruit3.png"),
-    require("./images/spelling/fruit4.png"),
-    require("./images/spelling/fruit5.png"),
-  ],
   fallingId: 0,
   questionType: null,
   randomQuestion: null,
@@ -174,8 +167,8 @@ export default {
             } else {
               this.fallingId = 0;
             }
-            var optionImageId = this.fallingId % this.optionImages.length;
-            this.createRandomItem(this.randomPair[this.fallingId], this.optionImages[optionImageId]);
+            var optionImageId = this.fallingId % View.preloadedFallingImages.length;
+            this.createRandomItem(this.randomPair[this.fallingId], View.preloadedFallingImages[optionImageId]);
           }
         }
         else {
@@ -295,7 +288,7 @@ export default {
     optionWrapper.style.width = `${this.optionSize}px`;
     optionWrapper.style.height = `${this.optionSize}px`;
     if (optionImage !== '' && optionImage !== 'undefined')
-      optionWrapper.style.backgroundImage = `url(${optionImage})`;
+      optionWrapper.style.backgroundImage = `url(${optionImage.src})`;
     optionWrapper.id = id;
     optionWrapper.setAttribute('word', text);
     let option = document.createElement('input');
@@ -438,6 +431,7 @@ export default {
     this.randomPair = this.randomOptions();
     this.questionWrapper = document.createElement('div');
     let questionBg = document.createElement('div');
+    this.answerWrapper = document.createElement('span');
 
     switch (this.randomQuestion.type) {
       case 'Spelling':
@@ -452,11 +446,12 @@ export default {
         this.questionWrapper.appendChild(questionText);
         let fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
+        this.answerWrapper.classList.add('textType');
         //View.stageImg.appendChild(questionText);
         break;
       case 'Listening':
-        this.questionWrapper.classList.add('questionWrapper');
-        questionBg.classList.add('questionBg');
+        this.questionWrapper.classList.add('questionAudioWrapper');
+        questionBg.classList.add('questionAudioBg');
         View.stageImg.appendChild(questionBg);
         this.buttonWrapper = document.createElement('button');
         this.buttonWrapper.classList.add('buttonWrapper');
@@ -483,6 +478,7 @@ export default {
           this.buttonWrapper.classList.add('not-clicked');
         });
         this.questionWrapper.appendChild(this.buttonWrapper);
+        this.answerWrapper.classList.add('audioType');
         break;
       case 'Picture':
         this.questionWrapper.classList.add('questionImageWrapper');
@@ -500,6 +496,7 @@ export default {
         imageElement.alt = 'image';
         imageElement.classList.add('questionImage');
         this.questionWrapper.appendChild(imageElement);
+        this.answerWrapper.classList.add('pictureType');
         break;
     }
 
@@ -507,6 +504,19 @@ export default {
     if (this.randomQuestion.answers === undefined) {
       let resetBtn = document.createElement('div');
       resetBtn.classList.add('resetBtn');
+
+      switch (this.randomQuestion.type) {
+        case 'Spelling':
+        case 'FillingBlank':
+          resetBtn.classList.add('resetTextType');
+          break;
+        case 'Listening':
+          resetBtn.classList.add('resetAudioType');
+          break;
+        case 'Picture':
+          resetBtn.classList.add('resetPictureType');
+          break;
+      }
       View.stageImg.appendChild(resetBtn);
     }
 
@@ -515,7 +525,6 @@ export default {
       console.log('audio', this.randomQuestion.QID);
     }
 
-    this.answerWrapper = document.createElement('span');
     this.answerWrapper.classList.add('answerWrapper');
     View.stageImg.appendChild(this.questionWrapper);
     View.stageImg.appendChild(this.answerWrapper);

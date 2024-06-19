@@ -36,7 +36,7 @@ export class RendererCanvas2d {
         //this.isPoseValid(poses, video.width / video.videoWidth);
         isCurPoseValid = this.isPoseValid(poses, video.width / video.videoWidth);
         if (isCurPoseValid && State.bodyInsideRedBox.value == true) {
-          if (State.state == 'prepare' && State.getStateLastFor() > 6000) {
+          if (State.state == 'prepare' && State.getStateLastFor() > 2000) {
             State.changeState('counting3');
           } else if (State.state == 'counting3' && State.getStateLastFor() > 1000) {
             State.changeState('counting2');
@@ -104,7 +104,7 @@ export class RendererCanvas2d {
         return false;
       }
 
-      let questionBoard = document.querySelector('.questionBg');
+      let questionBoard = document.querySelector('.questionAudioBg');
       let resetBtn = document.querySelector('.resetBtn');
 
       //檢查是否有選到圖
@@ -119,11 +119,13 @@ export class RendererCanvas2d {
 
         for (let point of checkKeypoints) {
           if (point.name === 'right_index') {
-            rightHandImg.style.left = `${point.x - 100}px`;
+            const xInVw = (point.x / window.innerWidth) * 100;
+            rightHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
             rightHandImg.style.top = `${point.y}px`;
             rightHandImg.style.display = 'block';
           } else if (point.name === 'left_index') {
-            leftHandImg.style.left = `${point.x - 100}px`;
+            const xInVw = (point.x / window.innerWidth) * 100;
+            leftHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
             leftHandImg.style.top = `${point.y}px`;
             leftHandImg.style.display = 'block';
           }

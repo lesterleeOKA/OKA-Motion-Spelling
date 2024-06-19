@@ -81,7 +81,7 @@ export default {
       View.showGame();
       View.showPrepareBoard();
       Sound.stopAll('bgm');
-      if (this.isSoundOn) Sound.play('prepare');
+      //if (this.isSoundOn) Sound.play('prepare');
     } else if (state == 'counting3') {
       View.hidePrepareBoard();
       View.showCount(3);

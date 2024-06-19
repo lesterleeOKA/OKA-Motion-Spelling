@@ -45,6 +45,24 @@ export default {
   topLeftControl: document.querySelector('.gameWrapper > .topLeftControl'),
   selectCounts: document.querySelectorAll('.canvasWrapper > .optionArea > .optionWrapper > .selectCount'),
   //-----------------------------------------------------------------------------------------------
+  preloadedFallingImages: [],
+  optionImages: [
+    require("./images/spelling/fruit1.png"),
+    require("./images/spelling/fruit2.png"),
+    require("./images/spelling/fruit3.png"),
+    require("./images/spelling/fruit4.png"),
+    require("./images/spelling/fruit5.png"),
+  ],
+  preloadUsedImages() {
+    this.optionImages.forEach((path) => {
+      const img = new Image();
+      img.src = path;
+      this.preloadedFallingImages.push(img);
+    });
+
+    console.log("preloadUsedImages", this.preloadedFallingImages);
+  },
+
   showInstruction() {
     this.instructionWrapper.style.top = 0;
   },

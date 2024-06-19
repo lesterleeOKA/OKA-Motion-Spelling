@@ -12,13 +12,13 @@
   transition: top 0.5s ease;
 }
 
-.instructionWrapper > .schoolLogo {
+/*.instructionWrapper > .schoolLogo {
   position: absolute;
   top: calc(min(2vh, 2vw));
   left: calc(min(2vh, 2vw));
   content: url(../images/schoolLogo.png);
   width: calc(min(15.7vh, 15.7vw));
-}
+}*/
 
 .instructionWrapper > .instructionBoard> .gameTitle {
   position: relative;
@@ -26,12 +26,13 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  height: calc(min(25.5vh, 25.5vw));
+  height: calc(min(20.5vh, 20.5vw));
   width: 100%;
-  bottom: calc(min(8vh, 8vw));
+  bottom: calc(min(12vh, 12vw));
 }
-.instructionWrapper > .gameTextTitle {
-  font-family: "Arzachel", system-ui;
+.instructionWrapper > .instructionBoard> .gameTextTitle {
+  position: relative;
+  font-family: 'BoinkLETPlain', sans-serif;
   font-weight: bolder;
   text-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
   font-size: calc(min(8.5vh, 8.5vw));
@@ -41,7 +42,8 @@
   background-position: center;
   background-size: contain;
   text-align: center;
-  color: #9c6334;
+  color: #e68ea1;
+  bottom: calc(min(13vh, 13vw));
 }
 
 .instructionWrapper > .instructionBoard {
@@ -74,7 +76,7 @@
   width: calc(min(52vh, 52vw));
   height: calc(min(5vh, 5vw));
   position: absolute;
-  margin-top: calc(min(22vh, 22vw));
+  margin-top: calc(min(18vh, 18vw));
   column-gap:calc(min(1vh, 1vw));
 }
 .instructionWrapper > .instructionBoard > .instructionRule > .icon {
@@ -127,10 +129,11 @@
   -ms-user-select: none;
   user-select: none;
   position: absolute;
-  margin-top: calc(min(38vh, 38vw));
+  margin-top: calc(min(35vh, 35vw));
 }
 
-.instructionWrapper > .instructionBoard > .startBtn:active {
+.instructionWrapper > .instructionBoard > .startBtn:active,
+.instructionWrapper > .instructionBoard > .startBtn.touched  {
   height: calc(min(6.5vh, 6.5vw));
   padding: calc(min(1vh, 1vw));
 }
@@ -143,17 +146,6 @@
     content: url(../images/start_green.png);
   }
 }
-
-/*@keyframes startBtnTextAnimation {
-  0% {
-    -webkit-text-stroke: 2px #e68b14ce;
-    pointer-events: none;
-  }
-  51% {
-    -webkit-text-stroke: 2px #608364ce;
-    pointer-events: none;
-  }
-}*/
 
 .instructionWrapper > .startBtn:active {
   content: url(../images/start_green.png);
