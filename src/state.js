@@ -8,6 +8,7 @@ export default {
   stateLastAt: +new Date(),
   stateLastFor: 0,
   stateType: '',
+  //homePageUrl: 'https://www.starwishparty.com',
   homePageUrl: window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/',
   isSoundOn: true,
   gamePauseData: {
@@ -81,7 +82,7 @@ export default {
       View.showGame();
       View.showPrepareBoard();
       Sound.stopAll('bgm');
-      //if (this.isSoundOn) Sound.play('prepare');
+      if (this.isSoundOn) Sound.play('prepare');
     } else if (state == 'counting3') {
       View.hidePrepareBoard();
       View.showCount(3);
@@ -108,7 +109,7 @@ export default {
         case 'showQstImg':
           this.changeState('playing', 'waitAns');
         case 'waitAns':
-          View.hideTips();
+          View.hidePrepareBoard();
           Game.startCountTime();
           break;
         case 'ansWrong':
@@ -148,12 +149,14 @@ export default {
     } else if (state == 'outBox') {
       if (stateType == 'outBox') {
         if (this.isSoundOn) Sound.play('outBox');
-        View.showTips('tipsOutBox');
+        //View.showTips('tipsOutBox');
+        View.showPrepareBoard();
       }
     } else if (state == 'finished') {
       View.hideTopLeftControl();
       View.hideTips();
       View.hideGame();
+      View.showHands(false);
       View.showFinished();
       Sound.stopAll();
       if (this.isSoundOn) {

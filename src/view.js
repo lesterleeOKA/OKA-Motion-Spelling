@@ -44,6 +44,9 @@ export default {
   finishedTime: document.querySelector('.finishedWrapper > .finishedBoardWrapper > .scoreTimeWrapper > .row.time > .value'),
   topLeftControl: document.querySelector('.gameWrapper > .topLeftControl'),
   selectCounts: document.querySelectorAll('.canvasWrapper > .optionArea > .optionWrapper > .selectCount'),
+
+  rightHandImg: document.getElementById('right-hand'),
+  leftHandImg: document.getElementById('left-hand'),
   //-----------------------------------------------------------------------------------------------
   preloadedFallingImages: [],
   optionImages: [
@@ -222,6 +225,11 @@ export default {
   //-----------------------------------------------------------------------------------------------
   setSelectCount(value) {
     for (let selectCount of this.selectCounts) selectCount.innerHTML = value;
-  }
+  },
   //-----------------------------------------------------------------------------------------------
+
+  showHands(status) {
+    this.rightHandImg.style.display = status ? 'block' : 'none';
+    this.leftHandImg.style.display = status ? 'block' : 'none';
+  }
 };
