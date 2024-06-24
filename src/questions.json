@@ -175,6 +175,126 @@
         "correctAnswer":"Stapler"
       },
       {
+        "QID":"p2u2-d1",
+        "type":"FillingBlank",
+        "question":"Peter is good at playing____________. He has scored many goals.",
+        "correctAnswer":"football"
+      },
+      {
+        "QID": "p2u2-d2",
+        "type": "FillingBlank",
+        "question": "Can you teach me how to ride a _________?",
+        "correctAnswer": "bicycle"
+      },
+      {
+        "QID": "p2u2-d3",
+        "type": "FillingBlank",
+        "question": "Sally's dog, Coco can get the ________ back in two seconds.",
+        "correctAnswer": "Frisbee"
+      },
+      {
+        "QID": "p2u2-d4",
+        "type": "FillingBlank",
+        "question": "My dad just bought me a new ______. It is fun to play with.",
+        "correctAnswer": "scooter"
+      },
+      {
+        "QID": "p2u2-d5",
+        "type": "FillingBlank",
+        "question": "Sam and Peter are battling on the _________.",
+        "correctAnswer": "seesaw"
+      },
+      {
+        "QID": "p2u2-d6",
+        "type": "FillingBlank",
+        "question": "We all love playing on the _______ because it feels like flying in the sky.",
+        "correctAnswer": "swing"
+      },
+      {
+        "QID": "p2u2-d7",
+        "type": "FillingBlank",
+        "question": "Wow! This is the fastest ______ever!",
+        "correctAnswer": "slide"
+      },
+      {
+        "QID": "p2u2-d8",
+        "type": "FillingBlank",
+        "question": "Should we play some ______ such as hide-and-seek?",
+        "correctAnswer": "games"
+      },
+      {
+        "QID": "p2u2-d9",
+        "type": "FillingBlank",
+        "question": "Let's take some beautiful _______ before we go!",
+        "correctAnswer": "photos"
+      },
+      {
+        "QID": "p2u2-d10",
+        "type": "FillingBlank",
+        "question": "Mom, please buy more chicken wings for the ____________tomorrow!",
+        "correctAnswer": "barbecue"
+      },
+      {
+        "QID": "p2u2-d11",
+        "type": "FillingBlank",
+        "question": "I don't think grandma can ______ the stairs. It's very tiring.",
+        "correctAnswer": "climb"
+      },
+      {
+        "QID": "p2u2-d12",
+        "type": "FillingBlank",
+        "question": "Excuse me, what would you like to ______?",
+        "correctAnswer": "drink"
+      },
+      {
+        "QID": "p2u2-d13",
+        "type": "FillingBlank",
+        "question": "I am ___________ the room all by myself!",
+        "correctAnswer": "painting"
+      },
+      {
+        "QID": "p2u2-d14",
+        "type": "FillingBlank",
+        "question": "Don't ______ on the floor, or I will tell Mr. Lam!",
+        "correctAnswer": "spit"
+      },
+      {
+        "QID": "p2u2-d15",
+        "type": "FillingBlank",
+        "question": "You must not _________. The rubbish bin is right next to you.",
+        "correctAnswer": "litter"
+      },
+      {
+        "QID": "p2u2-d16",
+        "type": "FillingBlank",
+        "question": "My mom is making me cheese and ham __________ for lunch.",
+        "correctAnswer": "sandwiches"
+      },
+      {
+        "QID": "p2u2-d17",
+        "type": "FillingBlank",
+        "question": "What is your favourite fruit? I love __________.",
+        "correctAnswer": "strawberries"
+      },
+      {
+        "QID": "p2u2-d18",
+        "type": "FillingBlank",
+        "question": "Do you know where we can go for a ______?",
+        "correctAnswer": "picnic"
+      },
+      {
+        "QID": "p2u2-d19",
+        "type": "FillingBlank",
+        "question": "We cannot pick _________ in the park.",
+        "correctAnswer": "flowers"
+      },
+      {
+        "QID": "p2u2-d20",
+        "type": "FillingBlank",
+        "question": "Mona likes to go ________because she can see the bright stars at night.",
+        "correctAnswer": "camping"
+      },
+      {
       "QID":"p2u3-c1",
       "type":"Listening",
       "question":"sixth",

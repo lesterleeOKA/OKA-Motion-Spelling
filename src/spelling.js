@@ -10,7 +10,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 180,
+  remainingTime: 120,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -32,6 +32,7 @@ export default {
   fallingDelay: 0,
   finishedCreateOptions: false,
   eachQAMark: 0,
+  isPlayLastTen: false,
 
   init() {
     //View.showTips('tipsReady');
@@ -62,7 +63,7 @@ export default {
     this.redBoxHeight = (View.canvas.height / 5) * 2;
     this.leftCount = 0;
     this.rightCount = 0;
-    this.fallingDelay = 1000;
+    this.fallingDelay = 800;
     View.stageImg.innerHTML = '';
     View.optionArea.innerHTML = '';
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
@@ -76,6 +77,7 @@ export default {
         star.classList.remove("show");
       }
     }
+    this.isPlayLastTen = false;
   },
 
   handleVisibilityChange() {
@@ -191,8 +193,18 @@ export default {
       this.time--;
       this.updateTimerDisplay(this.time);
 
+      if (this.time <= 10 && !this.isPlayLastTen) {
+        if (State.isSoundOn) {
+          Sound.play('lastTen', true);
+          console.log('play last ten!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        }
+        View.timeText.classList.add('lastTen');
+        this.isPlayLastTen = true;
+      }
+
       if (this.time <= 0) {
         this.stopCountTime();
+        View.timeText.classList.remove('lastTen');
         State.changeState('finished');
         this.startedGame = false;
       } else {
@@ -306,7 +318,7 @@ export default {
     item.optionWrapper.classList.add("show");
     item.optionWrapper.style.left = item.x + 'px';
     /*item.optionWrapper.style.setProperty('--top-height', `${0}px`);*/
-    item.optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
+    item.optionWrapper.style.setProperty('--bottom-height', `${(View.canvas.height)}px`);
     item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item));
   },
   resetFallingItem(item) {
@@ -326,13 +338,15 @@ export default {
     else {
       itemLength = this.randomPair.length;
     }
-    let delay = itemLength * 300;
+    let delay = 0;
 
-
+    if (itemLength > 1) {
+      delay = itemLength * 250;
+    }
     //console.log("delay", delay, itemLength);
     setTimeout(() => {
       optionWrapper.style.left = optionWrapper.x + 'px';
-      optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height * 2}px`);
+      optionWrapper.style.setProperty('--bottom-height', `${(View.canvas.height)}px`);
       //optionWrapper.style.setProperty('--fallingSpeed', `${5 + this.randomPair.length}s`);
       optionWrapper.classList.add('show');
     }, delay);
@@ -433,7 +447,6 @@ export default {
     switch (this.randomQuestion.type) {
       case 'Spelling':
       case 'MultipleChoice':
-      case 'FillingBlank':
         this.questionWrapper.classList.add('questionWrapper');
         questionBg.classList.add('questionBg');
         View.stageImg.appendChild(questionBg);
@@ -441,7 +454,7 @@ export default {
         var questionText = document.createElement('span');
         questionText.textContent = this.randomQuestion.question;
         this.questionWrapper.appendChild(questionText);
-        let fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.answerWrapper.classList.add('textType');
         //View.stageImg.appendChild(questionText);
@@ -452,6 +465,7 @@ export default {
         View.stageImg.appendChild(questionBg);
         this.buttonWrapper = document.createElement('button');
         this.buttonWrapper.classList.add('buttonWrapper');
+        this.buttonWrapper.classList.add('audioPlay');
         this.buttonWrapper.addEventListener('mousedown', () => {
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
@@ -476,6 +490,45 @@ export default {
         });
         this.questionWrapper.appendChild(this.buttonWrapper);
         this.answerWrapper.classList.add('audioType');
+        break;
+      case 'FillingBlank':
+        this.questionWrapper.classList.add('questionFillBlankWrapper');
+        questionBg.classList.add('questionImgBg');
+        View.stageImg.appendChild(questionBg);
+        var questionText = document.createElement('span');
+        questionText.textContent = this.randomQuestion.question;
+        this.questionWrapper.appendChild(questionText);
+        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        this.questionWrapper.style.setProperty('--question-font-size', fontSize);
+
+        this.buttonWrapper = document.createElement('button');
+        this.buttonWrapper.classList.add('buttonWrapper');
+        this.buttonWrapper.classList.add('fillBlankPlay');
+        this.buttonWrapper.addEventListener('mousedown', () => {
+          this.buttonWrapper.classList.add('clicked');
+          this.buttonWrapper.classList.remove('not-clicked');
+          this.playWordAudio(this.randomQuestion.QID);
+        });
+
+        this.buttonWrapper.addEventListener('mouseup', () => {
+          this.buttonWrapper.classList.remove('clicked');
+          this.buttonWrapper.classList.add('not-clicked');
+        });
+        this.buttonWrapper.addEventListener('touchstart', (event) => {
+          event.preventDefault(); // Prevent default touch behavior
+          this.buttonWrapper.classList.add('clicked');
+          this.buttonWrapper.classList.remove('not-clicked');
+          this.playWordAudio(this.randomQuestion.QID);
+        });
+
+        this.buttonWrapper.addEventListener('touchend', (event) => {
+          event.preventDefault(); // Prevent default touch behavior
+          this.buttonWrapper.classList.remove('clicked');
+          this.buttonWrapper.classList.add('not-clicked');
+        });
+        this.questionWrapper.appendChild(this.buttonWrapper);
+
+        this.answerWrapper.classList.add('pictureType');
         break;
       case 'Picture':
         this.questionWrapper.classList.add('questionImageWrapper');
@@ -513,12 +566,12 @@ export default {
 
       switch (this.randomQuestion.type) {
         case 'Spelling':
-        case 'FillingBlank':
           resetBtn.classList.add('resetTextType');
           break;
         case 'Listening':
           resetBtn.classList.add('resetAudioType');
           break;
+        case 'FillingBlank':
         case 'Picture':
           resetBtn.classList.add('resetPictureType');
           break;
@@ -553,7 +606,7 @@ export default {
   playWordAudio(QID) {
     // Add your button click event handler logic here
     if (State.isSoundOn) {
-      Sound.stopAll('bgm');
+      Sound.stopAll(['bgm', 'lastTen']);
       Sound.play(QID);
     }
   },
@@ -592,7 +645,7 @@ export default {
 
         this.fillwordTime += 1;
         if (State.isSoundOn) {
-          Sound.stopAll('bgm');
+          Sound.stopAll(['bgm', 'lastTen']);
           Sound.play('btnClick');
         }
         if (this.fillwordTime == this.answerLength) {
@@ -639,6 +692,6 @@ export default {
     View.stageImg.innerHTML = '';
     setTimeout(() => {
       this.nextQuestion = true;
-    }, 1000);
+    }, 500);
   }
 }

@@ -134,11 +134,17 @@ export class RendererCanvas2d {
         for (let point of checkKeypoints) {
 
           if (questionBoard && Game.randomQuestion.type === 'Listening') {
+
+            const questionBoardOffsetLeft = questionBoard.offsetLeft;
+            const questionBoardOffsetTop = questionBoard.offsetTop;
+            const questionBoardWidth = questionBoard.offsetWidth;
+            const questionBoardHeight = questionBoard.offsetHeight;
+
             if (
-              point.x > questionBoard.offsetLeft * 2 &&
-              point.x < (questionBoard.offsetLeft * 2 + questionBoard.offsetWidth * 2) &&
-              point.y > questionBoard.offsetTop &&
-              point.y < (questionBoard.offsetTop + questionBoard.offsetHeight
+              point.x > questionBoardOffsetLeft * 2.5 &&
+              point.x < (questionBoardOffsetLeft * 2 + questionBoardWidth * 1.5) &&
+              point.y > questionBoardOffsetTop &&
+              point.y < (questionBoardOffsetTop + questionBoardHeight * 0.5
               )
             ) {
               //console.log('touch question board!!!!!!!!!!!!!!!!!!!!!!');
@@ -156,15 +162,15 @@ export class RendererCanvas2d {
 
           if (resetBtn) {
             if (
-              point.x > resetBtn.offsetLeft * 2 &&
-              point.x < (resetBtn.offsetLeft * 2 + resetBtn.offsetWidth * 2) &&
-              point.y > resetBtn.offsetTop &&
-              point.y < (resetBtn.offsetTop + resetBtn.offsetHeight
+              point.x > (resetBtn.offsetLeft * 2 + 20) &&
+              point.x < (resetBtn.offsetLeft * 2 + (resetBtn.offsetWidth * 2) - 20) &&
+              point.y > (resetBtn.offsetTop + 20) &&
+              point.y < (resetBtn.offsetTop + (resetBtn.offsetHeight - 20)
               )
             ) {
 
               if (State.isSoundOn) {
-                Sound.stopAll('bgm');
+                Sound.stopAll(['bgm', 'lastTen']);
                 Sound.play('btnClick');
               }
 
