@@ -82,7 +82,7 @@ export class RendererCanvas2d {
   isPoseValid(poses) {
     if (!poses[0]) return false;
     let pose = poses[0];
-    let passScore = 0.65;
+    let passScore = 0.4;
 
     if (pose.keypoints != null) {
       //我建議膊頭兩點，腰兩點，膝頭兩點，手肘兩點，手腕兩點入框就可以玩
@@ -117,17 +117,23 @@ export class RendererCanvas2d {
         const rightHandImg = document.getElementById('right-hand');
         const leftHandImg = document.getElementById('left-hand');
 
-        for (let point of checkKeypoints) {
-          if (point.name === 'right_index') {
-            const xInVw = (point.x / window.innerWidth) * 100;
-            rightHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
-            rightHandImg.style.top = `${point.y}px`;
-            rightHandImg.style.display = 'block';
-          } else if (point.name === 'left_index') {
-            const xInVw = (point.x / window.innerWidth) * 100;
-            leftHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
-            leftHandImg.style.top = `${point.y}px`;
-            leftHandImg.style.display = 'block';
+        if (checkKeypoints.length === 0) {
+          // Disable both hand images
+          rightHandImg.style.display = 'none';
+          leftHandImg.style.display = 'none';
+        } else {
+          for (let point of checkKeypoints) {
+            if (point.name === 'right_index') {
+              const xInVw = (point.x / window.innerWidth) * 100;
+              rightHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
+              rightHandImg.style.top = `${point.y}px`;
+              rightHandImg.style.display = 'block';
+            } else if (point.name === 'left_index') {
+              const xInVw = (point.x / window.innerWidth) * 100;
+              leftHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
+              leftHandImg.style.top = `${point.y}px`;
+              leftHandImg.style.display = 'block';
+            }
           }
         }
 
@@ -169,14 +175,19 @@ export class RendererCanvas2d {
               )
             ) {
 
-              if (State.isSoundOn) {
-                Sound.stopAll(['bgm', 'lastTen']);
-                Sound.play('btnClick');
-              }
+              if (!resetBtn.classList.contains('active')) {
+                if (!Game.isTriggeredBackSpace) {
+                  if (State.isSoundOn) {
+                    Sound.stopAll(['bgm', 'lastTen']);
+                    Sound.play('btnClick');
+                  }
 
-              for (let option of optionWrappers) option.classList.remove('touch');
-              Game.resetFillWord();
-              resetBtn.classList.add('active');
+                  for (let option of optionWrappers) option.classList.remove('touch');
+                  //Game.resetFillWord();
+                  Game.backSpaceWord();
+                  resetBtn.classList.add('active');
+                }
+              }
               //console.log("reset word");
             } else {
               resetBtn.classList.remove('active');
@@ -193,26 +204,19 @@ export class RendererCanvas2d {
               point.x > (optionRect.left - canvasWrapperRect.left) &&
               point.x < (optionRect.right - canvasWrapperRect.left) &&
               point.y > (optionRect.top - canvasWrapperRect.top) &&
-              point.y < (optionRect.bottom - canvasWrapperRect.top)
+              point.y < (optionRect.bottom - canvasWrapperRect.top) &&
+              !Game.isTriggeredBackSpace
             ) {
               touchingWord.push(option);
             }
             //console.log(point);
-            /*if (
-              point.x > option.offsetLeft &&
-              point.x < (option.offsetLeft + option.offsetWidth) &&
-              point.y > option.offsetTop &&
-              point.y < (option.offsetTop + option.offsetHeight)
-            ) {
-              touchingWord.push(option);
-            }*/
           }
         }
 
         for (let option of optionWrappers) {
           if (touchingWord.includes(option) && !option.classList.contains('touch')) {
             State.setPoseState('selectedImg', option);
-            // console.log("touch ", option);
+            //console.log("touch ", option);
             Game.fillWord(option);
           }
         }

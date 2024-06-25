@@ -10,7 +10,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 120,
+  remainingTime: 9999,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -18,6 +18,7 @@ export default {
   nextQuestion: true,
   randomPair: [],
   fallingItems: [],
+  typedItems: [],
   answeredNum: 0,
   answerLength: 0,
   questionWrapper: null,
@@ -33,6 +34,7 @@ export default {
   finishedCreateOptions: false,
   eachQAMark: 0,
   isPlayLastTen: false,
+  isTriggeredBackSpace: false,
 
   init() {
     //View.showTips('tipsReady');
@@ -49,6 +51,7 @@ export default {
     this.addScore(0);
     this.randomPair = [];
     this.fallingItems = [];
+    this.typedItems = [];
     this.stopCountTime();
     this.fillwordTime = 0;
     this.questionWrapper = null;
@@ -56,7 +59,7 @@ export default {
     View.scoreBoard.className = "scoreBoard";
     this.answeredNum = 0;
     this.answerLength = 0;
-    this.optionSize = View.canvas.width / 8;
+    this.optionSize = View.canvas.width / 7.5;
     this.redBoxX = View.canvas.width / 3;
     this.redBoxY = (View.canvas.height / 5) * 3;
     this.redBoxWidth = View.canvas.width / 3;
@@ -78,6 +81,7 @@ export default {
       }
     }
     this.isPlayLastTen = false;
+    this.isTriggeredBackSpace = false;
   },
 
   handleVisibilityChange() {
@@ -250,6 +254,7 @@ export default {
         const newFallingItem = {
           x,
           size: this.optionSize,
+          img: optionImage,
           optionWrapper,
           id,
         };
@@ -259,6 +264,8 @@ export default {
       const newFallingItem = generatePosition();
       this.fallingItems.push(newFallingItem);
       this.renderFallingItem(newFallingItem);
+
+      //console.log("this.fallingItems", this.fallingItems);
     }
   },
   getBalancedRandom() {
@@ -280,13 +287,19 @@ export default {
   },
 
   generatePositionX(isLeft) {
-    let newX;
+    let numColumns, columnWidth, columnIndex;
+
     if (isLeft) {
-      newX = Math.round(this.getRandomInt(0, this.redBoxX - this.optionSize));
+      numColumns = Math.floor(this.redBoxX / this.optionSize);
+      columnWidth = this.redBoxX / numColumns;
+      columnIndex = this.getRandomInt(0, numColumns);
+      return columnIndex * columnWidth;
     } else {
-      newX = Math.round(this.getRandomInt((this.redBoxX + this.redBoxWidth + 20), View.canvas.width - this.optionSize));
+      numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / this.optionSize);
+      columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / numColumns;
+      columnIndex = this.getRandomInt(0, numColumns);
+      return this.redBoxX + this.redBoxWidth + columnIndex * columnWidth + 50;
     }
-    return newX;
   },
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -330,6 +343,17 @@ export default {
     let isLeft = this.getBalancedRandom();
     optionWrapper.x = this.generatePositionX(isLeft);
 
+    let delay = this.refallingDelay();
+    //console.log("delay", delay, itemLength);
+    setTimeout(() => {
+      optionWrapper.style.left = optionWrapper.x + 'px';
+      optionWrapper.style.setProperty('--bottom-height', `${(View.canvas.height)}px`);
+      //optionWrapper.style.setProperty('--fallingSpeed', `${5 + this.randomPair.length}s`);
+      optionWrapper.classList.add('show');
+    }, delay);
+  },
+
+  refallingDelay() {
     let itemLength;
 
     if (this.finishedCreateOptions) {
@@ -343,19 +367,12 @@ export default {
     if (itemLength > 1) {
       delay = itemLength * 250;
     }
-    //console.log("delay", delay, itemLength);
-    setTimeout(() => {
-      optionWrapper.style.left = optionWrapper.x + 'px';
-      optionWrapper.style.setProperty('--bottom-height', `${(View.canvas.height)}px`);
-      //optionWrapper.style.setProperty('--fallingSpeed', `${5 + this.randomPair.length}s`);
-      optionWrapper.classList.add('show');
-    }, delay);
-
+    return delay;
   },
 
   removeFallingItem(item) {
-    const index = this.fallingItems.indexOf(item);
-    if (index > -1) {
+    const index = this.fallingItems.findIndex(i => i.optionWrapper === item);
+    if (index !== -1) {
       this.fallingItems.splice(index, 1);
       View.optionArea.removeChild(item);
     }
@@ -640,7 +657,8 @@ export default {
           //option.classList.add('fadeOut');
           //this.removeFallingItem()
           //View.optionArea.removeChild(option);
-          this.removeFallingItem(option);
+          //this.removeFallingItem(option);
+          this.typedItems.push(option);
         }
 
         this.fillwordTime += 1;
@@ -660,6 +678,31 @@ export default {
     this.randomPair = this.randomOptions();
     this.clearWrapper();
   },
+  backSpaceWord() {
+    let answerText = this.answerWrapper.textContent;
+    if (!this.isTriggeredBackSpace && answerText.length > 0) {
+      this.isTriggeredBackSpace = true;
+      this.answerWrapper.textContent = answerText.slice(0, -1);
+      this.fillwordTime = answerText.length - 1;
+
+      let delay = 300;
+      let lastOption = null;
+      if (this.typedItems.length > 0) {
+        lastOption = this.typedItems[this.typedItems.length - 1];
+        console.log('lastOption', lastOption);
+      }
+
+      //let hiddenedOption = this.fallingItems.filter(item => item.optionWrapper.getAttribute('word') === lastChar);
+      setTimeout(() => {
+        if (lastOption && !lastOption.classList.contains('show')) {
+          lastOption.classList.add('show');
+        }
+        this.typedItems.pop();
+        console.log("this.typedItems", this.typedItems);
+        this.isTriggeredBackSpace = false;
+      }, delay);
+    }
+  },
   clearWrapper() {
     this.finishedCreateOptions = false;
     this.fallingId = 0;
@@ -671,6 +714,7 @@ export default {
     this.fillwordTime = 0;
     this.fallingItems.splice(0);
     View.optionArea.innerHTML = '';
+    this.typedItems.splice(0);
   },
   checkAnswer(answer) {
     if (answer === this.randomQuestion.correctAnswer) {
