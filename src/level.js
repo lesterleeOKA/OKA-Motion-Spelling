@@ -1,4 +1,5 @@
 let LEVEL_KEY = '';
+let GAME_TIME = null;
 
 function loadLevel() {
   const currentURL = window.location.href;
@@ -22,4 +23,23 @@ function loadLevel() {
   return levelKey;
 }
 
-export { loadLevel };
+function loadGameTime() {
+  const currentURL = window.location.href;
+  if (currentURL.includes('?')) {
+    // Split the URL by the ? character to get the search params
+    const [, searchParams] = currentURL.split('?');
+    const params = searchParams.split('&');
+
+    const gameTimeParam = params.find(param => param.startsWith('gameTime='));
+    const gameTimeValue = gameTimeParam ? gameTimeParam.split('=')[1] : null;
+
+    console.log(gameTimeValue);
+    GAME_TIME = gameTimeValue ? gameTimeValue.toString() : null;
+  }
+
+  var gameTime = GAME_TIME;
+  console.log("game time", gameTime);
+  return gameTime;
+}
+
+export { loadLevel, loadGameTime };

@@ -12,7 +12,7 @@ export class RendererCanvas2d {
     this.videoHeight = canvas.height;
     this.lastPoseValidValue = false;
     this.modelType = posedetection.SupportedModels.BlazePose;
-    this.scoreThreshold = 0.65;
+    this.scoreThreshold = 0.8;
     this.triggerAudio = false;
   }
 
@@ -82,7 +82,7 @@ export class RendererCanvas2d {
   isPoseValid(poses) {
     if (!poses[0]) return false;
     let pose = poses[0];
-    let passScore = 0.4;
+    let passScore = this.scoreThreshold;
 
     if (pose.keypoints != null) {
       //我建議膊頭兩點，腰兩點，膝頭兩點，手肘兩點，手腕兩點入框就可以玩
@@ -104,7 +104,17 @@ export class RendererCanvas2d {
         return false;
       }
 
-      let questionBoard = document.querySelector('.questionAudioBg');
+      let questionBoard = null;
+
+      if (Game.randomQuestion) {
+        if (Game.randomQuestion.type === 'Listening') {
+          questionBoard = document.querySelector('.questionAudioBg');
+        }
+        else if (Game.randomQuestion.type === 'FillingBlank') {
+          questionBoard = document.querySelector('.questionImgBg');
+        }
+      }
+
       let resetBtn = document.querySelector('.resetBtn');
 
       //檢查是否有選到圖
@@ -139,7 +149,7 @@ export class RendererCanvas2d {
 
         for (let point of checkKeypoints) {
 
-          if (questionBoard && Game.randomQuestion.type === 'Listening') {
+          if (questionBoard) {
 
             const questionBoardOffsetLeft = questionBoard.offsetLeft;
             const questionBoardOffsetTop = questionBoard.offsetTop;
@@ -171,8 +181,8 @@ export class RendererCanvas2d {
               point.x > (resetBtn.offsetLeft * 2 + 20) &&
               point.x < (resetBtn.offsetLeft * 2 + (resetBtn.offsetWidth * 2) - 20) &&
               point.y > (resetBtn.offsetTop + 20) &&
-              point.y < (resetBtn.offsetTop + (resetBtn.offsetHeight - 20)
-              )
+              point.y < (resetBtn.offsetTop + (resetBtn.offsetHeight - 20)) &&
+              !Game.isTriggeredBackSpace
             ) {
 
               if (!resetBtn.classList.contains('active')) {
@@ -181,9 +191,7 @@ export class RendererCanvas2d {
                     Sound.stopAll(['bgm', 'lastTen']);
                     Sound.play('btnClick');
                   }
-
                   for (let option of optionWrappers) option.classList.remove('touch');
-                  //Game.resetFillWord();
                   Game.backSpaceWord();
                   resetBtn.classList.add('active');
                 }
@@ -227,69 +235,6 @@ export class RendererCanvas2d {
         for (let option of optionWrappers) option.classList.remove('touch');
         State.changeState('playing', 'waitAns');
       }
-
-      //檢查有沒有面向鏡頭
-      /*let nose = pose.keypoints.find(k=>k.name=='nose' && k.score>passScore); //鼻尖
-      let left_ear = pose.keypoints.find(k=>k.name=='left_ear' && k.score>passScore); //左耳
-      let right_ear = pose.keypoints.find(k=>k.name=='right_ear' && k.score>passScore); //右耳
-      let left_eye = pose.keypoints.find(k=>k.name=='left_eye' && k.score>passScore); //左眼
-      let right_eye = pose.keypoints.find(k=>k.name=='right_eye' && k.score>passScore); //右眼
-      let left_shoulder = pose.keypoints.find(k=>k.name=='left_shoulder' && k.score>passScore); //膊頭
-      let right_shoulder = pose.keypoints.find(k=>k.name=='right_shoulder' && k.score>passScore); //膊頭
-
-      let isBodyNotFaceCam = (
-        Camera.constraints.video.facingMode=='user' ? (
-          (nose && left_ear && left_ear.x > nose.x) || //面部左轉
-          (nose && right_ear && right_ear.x < nose.x) || //面部右轉
-          (left_eye && right_eye && right_eye.x < left_eye.x) || //面部背各鏡頭
-          (left_shoulder && right_shoulder && right_shoulder.x < left_shoulder.x) //膊頭背各鏡頭
-        ) : (
-          (nose && left_ear && left_ear.x < nose.x) || //面部左轉
-          (nose && right_ear && right_ear.x > nose.x) || //面部右轉
-          (left_eye && right_eye && right_eye.x > left_eye.x) ||
-          (left_shoulder && right_shoulder && right_shoulder.x > left_shoulder.x)
-        )
-      );
-      State.setPoseState('bodyFaceCam', !isBodyNotFaceCam);
-      if (isBodyNotFaceCam) {
-        if (State.state=='playing') State.changeState('outBox', 'face');
-        //console.log('outBox', 'face');
-        return false;
-      }*/
-
-      //檢查有沒有舉高手
-      /*let left_elbow = pose.keypoints.find(k=>k.name=='left_elbow' && k.score>passScore); //手踭
-      let left_wrist = pose.keypoints.find(k=>k.name=='left_wrist' && k.score>passScore); //手腕
-      let right_elbow = pose.keypoints.find(k=>k.name=='right_elbow' && k.score>passScore); //手踭
-      let right_wrist = pose.keypoints.find(k=>k.name=='right_wrist' && k.score>passScore); //手腕
-      let isBodyHandsUp = (
-        (left_elbow && left_wrist && left_wrist.y < left_elbow.y) || //手腕高過手踭
-        (right_elbow && right_wrist && right_wrist.y < right_elbow.y) ||
-        (left_elbow && left_shoulder && left_shoulder.y > left_elbow.y) || //手踭高過膊頭
-        (right_elbow && right_shoulder && right_shoulder.y > right_elbow.y)
-      );
-      State.setPoseState('bodyHandsUp', isBodyHandsUp);
-      if (isBodyHandsUp) {
-        if (State.state=='playing') State.changeState('outBox', 'hand');
-        //console.log('outBox', 'hand');
-        return false;
-      }*/
-
-      //檢查是否踎低
-      /*let left_hip = pose.keypoints.find(k=>k.name=='left_hip' && k.score>passScore); //腰
-      let right_hip = pose.keypoints.find(k=>k.name=='right_hip' && k.score>passScore); //腰
-      let left_knee = pose.keypoints.find(k=>k.name=='left_knee' && k.score>passScore); //膝頭
-      let right_knee = pose.keypoints.find(k=>k.name=='right_knee' && k.score>passScore); //膝頭
-      let isBodySit = (
-        (left_shoulder && left_hip && left_knee && ((left_knee.y - left_hip.y) < ((left_hip.y - left_shoulder.y) * 0.5))) ||
-        (right_shoulder && right_hip && right_knee && ((right_knee.y - right_hip.y) < ((right_hip.y - right_shoulder.y) * 0.5)))
-      );
-      State.setPoseState('bodySit', isBodySit);
-      if (isBodySit) {
-        if (State.state=='playing') State.changeState('outBox', 'sit');
-        //console.log('outBox', 'sit');
-        return false;
-      }*/
 
       return true;
     } else {

@@ -8,8 +8,8 @@ export default {
   stateLastAt: +new Date(),
   stateLastFor: 0,
   stateType: '',
-  homePageUrl: 'https://www.starwishparty.com',
-  //homePageUrl: window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/',
+  //homePageUrl: 'https://www.starwishparty.com',
+  homePageUrl: window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/',
   isSoundOn: true,
   gamePauseData: {
     state: '',
@@ -152,6 +152,7 @@ export default {
         if (this.isSoundOn) Sound.play('outBox');
         //View.showTips('tipsOutBox');
         View.showPrepareBoard();
+        Game.selectedCount = 0;
       }
     } else if (state == 'finished') {
       View.hideTopLeftControl();

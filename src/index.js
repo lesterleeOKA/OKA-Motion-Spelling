@@ -27,8 +27,8 @@ async function createDetector() {
     runtime,
     modelType: 'lite',
     solutionPath: `@mediapipe/pose@0.5.1675469404`,
-    enableSegmentation: true,
-    smoothSegmentation: true
+    enableSegmentation: false,
+    smoothSegmentation: false,
     //solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
   });
 }

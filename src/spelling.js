@@ -1,6 +1,7 @@
 import View from './view';
 import State from './state';
 import Sound from './sound';
+import { loadGameTime } from "./level";
 import QuestionManager from './question';
 
 export default {
@@ -10,7 +11,7 @@ export default {
   question: '',
   score: 0,
   time: 0,
-  remainingTime: 9999,
+  remainingTime: 0,
   optionSize: 0,
   fallingOption: null,
   timer: null,
@@ -35,11 +36,14 @@ export default {
   eachQAMark: 0,
   isPlayLastTen: false,
   isTriggeredBackSpace: false,
+  selectedCount: 0,
 
   init() {
     //View.showTips('tipsReady');
+    let gameTime = loadGameTime();
     this.startedGame = false;
     this.fallingId = 0;
+    this.remainingTime = gameTime !== null ? gameTime : 120;
     this.updateTimerDisplay(this.remainingTime);
     this.questionType = QuestionManager.questionField;
     this.randomQuestion = null;
@@ -82,6 +86,7 @@ export default {
     }
     this.isPlayLastTen = false;
     this.isTriggeredBackSpace = false;
+    this.selectedCount = 0;
   },
 
   handleVisibilityChange() {
@@ -245,12 +250,12 @@ export default {
   },
   createRandomItem(char, optionImage) {
     if (char && char.length !== 0) {
-      const isLeft = this.getBalancedRandom();
+      const columnId = this.getBalancedColumn();
       const word = char;
       const generatePosition = () => {
-        const x = this.generatePositionX(isLeft);
+        const x = this.generatePositionX(columnId);
         const id = this.generateUniqueId();
-        const optionWrapper = this.createOptionWrapper(word, id, optionImage);
+        const optionWrapper = this.createOptionWrapper(word, id, optionImage, columnId);
         const newFallingItem = {
           x,
           size: this.optionSize,
@@ -264,47 +269,37 @@ export default {
       const newFallingItem = generatePosition();
       this.fallingItems.push(newFallingItem);
       this.renderFallingItem(newFallingItem);
-
-      //console.log("this.fallingItems", this.fallingItems);
-    }
-  },
-  getBalancedRandom() {
-    if (this.leftCount > this.rightCount) {
-      this.rightCount++;
-      return false;
-    } else if (this.rightCount > this.leftCount) {
-      this.leftCount++;
-      return true;
-    } else {
-      const isLeft = Math.round(Math.random()) === 0;
-      if (isLeft) {
-        this.leftCount++;
-      } else {
-        this.rightCount++;
-      }
-      return isLeft;
     }
   },
 
-  generatePositionX(isLeft) {
-    let numColumns, columnWidth, columnIndex;
+  getBalancedColumn() {
+    if (this.selectedCount < 3)
+      this.selectedCount += 1;
+    else
+      this.selectedCount = 0;
+
+    return this.selectedCount;
+  },
+
+  generatePositionX(columnId) {
+    console.log("Generated X", columnId);
+    const isLeft = columnId < Math.floor(this.redBoxX / this.optionSize);
+    let numColumns, columnWidth;
 
     if (isLeft) {
       numColumns = Math.floor(this.redBoxX / this.optionSize);
       columnWidth = this.redBoxX / numColumns;
-      columnIndex = this.getRandomInt(0, numColumns);
-      return columnIndex * columnWidth;
+      return columnId * columnWidth + 30;
     } else {
       numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / this.optionSize);
       columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / numColumns;
-      columnIndex = this.getRandomInt(0, numColumns);
-      return this.redBoxX + this.redBoxWidth + columnIndex * columnWidth + 50;
+      return this.redBoxX + this.redBoxWidth + (columnId - Math.floor(this.redBoxX / this.optionSize)) * columnWidth + 15;
     }
   },
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },
-  createOptionWrapper(text, id, optionImage) {
+  createOptionWrapper(text, id, optionImage, columnId) {
     let optionWrapper = document.createElement('div');
     optionWrapper.classList.add('optionWrapper');
     optionWrapper.style.width = `${this.optionSize}px`;
@@ -313,6 +308,7 @@ export default {
       optionWrapper.style.backgroundImage = `url(${optionImage.src})`;
     optionWrapper.id = id;
     optionWrapper.setAttribute('word', text);
+    optionWrapper.setAttribute('column', columnId);
     let option = document.createElement('input');
     option.classList.add('option');
     option.type = 'text';
@@ -335,13 +331,14 @@ export default {
     item.optionWrapper.addEventListener('animationend', () => this.resetFallingItem(item));
   },
   resetFallingItem(item) {
-    var optionWrapper = item.optionWrapper;
+    const optionWrapper = item.optionWrapper;
+
     optionWrapper.classList.remove('show');
     if (this.nextQuestion)
       return;
 
-    let isLeft = this.getBalancedRandom();
-    optionWrapper.x = this.generatePositionX(isLeft);
+    const columnId = this.getBalancedColumn();
+    optionWrapper.x = this.generatePositionX(columnId);
 
     let delay = this.refallingDelay();
     //console.log("delay", delay, itemLength);
@@ -658,6 +655,7 @@ export default {
           //this.removeFallingItem()
           //View.optionArea.removeChild(option);
           //this.removeFallingItem(option);
+          console.log("deduct:", option);
           this.typedItems.push(option);
         }
 
@@ -685,20 +683,23 @@ export default {
       this.answerWrapper.textContent = answerText.slice(0, -1);
       this.fillwordTime = answerText.length - 1;
 
-      let delay = 300;
+      let delay = 1000;
       let lastOption = null;
       if (this.typedItems.length > 0) {
         lastOption = this.typedItems[this.typedItems.length - 1];
         console.log('lastOption', lastOption);
+
+        if (lastOption && !lastOption.classList.contains('show')) {
+          const columnId = this.getBalancedColumn();
+          lastOption.x = this.generatePositionX(columnId);
+          lastOption.classList.add('show');
+        }
+        this.typedItems.pop();
       }
 
       //let hiddenedOption = this.fallingItems.filter(item => item.optionWrapper.getAttribute('word') === lastChar);
       setTimeout(() => {
-        if (lastOption && !lastOption.classList.contains('show')) {
-          lastOption.classList.add('show');
-        }
-        this.typedItems.pop();
-        console.log("this.typedItems", this.typedItems);
+        //console.log("this.typedItems", this.typedItems);
         this.isTriggeredBackSpace = false;
       }, delay);
     }
@@ -715,6 +716,11 @@ export default {
     this.fallingItems.splice(0);
     View.optionArea.innerHTML = '';
     this.typedItems.splice(0);
+    this.column1Count = 0;
+    this.column2Count = 0;
+    this.column3Count = 0;
+    this.column4Count = 0;
+    this.selectedCount = 0;
   },
   checkAnswer(answer) {
     if (answer === this.randomQuestion.correctAnswer) {
