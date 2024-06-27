@@ -19,6 +19,7 @@ let stats;
 let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
 const canvas = document.createElement('canvas');
+let virtualBg = require("./images/spelling/ref.jpg");
 //const ctx = canvas.getContext('2d');
 
 async function createDetector() {
@@ -27,8 +28,8 @@ async function createDetector() {
     runtime,
     modelType: 'lite',
     solutionPath: `@mediapipe/pose@0.5.1675469404`,
-    enableSegmentation: false,
-    smoothSegmentation: false,
+    enableSegmentation: true,
+    smoothSegmentation: true,
     //solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
   });
 }
@@ -71,7 +72,7 @@ async function renderResult() {
       poses = await detector.estimatePoses(
         Camera.video, { maxPoses: 1, flipHorizontal: false });
 
-      //segmentation = poses.map(singleSegmentation => singleSegmentation.segmentation);
+      segmentation = poses.map(singleSegmentation => singleSegmentation.segmentation);
       //console.log(poses[0]);
     } catch (error) {
       detector.dispose();
@@ -80,17 +81,17 @@ async function renderResult() {
       //segmenter = null;
       alert(error);
     }
-    /*if (segmentation && segmentation.length > 0) {
+    if (segmentation && segmentation.length > 0) {
       const data = await bodySegmentation.toBinaryMask(
         segmentation, { r: 0, g: 0, b: 0, a: 0 }, { r: 0, g: 0, b: 0, a: 255 },
-        false, 1);
+        false, 0.78);
 
       await bodySegmentation.drawMask(
-        canvas, Camera.videoStream, data, 1, 15);
-    }*/
+        canvas, Camera.videoStream, data, 1, 1);
+    }
     //endEstimatePosesStats();
   }
-  View.renderer.draw([Camera.video, poses, false, null]);
+  View.renderer.draw([Camera.video, poses, false, canvas]);
   //View.renderer.draw([Camera.video, poses, false, canvas]);
 }
 
@@ -339,14 +340,12 @@ async function app() {
   if (location.protocol !== 'https:') {
     location.replace(`https:${location.href.substring(location.protocol.length)}`);
   }
-
+  //stats = setupStats();
   init().then(() => {
     Util.loadingStart();
     setTimeout(() => {
-      //stats = setupStats();
       Camera.initSetup();
       //(new FPSMeter({ ui: true })).start();
-      //stats = setupStats();
       createDetector().then((detector) => {
 
         //console.log(detector);

@@ -14,8 +14,10 @@ function loadLevel() {
     const unitParam = params.find(param => param.startsWith('unit='));
     const unitValue = unitParam ? unitParam.split('=')[1] : null;
 
-    console.log(unitValue);
-    LEVEL_KEY = unitValue.toString();
+    if (unitValue) {
+      console.log(unitValue);
+      LEVEL_KEY = unitValue.toString();
+    }
   }
 
   var levelKey = LEVEL_KEY;
@@ -33,8 +35,10 @@ function loadGameTime() {
     const gameTimeParam = params.find(param => param.startsWith('gameTime='));
     const gameTimeValue = gameTimeParam ? gameTimeParam.split('=')[1] : null;
 
-    console.log(gameTimeValue);
-    GAME_TIME = gameTimeValue ? gameTimeValue.toString() : null;
+    if (gameTimeValue) {
+      console.log(gameTimeValue);
+      GAME_TIME = gameTimeValue.toString();
+    }
   }
 
   var gameTime = GAME_TIME;

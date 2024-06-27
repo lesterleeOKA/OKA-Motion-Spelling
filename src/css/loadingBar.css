@@ -49,7 +49,7 @@
 .greenBar::after {
   content: '';
   position: absolute;
-  top: -2px;
+  top: 0;
   right: 0;
   height: 104%;
   width: 104%;

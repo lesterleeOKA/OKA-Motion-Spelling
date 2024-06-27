@@ -12,7 +12,7 @@ export class RendererCanvas2d {
     this.videoHeight = canvas.height;
     this.lastPoseValidValue = false;
     this.modelType = posedetection.SupportedModels.BlazePose;
-    this.scoreThreshold = 0.8;
+    this.scoreThreshold = 0.65;
     this.triggerAudio = false;
   }
 

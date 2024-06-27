@@ -282,7 +282,7 @@ export default {
   },
 
   generatePositionX(columnId) {
-    console.log("Generated X", columnId);
+    //console.log("Generated X", columnId);
     const isLeft = columnId < Math.floor(this.redBoxX / this.optionSize);
     let numColumns, columnWidth;
 
