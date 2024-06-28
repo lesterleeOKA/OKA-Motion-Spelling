@@ -58,8 +58,6 @@ export default {
     this.stateType = stateType;
 
     if (state == 'instruction') {
-      const bgImageElement = document.getElementById('bgImage');
-      bgImageElement.style.backgroundColor = 'black';
       Game.init();
       View.hideTopLeftControl();
       View.hideTips();

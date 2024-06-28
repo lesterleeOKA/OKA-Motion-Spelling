@@ -8,7 +8,7 @@ import View from './view';
 import State from './state';
 import Sound from './sound';
 import { setupStats } from './stats_panel';
-import { loadLevel } from './level';
+import { parseUrlParams } from './level';
 import { audioFiles } from './mediaFile';
 import QuestionManager from './question';
 
@@ -19,7 +19,8 @@ let stats;
 let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
 const canvas = document.createElement('canvas');
-let virtualBg = require("./images/spelling/ref.jpg");
+const fpsDebug = document.getElementById('stats');
+const { levelKey, removal, fps } = parseUrlParams();
 //const ctx = canvas.getContext('2d');
 
 async function createDetector() {
@@ -28,8 +29,8 @@ async function createDetector() {
     runtime,
     modelType: 'lite',
     solutionPath: `@mediapipe/pose@0.5.1675469404`,
-    enableSegmentation: true,
-    smoothSegmentation: true,
+    enableSegmentation: removal === '1' ? true : false,
+    smoothSegmentation: removal === '1' ? true : false,
     //solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`
   });
 }
@@ -49,7 +50,6 @@ async function checkGuiUpdate() {
     detector = null;
     alert(error);
   }
-
 }
 
 async function renderResult() {
@@ -63,55 +63,111 @@ async function renderResult() {
 
   let poses = null;
   let segmentation = null;
+  let compositeCanvas = null;
 
   // Detector can be null if initialization failed (for example when loading
   // from a URL that does not exist).
   if (detector != null) {
-    //beginEstimatePosesStats();
+    beginEstimatePosesStats();
     try {
       poses = await detector.estimatePoses(
         Camera.video, { maxPoses: 1, flipHorizontal: false });
 
-      segmentation = poses.map(singleSegmentation => singleSegmentation.segmentation);
+      if (removal === '1')
+        segmentation = poses.map(singleSegmentation => singleSegmentation.segmentation);
       //console.log(poses[0]);
     } catch (error) {
       detector.dispose();
       detector = null;
-      //segmenter.dispose();
-      //segmenter = null;
       alert(error);
     }
-    if (segmentation && segmentation.length > 0) {
-      const data = await bodySegmentation.toBinaryMask(
-        segmentation, { r: 0, g: 0, b: 0, a: 0 }, { r: 0, g: 0, b: 0, a: 255 },
-        false, 0.78);
 
-      await bodySegmentation.drawMask(
-        canvas, Camera.videoStream, data, 1, 1);
+    if (segmentation && segmentation.length > 0) {
+
+      const binaryMask = await bodySegmentation.toBinaryMask(
+        segmentation, { r: 0, g: 0, b: 0, a: 0 }, { r: 0, g: 0, b: 0, a: 255 },
+        false, 0.65
+      );
+
+      // Create a composite canvas for the final output
+      compositeCanvas = document.createElement('canvas');
+      const compositeContext = compositeCanvas.getContext('2d');
+      compositeCanvas.width = canvas.width;
+      compositeCanvas.height = canvas.height;
+      // Create a temporary canvas to hold the video and mask
+      const videoCanvas = document.createElement('canvas');
+      const videoContext = videoCanvas.getContext('2d');
+      videoCanvas.width = canvas.width;
+      videoCanvas.height = canvas.height;
+      // Draw the video stream onto the temporary canvas
+      videoContext.drawImage(Camera.video, 0, 0, videoCanvas.width, videoCanvas.height);
+
+      await bodySegmentation.drawMask(videoCanvas, Camera.videoStream, binaryMask, 1, 0);
+
+      // Get the ImageData of the video
+      const videoImageData = videoContext.getImageData(0, 0, videoCanvas.width, videoCanvas.height);
+      const videoData = videoImageData.data;
+
+      // Get the ImageData of the background image
+      const backgroundImageData = compositeContext.getImageData(0, 0, compositeCanvas.width, compositeCanvas.height);
+      const backgroundData = backgroundImageData.data;
+
+      // Modify the video image data to replace non-body pixels with background image pixels
+      const maskImageData = new ImageData(new Uint8ClampedArray(binaryMask.data), binaryMask.width, binaryMask.height);
+      const maskData = maskImageData.data;
+
+      for (let i = 0; i < maskData.length; i += 4) {
+        if (maskData[i + 3] === 0) { // Non-body pixel
+          // Keep the video pixel
+          /*maskData[i] = videoData[i];
+          maskData[i + 1] = videoData[i + 1];
+          maskData[i + 2] = videoData[i + 2];
+          maskData[i + 3] = videoData[i + 3];*/
+          maskData[i + 3] = 0; // Set alpha to 0
+        }
+        else {
+          videoData[i] = backgroundData[i];
+          videoData[i + 1] = backgroundData[i + 1];
+          videoData[i + 2] = backgroundData[i + 2];
+          videoData[i + 3] = backgroundData[i + 3];
+        }
+      }
+
+      // Put the modified video image data back onto the video canvas
+      videoContext.putImageData(videoImageData, 0, 0);
+
+      // Draw the masked video onto the composite canvas
+      compositeContext.drawImage(videoCanvas, 0, 0, compositeCanvas.width, compositeCanvas.height);
+      // Draw the final composite canvas
     }
-    //endEstimatePosesStats();
+    endEstimatePosesStats();
   }
-  View.renderer.draw([Camera.video, poses, false, canvas]);
+
+  View.renderer.draw([Camera.video, poses, false, compositeCanvas]);
   //View.renderer.draw([Camera.video, poses, false, canvas]);
 }
 
 function beginEstimatePosesStats() {
-  startInferenceTime = (performance || Date).now();
+  if (fps === '1') {
+    startInferenceTime = (performance || Date).now();
+  }
 }
 
 function endEstimatePosesStats() {
-  const endInferenceTime = (performance || Date).now();
-  inferenceTimeSum += endInferenceTime - startInferenceTime;
-  ++numInferences;
+  if (fps === '1') {
+    const endInferenceTime = (performance || Date).now();
+    inferenceTimeSum += endInferenceTime - startInferenceTime;
+    ++numInferences;
 
-  const panelUpdateMilliseconds = 1000;
-  if (endInferenceTime - lastPanelUpdate >= panelUpdateMilliseconds) {
-    const averageInferenceTime = inferenceTimeSum / numInferences;
-    inferenceTimeSum = 0;
-    numInferences = 0;
-    stats.customFpsPanel.update(
-      1000.0 / averageInferenceTime, 120 /* maxValue */);
-    lastPanelUpdate = endInferenceTime;
+    const panelUpdateMilliseconds = 1000;
+    if (endInferenceTime - lastPanelUpdate >= panelUpdateMilliseconds) {
+      const averageInferenceTime = inferenceTimeSum / numInferences;
+      inferenceTimeSum = 0;
+      numInferences = 0;
+      stats.customFpsPanel.update(
+        1000.0 / averageInferenceTime, 120 /* maxValue */);
+      lastPanelUpdate = endInferenceTime;
+    }
   }
 }
 
@@ -302,8 +358,6 @@ function init() {
   View.offBtn.addEventListener(clickHandler, handleButtonClick);
   View.onBtn.addEventListener(clickHandler, handleButtonClick);
 
-
-  const levelKey = loadLevel();
   const defaultAudios = [
     ['bgm', require('./audio/bgm_mspell.mp3'), false, 0.5],
     ['btnClick', require('./audio/btnClick.wav')],
@@ -340,7 +394,17 @@ async function app() {
   if (location.protocol !== 'https:') {
     location.replace(`https:${location.href.substring(location.protocol.length)}`);
   }
-  //stats = setupStats();
+
+  if (removal === '1') {
+    const bgImageElement = document.getElementById('bgImage');
+    bgImageElement.classList.add('bgImage');
+  }
+
+  if (fps === '1') {
+    fpsDebug.style.opacity = 1;
+    stats = setupStats();
+  }
+
   init().then(() => {
     Util.loadingStart();
     setTimeout(() => {
@@ -361,39 +425,6 @@ async function app() {
     }, 2000);
   });
 
-  /* init().then(() => {
-     Util.loadingStart();
-     setTimeout(async () => {
-       (new FPSMeter({ ui: true })).start();
-       await Camera.setup();
-       await tf.setBackend('wasm');
-       await tf.ready();
-
-       await createDetector().then((detector) => {
-         console.log(detector);
-         //var poses = detector.estimatePoses(Camera.video);
-         //console.log(poses[0]);
-         //const canvas = document.getElementById('output');
-         //View.renderer = new RendererCanvas2d(View.canvas);
-
-         renderPrediction().then(() => {
-           Util.loadingComplete().then(() => {
-             State.changeState('instruction');
-           });
-         })
-       });
-       //const poses = await detector.estimatePoses(Camera.video);
-       //console.log(poses[0]);
-       //const canvas = document.getElementById('output');
-       View.renderer = new RendererCanvas2d(View.canvas);
-
-       await renderPrediction(detector);
-
-       Util.loadingComplete().then(() => {
-         State.changeState('instruction');
-       });
-     }, 2000);
-   });*/
 };
 
 //-------------------------------------------------------------------------------------------------
