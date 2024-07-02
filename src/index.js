@@ -18,16 +18,16 @@ let rafId;
 let stats;
 let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
-const canvas = document.createElement('canvas');
+const bgImage = require('./images/spelling/bg.jpg');
 const fpsDebug = document.getElementById('stats');
-const { levelKey, removal, fps } = parseUrlParams();
+const { levelKey, model, removal, fps } = parseUrlParams();
 //const ctx = canvas.getContext('2d');
 
 async function createDetector() {
   const runtime = 'mediapipe';
   return posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
     runtime,
-    modelType: 'lite',
+    modelType: ['heavy', 'full', 'lite'].includes(model) ? model : 'lite',
     solutionPath: `@mediapipe/pose@0.5.1675469404`,
     enableSegmentation: removal === '1' ? true : false,
     smoothSegmentation: removal === '1' ? true : false,
@@ -37,8 +37,6 @@ async function createDetector() {
 
 async function checkGuiUpdate() {
   window.cancelAnimationFrame(rafId);
-  canvas.width = 640;
-  canvas.height = 480;
 
   if (detector != null) {
     detector.dispose();
@@ -92,18 +90,16 @@ async function renderResult() {
       // Create a composite canvas for the final output
       compositeCanvas = document.createElement('canvas');
       const compositeContext = compositeCanvas.getContext('2d');
-      compositeCanvas.width = canvas.width;
-      compositeCanvas.height = canvas.height;
+      compositeCanvas.width = Camera.videoStream.width;
+      compositeCanvas.height = Camera.videoStream.height;
       // Create a temporary canvas to hold the video and mask
       const videoCanvas = document.createElement('canvas');
       const videoContext = videoCanvas.getContext('2d');
-      videoCanvas.width = canvas.width;
-      videoCanvas.height = canvas.height;
+      videoCanvas.width = compositeCanvas.width;
+      videoCanvas.height = compositeCanvas.height;
       // Draw the video stream onto the temporary canvas
       videoContext.drawImage(Camera.video, 0, 0, videoCanvas.width, videoCanvas.height);
-
-      await bodySegmentation.drawMask(videoCanvas, Camera.videoStream, binaryMask, 1, 0);
-
+      //await bodySegmentation.drawMask(videoCanvas, Camera.videoStream, binaryMask, 1, 0);
       // Get the ImageData of the video
       const videoImageData = videoContext.getImageData(0, 0, videoCanvas.width, videoCanvas.height);
       const videoData = videoImageData.data;
@@ -117,15 +113,7 @@ async function renderResult() {
       const maskData = maskImageData.data;
 
       for (let i = 0; i < maskData.length; i += 4) {
-        if (maskData[i + 3] === 0) { // Non-body pixel
-          // Keep the video pixel
-          /*maskData[i] = videoData[i];
-          maskData[i + 1] = videoData[i + 1];
-          maskData[i + 2] = videoData[i + 2];
-          maskData[i + 3] = videoData[i + 3];*/
-          maskData[i + 3] = 0; // Set alpha to 0
-        }
-        else {
+        if (maskData[i + 3] !== 0) {
           videoData[i] = backgroundData[i];
           videoData[i + 1] = backgroundData[i + 1];
           videoData[i + 2] = backgroundData[i + 2];
@@ -135,10 +123,7 @@ async function renderResult() {
 
       // Put the modified video image data back onto the video canvas
       videoContext.putImageData(videoImageData, 0, 0);
-
-      // Draw the masked video onto the composite canvas
       compositeContext.drawImage(videoCanvas, 0, 0, compositeCanvas.width, compositeCanvas.height);
-      // Draw the final composite canvas
     }
     endEstimatePosesStats();
   }
@@ -362,7 +347,7 @@ function init() {
     ['bgm', require('./audio/bgm_mspell.mp3'), false, 0.5],
     ['btnClick', require('./audio/btnClick.wav')],
     ['countDown', require('./audio/countDown.mp3')],
-    ['instruction', require('./audio/instruction.mp3')],
+    //['instruction', require('./audio/instruction.mp3')],
     ['prepare', require('./audio/prepare.mp3')],
     ['start', require('./audio/start.mp3')],
     /*['finished', require('./audio/finished.mp3')],*/
@@ -376,7 +361,7 @@ function init() {
   ];
 
   const additionalAudios = audioFiles;
-  const filteredAdditionalAudios = levelKey === ''
+  const filteredAdditionalAudios = levelKey === null
     ? additionalAudios
     : additionalAudios.filter(([key]) => levelKey && key.includes(levelKey));
 
@@ -397,7 +382,8 @@ async function app() {
 
   if (removal === '1') {
     const bgImageElement = document.getElementById('bgImage');
-    bgImageElement.classList.add('bgImage');
+    bgImageElement.style.backgroundImage = `url(${bgImage})`;
+    //bgImageElement.classList.add('bgImage');
   }
 
   if (fps === '1') {

@@ -397,7 +397,7 @@ export default {
     const _question = questions[this.answeredNum].question;
     const _answers = questions[this.answeredNum].answers;
     const _correctAnswer = questions[this.answeredNum].correctAnswer;
-    const _media = questions[this.answeredNum].media;
+    //const _media = questions[this.answeredNum].media;
 
     if (this.answeredNum < questions.length - 1) {
       this.answeredNum += 1;
@@ -413,7 +413,7 @@ export default {
       question: _question,
       answers: _answers,
       correctAnswer: _correctAnswer,
-      media: _media,
+      //media: _media,
     };
   },
   generateCharArray(word) {

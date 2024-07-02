@@ -5257,7 +5257,7 @@ parcel-bundler@1.12.5:
     v8-compile-cache "^2.0.0"
     ws "^5.1.1"
 
-parcel-plugin-static-files-copy@^2.5.1:
+parcel-plugin-static-files-copy@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/parcel-plugin-static-files-copy/-/parcel-plugin-static-files-copy-2.6.0.tgz#06d7d9b6d7e2071b2e261315e94209b522108beb"
   integrity sha512-k3YxdnEQWo1aMfCeBfxgUNJWuUE0O730EGiGBcmWEUOto7f1jM/8oxBKXkVZsXDCO1o00dw5X7CsT+yF0JY4qA==
