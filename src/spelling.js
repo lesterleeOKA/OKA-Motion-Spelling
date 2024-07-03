@@ -437,6 +437,7 @@ export default {
       case 'Spelling':
       case 'Listening':
       case 'FillingBlank':
+      case 'Reorder':
       case 'Picture':
         var array = this.generateCharArray(this.randomQuestion.correctAnswer);
         this.answerLength = array.length;
@@ -506,6 +507,7 @@ export default {
         this.answerWrapper.classList.add('audioType');
         break;
       case 'FillingBlank':
+      case 'Reorder':
         this.questionWrapper.classList.add('questionFillBlankWrapper');
         questionBg.classList.add('questionImgBg');
         View.stageImg.appendChild(questionBg);
@@ -586,6 +588,7 @@ export default {
           resetBtn.classList.add('resetAudioType');
           break;
         case 'FillingBlank':
+        case 'Reorder':
         case 'Picture':
           resetBtn.classList.add('resetPictureType');
           break;
