@@ -148,7 +148,6 @@ export default {
         if (this.isSoundOn) Sound.play('outBox');
         //View.showTips('tipsOutBox');
         View.showPrepareBoard();
-        Game.selectedCount = 0;
       }
     } else if (state == 'finished') {
       View.hideTopLeftControl();
