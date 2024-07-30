@@ -1,6 +1,6 @@
-import { stat } from 'fs';
 import Game from './spelling';
 import State from './state';
+import Util from './util';
 
 export default {
   //-----------------------------------------------------------------------------------------------
@@ -64,6 +64,7 @@ export default {
     });
 
     console.log("preloadUsedImages", this.preloadedFallingImages);
+    Util.updateLoadingStatus("Loading Images");
   },
 
   showInstruction() {
