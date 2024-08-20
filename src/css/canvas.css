@@ -267,7 +267,7 @@
 }
 
 :root {
-  --fallingSpeed: 5s;
+  --fallingSpeed: 0s;
   --top-height: 0px;
   --bottom-height: 200px;
   --font-size: 3vh;
