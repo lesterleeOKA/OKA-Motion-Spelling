@@ -47,11 +47,11 @@ export default {
 
   init() {
     //View.showTips('tipsReady');
-    const { gameTime } = parseUrlParams();
+    const { gameTime, fallSpeed } = parseUrlParams();
     this.startedGame = false;
     this.fallingId = 0;
     this.remainingTime = gameTime !== null ? gameTime : 120;
-    this.fallingSpeed = 10;
+    this.fallingSpeed = fallSpeed !== null ? fallSpeed : 10;
     this.fallingDelay = this.fallingSpeed * 250;
     this.updateTimerDisplay(this.remainingTime);
     this.questionType = QuestionManager.questionField;
