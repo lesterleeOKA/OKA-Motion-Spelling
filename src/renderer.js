@@ -185,8 +185,9 @@ export class RendererCanvas2d {
               const rightWristX = point.x;
               const rightWristY = point.y;
               let xInVw_right = (rightWristX / window.innerWidth) * 95;
+              let yInVw_right = (window.innerWidth / 12);
               rightHandImg.style.left = `calc(${xInVw_right}vw - calc(min(3vh, 3vw)))`;
-              rightHandImg.style.top = `${rightWristY - 130}px`;
+              rightHandImg.style.top = `${rightWristY - yInVw_right}px`;
               rightHandImg.style.display = 'block';
               this.handleWristDetection(optionWrappers, resetBtn, rightWristX, rightWristY);
               break;
@@ -194,8 +195,9 @@ export class RendererCanvas2d {
               const leftWristX = point.x;
               const leftWristY = point.y;
               let xInVw_left = (leftWristX / window.innerWidth) * 105;
+              let yInVw_left = (window.innerWidth / 12);
               leftHandImg.style.left = `calc(${xInVw_left}vw - calc(min(3vh, 3vw)))`;
-              leftHandImg.style.top = `${leftWristY - 130}px`;
+              leftHandImg.style.top = `${leftWristY - yInVw_left}px`;
               leftHandImg.style.display = 'block';
               this.handleWristDetection(optionWrappers, resetBtn, leftWristX, leftWristY);
               break;
