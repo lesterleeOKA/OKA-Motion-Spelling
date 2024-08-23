@@ -10,6 +10,7 @@
   display: none;
   width: calc(min(10vh, 10vw));
   height: auto;
+  z-index: 2;
 }
 
 .canvasWrapper > .optionArea {
@@ -173,22 +174,23 @@
   height: 25%;
   position: absolute;
   border: none;
+  z-index: 1;
 }
 .active {
   transform: scale(0.7);
   border: none;
 }
 .resetTextType{
-  top: 36%;
-  right: -4.5%;
+  top: 41%;
+  right: 35%;
 }
 .resetPictureType{
-  bottom: -10%;
-  right: -3.5%;
+  bottom: -13%;
+  right: 35%;
 }
 .resetAudioType{
-  bottom: 30%;
-  right: -0.5%;
+  bottom: 25%;
+  right: 35%;
 }
 
 .answerWrapper{

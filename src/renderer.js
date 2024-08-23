@@ -13,8 +13,9 @@ export class RendererCanvas2d {
     this.lastPoseValidValue = false;
     this.modelType = posedetection.SupportedModels.BlazePose;
     this.scoreThreshold = 0.75;
-    this.triggerAudio = false;
     this.center_shoulder = null;
+    this.triggeredAudio = false;
+    this.canvasWrapperRect = null;
   }
 
   draw(rendererParams) {
@@ -162,108 +163,118 @@ export class RendererCanvas2d {
       }
 
       let resetBtn = document.querySelector('.resetBtn');
+      let audioBtn = document.querySelector('.buttonWrapper');
+
+      const rightHandImg = document.getElementById('right-hand');
+      const leftHandImg = document.getElementById('left-hand');
 
       //檢查是否有選到圖
       let optionWrappers = document.querySelectorAll('.canvasWrapper > .optionArea > .optionWrapper.show');
       let canvasWrapper = document.querySelector('.canvasWrapper');
+      this.canvasWrapperRect = canvasWrapper.getBoundingClientRect();
       if (State.state == 'playing' && ['waitAns'].includes(State.stateType)) {
-        let checkKeypoints = pose.keypoints.filter(k => ['right_index', 'left_index'].includes(k.name) && k.score > passScore);
+        let checkKeypoints = pose.keypoints.filter(k => ['right_wrist', 'left_wrist'/*, 'right_index', 'left_index'*/].includes(k.name) && k.score > passScore);
         let touchingWord = [];
-
-        const rightHandImg = document.getElementById('right-hand');
-        const leftHandImg = document.getElementById('left-hand');
 
         rightHandImg.style.display = 'none';
         leftHandImg.style.display = 'none';
 
         for (let point of checkKeypoints) {
-          if (point.name === 'right_index') {
-            const xInVw = (point.x / window.innerWidth) * 100;
-            rightHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
-            rightHandImg.style.top = `${point.y}px`;
-            rightHandImg.style.display = 'block';
-          }
-
-          if (point.name === 'left_index') {
-            const xInVw = (point.x / window.innerWidth) * 100;
-            leftHandImg.style.left = `calc(${xInVw}vw - calc(min(3vh, 3vw)))`;
-            leftHandImg.style.top = `${point.y}px`;
-            leftHandImg.style.display = 'block';
+          switch (point.name) {
+            case 'right_wrist':
+              const rightWristX = point.x;
+              const rightWristY = point.y;
+              let xInVw_right = (rightWristX / window.innerWidth) * 95;
+              rightHandImg.style.left = `calc(${xInVw_right}vw - calc(min(3vh, 3vw)))`;
+              rightHandImg.style.top = `${rightWristY - 130}px`;
+              rightHandImg.style.display = 'block';
+              this.handleWristDetection(optionWrappers, resetBtn, rightWristX, rightWristY);
+              break;
+            case 'left_wrist':
+              const leftWristX = point.x;
+              const leftWristY = point.y;
+              let xInVw_left = (leftWristX / window.innerWidth) * 105;
+              leftHandImg.style.left = `calc(${xInVw_left}vw - calc(min(3vh, 3vw)))`;
+              leftHandImg.style.top = `${leftWristY - 130}px`;
+              leftHandImg.style.display = 'block';
+              this.handleWristDetection(optionWrappers, resetBtn, leftWristX, leftWristY);
+              break;
           }
         }
 
-        for (let point of checkKeypoints) {
+        const rightHandLeft = rightHandImg.offsetLeft;
+        const rightHandTop = rightHandImg.offsetTop;
+        const rightHandWidth = rightHandImg.offsetWidth;
+        const rightHandHeight = rightHandImg.offsetHeight;
 
-          if (questionBoard) {
+        const leftHandLeft = leftHandImg.offsetLeft;
+        const leftHandTop = leftHandImg.offsetTop;
+        const leftHandWidth = leftHandImg.offsetWidth;
+        const leftHandHeight = leftHandImg.offsetHeight;
 
-            const questionBoardOffsetLeft = questionBoard.offsetLeft;
-            const questionBoardOffsetTop = questionBoard.offsetTop;
-            const questionBoardWidth = questionBoard.offsetWidth;
-            const questionBoardHeight = questionBoard.offsetHeight;
+        for (let option of optionWrappers) {
 
-            if (
-              point.x > questionBoardOffsetLeft * 2.5 &&
-              point.x < (questionBoardOffsetLeft * 2 + questionBoardWidth * 1.5) &&
-              point.y > questionBoardOffsetTop &&
-              point.y < (questionBoardOffsetTop + questionBoardHeight * 0.5
-              )
-            ) {
-              //console.log('touch question board!!!!!!!!!!!!!!!!!!!!!!');
-              if (!this.triggerAudio) {
-                Game.motionTriggerPlayAudio(true);
-                this.triggerAudio = true;
-              }
-            }
-            else {
-              Game.motionTriggerPlayAudio(false);
-              this.triggerAudio = false;
+          const optionRect = option.getBoundingClientRect();
+          if (rightHandImg.style.display !== 'none' &&
+            rightHandLeft < (optionRect.right - this.canvasWrapperRect.left) &&
+            (rightHandLeft + rightHandWidth) > (optionRect.left - this.canvasWrapperRect.left) &&
+            rightHandTop < (optionRect.bottom - this.canvasWrapperRect.top) &&
+            (rightHandTop + rightHandHeight) > (optionRect.top - this.canvasWrapperRect.top) &&
+            !Game.isTriggeredBackSpace
+          ) {
+            touchingWord.push(option);
+          }
+
+          if (leftHandImg.style.display !== 'none' &&
+            leftHandLeft < (optionRect.right - this.canvasWrapperRect.left) &&
+            (leftHandLeft + leftHandWidth) > (optionRect.left - this.canvasWrapperRect.left) &&
+            leftHandTop < (optionRect.bottom - this.canvasWrapperRect.top) &&
+            (leftHandTop + leftHandHeight) > (optionRect.top - this.canvasWrapperRect.top) &&
+            !Game.isTriggeredBackSpace
+          ) {
+            touchingWord.push(option);
+          }
+        }
+
+        this.triggeredAudio = false;
+
+        if (audioBtn) {
+          const audioBtnRect = audioBtn.getBoundingClientRect();
+          let audioRectHalf = (audioBtnRect.width * 0.5);
+          if (rightHandImg.style.display !== 'none' &&
+            rightHandLeft < (audioBtnRect.right - audioRectHalf - this.canvasWrapperRect.left) &&
+            (rightHandLeft + rightHandWidth) > (audioBtnRect.left - this.canvasWrapperRect.left) + audioRectHalf &&
+            rightHandTop < (audioBtnRect.bottom - this.canvasWrapperRect.top) &&
+            (rightHandTop + rightHandHeight) > (audioBtnRect.top - this.canvasWrapperRect.top)
+          ) {
+            if (!this.triggeredAudio) {
+              Game.motionTriggerPlayAudio(true);
+              this.triggeredAudio = true;
             }
           }
 
-
-          if (resetBtn) {
-            if (
-              point.x > (resetBtn.offsetLeft * 2 + 20) &&
-              point.x < (resetBtn.offsetLeft * 2 + (resetBtn.offsetWidth * 2) - 20) &&
-              point.y > (resetBtn.offsetTop + 20) &&
-              point.y < (resetBtn.offsetTop + (resetBtn.offsetHeight - 20)) &&
-              !Game.isTriggeredBackSpace
-            ) {
-
-              if (!resetBtn.classList.contains('active')) {
-                if (!Game.isTriggeredBackSpace) {
-                  if (State.isSoundOn) {
-                    Sound.stopAll(['bgm', 'lastTen']);
-                    Sound.play('btnClick');
-                  }
-                  for (let option of optionWrappers) option.classList.remove('touch');
-                  Game.backSpaceWord();
-                  resetBtn.classList.add('active');
-                }
-              }
-              //console.log("reset word");
-            } else {
-              resetBtn.classList.remove('active');
+          if (leftHandImg.style.display !== 'none' &&
+            leftHandLeft < (audioBtnRect.right - audioRectHalf - this.canvasWrapperRect.left) &&
+            (leftHandLeft + leftHandWidth) > (audioBtnRect.left - this.canvasWrapperRect.left) + audioRectHalf &&
+            leftHandTop < (audioBtnRect.bottom - this.canvasWrapperRect.top) &&
+            (leftHandTop + leftHandHeight) > (audioBtnRect.top - this.canvasWrapperRect.top)
+          ) {
+            if (!this.triggeredAudio) {
+              Game.motionTriggerPlayAudio(true);
+              this.triggeredAudio = true;
             }
-
           }
 
-
-          for (let option of optionWrappers) {
-
-            const optionRect = option.getBoundingClientRect();
-            const canvasWrapperRect = canvasWrapper.getBoundingClientRect();
-
-            if (
-              point.x > (optionRect.left - canvasWrapperRect.left) &&
-              point.x < (optionRect.right - canvasWrapperRect.left) &&
-              point.y > (optionRect.top - canvasWrapperRect.top) &&
-              point.y < (optionRect.bottom - canvasWrapperRect.top) &&
-              !Game.isTriggeredBackSpace
-            ) {
-              touchingWord.push(option);
+          if (audioBtn.classList.contains('clicked')) {
+            if (!Game.touchBtn) {
+              if (!this.triggeredAudio) Game.motionTriggerPlayAudio(false);
             }
-            //console.log(point);
+          }
+        }
+
+        if (resetBtn) {
+          if (!Game.isTriggeredBackSpace && resetBtn.classList.contains('active') && !Game.touchBtn) {
+            resetBtn.classList.remove('active');
           }
         }
 
@@ -286,6 +297,25 @@ export class RendererCanvas2d {
     } else {
       return false;
     }
+  }
+
+  handleWristDetection(optionWrappers, resetBtn, wristX, wristY) {
+    const offsetX = (window.innerWidth / 7.68);
+    if (resetBtn) {
+      if (
+        wristX > resetBtn.offsetLeft * 2 + offsetX &&
+        wristX < (resetBtn.offsetLeft * 2 + resetBtn.offsetWidth * 2) + (offsetX / 2) &&
+        wristY - 30 > resetBtn.offsetTop &&
+        wristY - 130 < (resetBtn.offsetTop + resetBtn.offsetHeight)
+      ) {
+        if (!Game.isTriggeredBackSpace) {
+          for (let option of optionWrappers) option.classList.remove('touch');
+          Game.backSpaceWord(resetBtn);
+        }
+      }
+    }
+
+
   }
 
   drawBox(isCurPoseValid) {

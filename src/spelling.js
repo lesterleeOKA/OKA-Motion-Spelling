@@ -44,14 +44,15 @@ export default {
   numberOfColumns: 4,
   wholeScreenColumnSeperated: false,
   starNum: 0,
+  touchBtn: false,
 
   init() {
     //View.showTips('tipsReady');
     const { gameTime, fallSpeed } = parseUrlParams();
     this.startedGame = false;
     this.fallingId = 0;
-    this.remainingTime = gameTime !== null ? gameTime : 120;
-    this.fallingSpeed = fallSpeed !== null ? fallSpeed : 10;
+    this.remainingTime = gameTime !== null ? gameTime : 300;
+    this.fallingSpeed = fallSpeed !== null ? fallSpeed : 8;
     this.fallingDelay = this.fallingSpeed * 250;
     this.updateTimerDisplay(this.remainingTime);
     this.questionType = QuestionManager.questionField;
@@ -98,7 +99,7 @@ export default {
     this.isTriggeredBackSpace = false;
     this.starNum = 0;
     this.selectedCount = 0;
-
+    this.touchBtn = false;
   },
 
   handleVisibilityChange() {
@@ -682,17 +683,20 @@ export default {
         this.buttonWrapper.classList.add('buttonWrapper');
         this.buttonWrapper.classList.add('fillBlankPlay');
         this.buttonWrapper.addEventListener('mousedown', () => {
+          this.touchBtn = true;
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
           this.playWordAudio(this.randomQuestion.QID);
         });
 
         this.buttonWrapper.addEventListener('mouseup', () => {
+          this.touchBtn = false;
           this.buttonWrapper.classList.remove('clicked');
           this.buttonWrapper.classList.add('not-clicked');
         });
         this.buttonWrapper.addEventListener('touchstart', (event) => {
           event.preventDefault(); // Prevent default touch behavior
+          this.touchBtn = true;
           this.buttonWrapper.classList.add('clicked');
           this.buttonWrapper.classList.remove('not-clicked');
           this.playWordAudio(this.randomQuestion.QID);
@@ -700,6 +704,7 @@ export default {
 
         this.buttonWrapper.addEventListener('touchend', (event) => {
           event.preventDefault(); // Prevent default touch behavior
+          this.touchBtn = false;
           this.buttonWrapper.classList.remove('clicked');
           this.buttonWrapper.classList.add('not-clicked');
         });
@@ -757,29 +762,23 @@ export default {
       }
 
       resetTouchBtn.addEventListener('mousedown', () => {
-        resetTouchBtn.classList.add('active');
-        if (State.isSoundOn) {
-          Sound.stopAll(['bgm', 'lastTen']);
-          Sound.play('btnClick');
-        }
-        this.backSpaceWord();
+        this.touchBtn = true;
+        this.backSpaceWord(resetTouchBtn);
       });
 
       resetTouchBtn.addEventListener('mouseup', () => {
+        this.touchBtn = false;
         resetTouchBtn.classList.remove('active');
       });
       resetTouchBtn.addEventListener('touchstart', (event) => {
         event.preventDefault(); // Prevent default touch behavior
-        resetTouchBtn.classList.add('active');
-        if (State.isSoundOn) {
-          Sound.stopAll(['bgm', 'lastTen']);
-          Sound.play('btnClick');
-        }
-        this.backSpaceWord();
+        this.touchBtn = true;
+        this.backSpaceWord(resetTouchBtn);
       });
 
       resetTouchBtn.addEventListener('touchend', (event) => {
         event.preventDefault(); // Prevent default touch behavior
+        this.touchBtn = false;
         resetTouchBtn.classList.remove('active');
       });
 
@@ -806,8 +805,11 @@ export default {
       this.playWordAudio(this.randomQuestion.QID);
     }
     else {
-      this.buttonWrapper.classList.add('not-clicked');
-      this.buttonWrapper.classList.remove('clicked');
+
+      setTimeout(() => {
+        this.buttonWrapper.classList.add('not-clicked');
+        this.buttonWrapper.classList.remove('clicked');
+      }, 250);
     }
   },
 
@@ -870,14 +872,21 @@ export default {
     this.randomPair = this.randomOptions();
     this.clearWrapper();
   },
-  backSpaceWord() {
+  backSpaceWord(resetBtn = null) {
     let answerText = this.answerWrapper.textContent;
-    if (!this.isTriggeredBackSpace && answerText.length > 0) {
+    if (!this.isTriggeredBackSpace && answerText.length > 0 && answerText !== '') {
+
+      if (resetBtn) resetBtn.classList.add('active');
+      if (State.isSoundOn) {
+        Sound.stopAll(['bgm', 'lastTen']);
+        Sound.play('btnClick');
+      }
+
       this.isTriggeredBackSpace = true;
       this.answerWrapper.textContent = answerText.slice(0, -1);
       this.fillwordTime = answerText.length - 1;
 
-      let delay = 1000;
+      let delay = 500;
       let lastOption = null;
       if (this.typedItems.length > 0) {
         lastOption = this.typedItems[this.typedItems.length - 1];
