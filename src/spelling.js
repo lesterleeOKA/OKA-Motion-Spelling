@@ -1,7 +1,6 @@
 import View from './view';
 import State from './state';
 import Sound from './sound';
-import { parseUrlParams } from "./level";
 import QuestionManager from './question';
 
 export default {
@@ -46,9 +45,8 @@ export default {
   starNum: 0,
   touchBtn: false,
 
-  init() {
+  init(gameTime = null, fallSpeed = null) {
     //View.showTips('tipsReady');
-    const { gameTime, fallSpeed } = parseUrlParams();
     this.startedGame = false;
     this.fallingId = 0;
     this.remainingTime = gameTime !== null ? gameTime : 300;
@@ -118,6 +116,8 @@ export default {
       cancelAnimationFrame(this.fallingOption);
       this.timerRunning = false;
       this.showQuestions(false);
+      this.isPlayLastTen = false;
+      if (State.isSoundOn) Sound.stopAll(['bgm']);
     }
   },
 
@@ -543,12 +543,12 @@ export default {
       questions = questions.sort(() => Math.random() - 0.5);
     }
     console.log("questions", questions);
-    const _type = questions[this.answeredNum].type;
+    const _type = questions[this.answeredNum].QuestionType;
     const _QID = questions[this.answeredNum].QID;
-    const _question = questions[this.answeredNum].question;
-    const _answers = questions[this.answeredNum].answers;
-    const _correctAnswer = questions[this.answeredNum].correctAnswer;
-    //const _media = questions[this.answeredNum].media;
+    const _question = questions[this.answeredNum].Question;
+    const _answers = questions[this.answeredNum].Answers;
+    const _correctAnswer = questions[this.answeredNum].CorrectAnswer;
+    const _media = questions[this.answeredNum].Media;
 
     if (this.answeredNum < questions.length - 1) {
       this.answeredNum += 1;
@@ -559,12 +559,12 @@ export default {
 
     //console.log("answered count", this.answeredNum);
     return {
-      type: _type,
+      QuestionType: _type,
       QID: _QID,
-      question: _question,
-      answers: _answers,
-      correctAnswer: _correctAnswer,
-      //media: _media,
+      Question: _question,
+      Answers: _answers,
+      CorrectAnswer: _correctAnswer,
+      Media: _media,
     };
   },
   generateCharArray(word) {
@@ -584,18 +584,18 @@ export default {
 
   randomOptions() {
     //console.log('question class', this.randomQuestion);
-    switch (this.randomQuestion.type) {
+    switch (this.randomQuestion.QuestionType) {
       case 'Spelling':
-      case 'Listening':
-      case 'FillingBlank':
+      case 'Audio':
+      case 'FillInBlank':
       case 'Reorder':
       case 'Picture':
-        var array = this.generateCharArray(this.randomQuestion.correctAnswer);
+        var array = this.generateCharArray(this.randomQuestion.CorrectAnswer);
         this.answerLength = array.length;
         return array;
-      case 'MultipleChoice':
+      case 'Text':
         this.answerLength = 1;
-        return this.randomizeAnswers(this.randomQuestion.answers);
+        return this.randomizeAnswers(this.randomQuestion.Answers);
     }
   },
   setQuestions() {
@@ -604,41 +604,41 @@ export default {
     if (this.randomQuestion === null)
       return;
 
-    this.question = this.randomQuestion.question;
+    this.question = this.randomQuestion.Question;
     this.randomPair = this.randomOptions();
     this.selectedCount = Math.floor(Math.random() * this.numberOfColumns);
     this.questionWrapper = document.createElement('div');
     let questionBg = document.createElement('div');
     this.answerWrapper = document.createElement('span');
 
-    switch (this.randomQuestion.type) {
+    switch (this.randomQuestion.QuestionType) {
       case 'Spelling':
         this.questionWrapper.classList.add('questionWrapper');
         questionBg.classList.add('questionBg');
         View.stageImg.appendChild(questionBg);
 
         var questionText = document.createElement('span');
-        questionText.textContent = this.randomQuestion.question;
+        questionText.textContent = this.randomQuestion.Question;
         this.questionWrapper.appendChild(questionText);
         var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.answerWrapper.classList.add('textType');
         //View.stageImg.appendChild(questionText);
         break;
-      case 'MultipleChoice':
+      case 'Text':
         this.questionWrapper.classList.add('questionAudioWrapper');
         questionBg.classList.add('questionAudioBg');
         View.stageImg.appendChild(questionBg);
         var questionText = document.createElement('span');
-        questionText.textContent = this.randomQuestion.question;
+        questionText.textContent = this.randomQuestion.Question;
         this.questionWrapper.appendChild(questionText);
-        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.questionWrapper.style.top = "-15%";
         this.answerWrapper.classList.add('audioType');
 
         break;
-      case 'Listening':
+      case 'Audio':
         this.questionWrapper.classList.add('questionAudioWrapper');
         questionBg.classList.add('questionAudioBg');
         View.stageImg.appendChild(questionBg);
@@ -670,15 +670,15 @@ export default {
         this.questionWrapper.appendChild(this.buttonWrapper);
         this.answerWrapper.classList.add('audioType');
         break;
-      case 'FillingBlank':
+      case 'FillInBlank':
       case 'Reorder':
         this.questionWrapper.classList.add('questionFillBlankWrapper');
         questionBg.classList.add('questionImgBg');
         View.stageImg.appendChild(questionBg);
         var questionText = document.createElement('span');
-        questionText.textContent = this.randomQuestion.question;
+        questionText.textContent = this.randomQuestion.Question;
         this.questionWrapper.appendChild(questionText);
-        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
 
         this.buttonWrapper = document.createElement('button');
@@ -743,20 +743,20 @@ export default {
         break;
     }
 
-    console.log("this.randomQuestion.answers", this.randomQuestion.answers);
-    if (this.randomQuestion.answers === undefined) {
+    console.log("this.randomQuestion.Answers", this.randomQuestion.Answers);
+    if (this.randomQuestion.Answers === undefined) {
       let resetBtn = document.createElement('div');
       let resetTouchBtn = document.createElement('button');
       resetTouchBtn.classList.add('resetBtn');
 
-      switch (this.randomQuestion.type) {
+      switch (this.randomQuestion.QuestionType) {
         case 'Spelling':
           resetTouchBtn.classList.add('resetTextType');
           break;
-        case 'Listening':
+        case 'Audio':
           resetTouchBtn.classList.add('resetAudioType');
           break;
-        case 'FillingBlank':
+        case 'FillInBlank':
         case 'Reorder':
         case 'Picture':
           resetTouchBtn.classList.add('resetPictureType');
@@ -846,7 +846,7 @@ export default {
       if (this.fillwordTime < this.answerLength) {
         this.answerWrapper.textContent += option.getAttribute('word');
 
-        if (this.questionType.type === "MultipleChoice") {
+        if (this.questionType.QuestionType === "Text") {
           if (View.optionArea.contains(option)) {
             this.resetFallingItem(option);
           }
@@ -924,7 +924,7 @@ export default {
     this.refallingId = 0;
   },
   checkAnswer(answer) {
-    if (answer === this.randomQuestion.correctAnswer) {
+    if (answer === this.randomQuestion.CorrectAnswer) {
       //答岩1分，答錯唔扣分
       this.addScore(this.eachQAMark);
       this.answerWrapper.classList.add('correct');
