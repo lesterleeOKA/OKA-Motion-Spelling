@@ -620,7 +620,7 @@ export default {
         var questionText = document.createElement('span');
         questionText.textContent = this.randomQuestion.Question;
         this.questionWrapper.appendChild(questionText);
-        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.question.length} * 0.1vh), 6vh))`;
+        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.answerWrapper.classList.add('textType');
         //View.stageImg.appendChild(questionText);
