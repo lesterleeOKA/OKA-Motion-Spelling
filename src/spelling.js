@@ -453,8 +453,15 @@ export default {
     option.classList.add('option');
     //option.type = 'text';
     option.textContent = text;
-    let fontSize = `calc(min(max(4vh, 20vh - ${text.length} * 5.2vh), 8vh))`;
-    option.style.setProperty('--font-size', fontSize);
+    /* let fontSize = `calc(min(max(4vh, 20vh - ${text.length} * 5.2vh), 8vh))`;
+     option.style.setProperty('--font-size', fontSize);*/
+
+    let containerWidth = this.optionSize;
+    let maxFontSize = 80;
+    let minFontSize = 10;
+    let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.4)));
+    option.style.fontSize = `${fontSize}px`;
+
     optionWrapper.appendChild(option);
     return optionWrapper;
   },
