@@ -253,6 +253,7 @@ function handleButtonClick(e) {
       State.changeState('prepare');
       break;
     case View.exitBtn:
+      cleanup();
       if (State.isSoundOn) {
         Sound.play('btnClick');
       }
@@ -261,7 +262,7 @@ function handleButtonClick(e) {
       //State.changeState('pause');
       setTimeout(() => {
         State.changeState('leave');
-      }, 100);
+      }, 500);
       break;
     case View.musicBtn:
       if (State.state !== 'showMusicOnOff') {
@@ -286,13 +287,14 @@ function handleButtonClick(e) {
       }
       break;
     case View.backHomeBtnOfFinished:
+      cleanup();
       if (State.isSoundOn) {
         Sound.play('btnClick');
       }
       State.state = '';
       setTimeout(() => {
         State.changeState('leave');
-      }, 200);
+      }, 500);
       break;
     case View.playAgainBtn:
       if (State.isSoundOn) {
@@ -303,6 +305,7 @@ function handleButtonClick(e) {
       State.changeState('prepare');
       break;
     case View.backHomeBtnOfExit:
+      cleanup();
       if (State.isSoundOn) {
         Sound.play('btnClick');
       }
@@ -310,7 +313,7 @@ function handleButtonClick(e) {
       State.state = '';
       setTimeout(() => {
         State.changeState('leave');
-      }, 200);
+      }, 500);
       break;
     case View.continuebtn:
       if (State.isSoundOn) {
@@ -479,18 +482,23 @@ async function app() {
 };
 
 //-------------------------------------------------------------------------------------------------
-function toggleSound() {
-  State.isSoundOn = !State.isSoundOn;
-  //console.log('State.isSoundOn: ' + State.isSoundOn);
+async function cleanup() {
+  // Dispose the detector if it is created
+  if (detector) {
+    await detector.dispose(); // Ensure we await the dispose method if it's asynchronous
+    detector = null;
+  }
+  // Stop the camera if it's running
+  if (Camera.video) {
+    Camera.video.srcObject.getTracks().forEach(track => {
+      track.stop(); // Stop each track
+    });
+    Camera.video.srcObject = null; // Clear the video source
+  }
   if (State.isSoundOn) {
-    View.musicBtn.classList.add('on');
-    View.musicBtn.classList.remove('off');
-    Sound.play('bgm', true);
-  } else {
-    View.musicBtn.classList.remove('on');
-    View.musicBtn.classList.add('off');
     Sound.stopAll();
   }
+  console.log("Cleanup completed.");
 }
 //-------------------------------------------------------------------------------------------------
 app();
