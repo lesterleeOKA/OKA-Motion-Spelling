@@ -457,9 +457,9 @@ export default {
      option.style.setProperty('--font-size', fontSize);*/
 
     let containerWidth = this.optionSize;
-    let maxFontSize = 80;
-    let minFontSize = 10;
-    let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.4)));
+    let maxFontSize = 60; // Maximum font size in px
+    let minFontSize = 10; // Minimum font size in px
+    let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.65)));
     option.style.fontSize = `${fontSize}px`;
 
     optionWrapper.appendChild(option);
@@ -545,17 +545,17 @@ export default {
     if (this.questionType === null || this.questionType === undefined)
       return null;
 
-    let questions = this.questionType.QA;
+    let questions = this.questionType.questions;
     if (this.answeredNum === 0) {
       questions = questions.sort(() => Math.random() - 0.5);
     }
     console.log("questions", questions);
-    const _type = questions[this.answeredNum].QuestionType;
-    const _QID = questions[this.answeredNum].QID;
-    const _question = questions[this.answeredNum].Question;
-    const _answers = questions[this.answeredNum].Answers;
-    const _correctAnswer = questions[this.answeredNum].CorrectAnswer;
-    const _media = questions[this.answeredNum].Media;
+    const _type = questions[this.answeredNum].questionType;
+    const _QID = questions[this.answeredNum].qid;
+    const _question = questions[this.answeredNum].question;
+    const _answers = questions[this.answeredNum].answers;
+    const _correctAnswer = questions[this.answeredNum].correctAnswer;
+    const _media = questions[this.answeredNum].media;
 
     if (this.answeredNum < questions.length - 1) {
       this.answeredNum += 1;
@@ -590,17 +590,17 @@ export default {
   },
 
   randomOptions() {
-    //console.log('question class', this.randomQuestion);
+    console.log('question class', this.randomQuestion);
     switch (this.randomQuestion.QuestionType) {
-      case 'Spelling':
-      case 'Audio':
-      case 'FillInBlank':
-      case 'Reorder':
-      case 'Picture':
+      case 'spelling':
+      case 'audio':
+      case 'fillInBlank':
+      case 'reorder':
+      case 'picture':
         var array = this.generateCharArray(this.randomQuestion.CorrectAnswer);
         this.answerLength = array.length;
         return array;
-      case 'Text':
+      case 'text':
         this.answerLength = 1;
         return this.randomizeAnswers(this.randomQuestion.Answers);
     }
@@ -619,7 +619,7 @@ export default {
     this.answerWrapper = document.createElement('span');
 
     switch (this.randomQuestion.QuestionType) {
-      case 'Spelling':
+      case 'spelling':
         this.questionWrapper.classList.add('questionWrapper');
         questionBg.classList.add('questionBg');
         View.stageImg.appendChild(questionBg);
@@ -632,7 +632,7 @@ export default {
         this.answerWrapper.classList.add('textType');
         //View.stageImg.appendChild(questionText);
         break;
-      case 'Text':
+      case 'text':
         this.questionWrapper.classList.add('questionAudioWrapper');
         questionBg.classList.add('questionAudioBg');
         View.stageImg.appendChild(questionBg);
@@ -645,7 +645,7 @@ export default {
         this.answerWrapper.classList.add('audioType');
 
         break;
-      case 'Audio':
+      case 'audio':
         this.questionWrapper.classList.add('questionAudioWrapper');
         questionBg.classList.add('questionAudioBg');
         View.stageImg.appendChild(questionBg);
@@ -677,8 +677,8 @@ export default {
         this.questionWrapper.appendChild(this.buttonWrapper);
         this.answerWrapper.classList.add('audioType');
         break;
-      case 'FillInBlank':
-      case 'Reorder':
+      case 'fillInBlank':
+      case 'reorder':
         this.questionWrapper.classList.add('questionFillBlankWrapper');
         questionBg.classList.add('questionImgBg');
         View.stageImg.appendChild(questionBg);
@@ -721,7 +721,7 @@ export default {
 
         this.answerWrapper.classList.add('pictureType');
         break;
-      case 'Picture':
+      case 'picture':
         this.questionWrapper.classList.add('questionImageWrapper');
         questionBg.classList.add('questionImgBg');
         View.stageImg.appendChild(questionBg);
@@ -757,15 +757,15 @@ export default {
       resetTouchBtn.classList.add('resetBtn');
 
       switch (this.randomQuestion.QuestionType) {
-        case 'Spelling':
+        case 'spelling':
           resetTouchBtn.classList.add('resetTextType');
           break;
-        case 'Audio':
+        case 'audio':
           resetTouchBtn.classList.add('resetAudioType');
           break;
-        case 'FillInBlank':
-        case 'Reorder':
-        case 'Picture':
+        case 'fillInBlank':
+        case 'reorder':
+        case 'picture':
           resetTouchBtn.classList.add('resetPictureType');
           break;
       }
