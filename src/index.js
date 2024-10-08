@@ -189,7 +189,7 @@ async function init() {
 
   // Load question data and handle callbacks
   await new Promise((resolve, reject) => {
-    QuestionManager.loadQuestionData(
+    QuestionManager.checkIsLogin(
       jwt,
       id,
       levelKey,
@@ -213,6 +213,19 @@ async function init() {
 
   // Set up event listeners
   setupEventListeners();
+
+  // Add onbeforeunload event handler
+  window.onbeforeunload = function (e) {
+    console.log("Calling OnClose from Browser!");
+    apiManager.exitGameRecord(
+      () => {
+        console.log("Quit Game");
+      }
+    );
+    const dialogText = "Your game has been saved! Would you like to continue unloading the page?";
+    e.returnValue = dialogText; // For most browsers
+    return dialogText;
+  };
 
   const defaultAudios = [
     ['bgm', require('./audio/bgm_mspell.mp3'), false, 0.5],
