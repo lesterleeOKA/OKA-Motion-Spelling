@@ -1,8 +1,8 @@
 
 import View from './view';
+import { logController } from './logController';
 
 export default {
-
   percentValue: 0,
   timer: null,
   loadingStatus: null,
@@ -11,7 +11,7 @@ export default {
 
 
   loadingStart(retry = 0) {
-    console.log('in loadingStart(), retry:' + retry);
+    logController.log('in loadingStart(), retry:' + retry);
     if (retry > 25) return;
 
     let greenBar = document.getElementById("greenBar");

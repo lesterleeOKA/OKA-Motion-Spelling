@@ -55,6 +55,8 @@ export default {
   leftHandImg: document.getElementById('left-hand'),
   playerIcon: document.getElementById('userIcon'),
   fpsModeBtn: document.getElementById('fpsButton'),
+
+  progressBarWrapper: document.querySelector('.progressBarWrapper'),
   //-----------------------------------------------------------------------------------------------
   preloadedFallingImages: [],
   optionImages: [
@@ -71,7 +73,6 @@ export default {
       this.preloadedFallingImages.push(img);
     });
 
-    console.log("preloadUsedImages", this.preloadedFallingImages);
     Util.updateLoadingStatus("Loading Images");
   },
 
@@ -264,5 +265,9 @@ export default {
       this.playerName.style.display = 'none';
       this.playerNameText.textContent = '';
     }
+  },
+
+  setProgressBar(status = null) {
+    this.progressBarWrapper.style.display = status ? 'block' : 'none';
   }
 };

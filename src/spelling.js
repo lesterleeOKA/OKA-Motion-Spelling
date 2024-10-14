@@ -2,6 +2,7 @@ import View from './view';
 import State from './state';
 import Sound from './sound';
 import QuestionManager from './question';
+import { logController } from './logController';
 
 export default {
   fallingId: 0,
@@ -106,6 +107,7 @@ export default {
     this.selectedCount = 0;
     this.touchBtn = false;
     this.apiManager = State.apiManager;
+    this.resetProgressBar();
   },
 
   handleVisibilityChange() {
@@ -164,7 +166,7 @@ export default {
     this.countUp(View.scoreText, currentScore, this.score, 1000);
   },
 
-  countUp(displayElement, start, end, duration) {
+  countUp(displayElement, start, end, duration, playEffect = true, unit = "") {
     let startTime = null;
     let lastSoundTime = 0;
     const soundInterval = 200;
@@ -177,10 +179,10 @@ export default {
       const progress = timestamp - startTime;
       // Calculate the current value based on the start value
       const current = Math.min(Math.floor((progress / duration) * (end - start) + start), end);
-      displayElement.innerText = current;
+      displayElement.innerText = current + unit;
 
       if (current < end) {
-        if (State.isSoundOn && (timestamp - lastSoundTime >= soundInterval)) {
+        if (State.isSoundOn && (timestamp - lastSoundTime >= soundInterval) && playEffect) {
           Sound.play('score');
           lastSoundTime = timestamp; // Update the last sound time
         }
@@ -271,12 +273,12 @@ export default {
       if (!this.lastFallingTime) this.lastFallingTime = timestamp;
       const elapsed = timestamp - this.lastFallingTime;
       let currentDelay = firstFall ? 500 : this.fallingDelay;
-      //console.log(this.finishedCreateOptions);
+      //logController.log(this.finishedCreateOptions);
       if (elapsed >= currentDelay) {
         if (!this.finishedCreateOptions && this.randomPair.length > 0) {
           if (this.fallingItems.length < this.randomPair.length) {
             if (this.fallingId < this.fallingItems.length) {
-              console.log("falling id:", this.fallingId);
+              logController.log("falling id:", this.fallingId);
               this.fallingId += 1;
             } else {
               this.fallingId = 0;
@@ -286,7 +288,7 @@ export default {
           }
           else {
             this.finishedCreateOptions = true;
-            console.log("finished created all");
+            logController.log("finished created all");
           }
         }
         else {
@@ -319,7 +321,7 @@ export default {
       if (this.time <= 10 && !this.isPlayLastTen) {
         if (State.isSoundOn) {
           Sound.play('lastTen', true);
-          console.log('play last ten!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          logController.log('play last ten!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         }
         View.timeText.classList.add('lastTen');
         this.isPlayLastTen = true;
@@ -345,7 +347,7 @@ export default {
     const minutes = Math.floor(countdownTime / 60);
     const seconds = countdownTime % 60;
     const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    //console.log("count", timeString);
+    //logController.log("count", timeString);
     View.timeText.innerText = timeString;
   },
   getTranslateYValue(transformStyle) {
@@ -395,7 +397,7 @@ export default {
 
   getBalancedColumn() {
     let newRandomId = this.getNextSordOrder();
-    console.log("new randomw id", newRandomId);
+    logController.log("new randomw id", newRandomId);
     return newRandomId;
   },
 
@@ -469,7 +471,7 @@ export default {
 
   animationEnd(optionWrapper) {
     this.reFallingItems.push(optionWrapper);
-    console.log("re falling item", this.reFallingItems);
+    logController.log("re falling item", this.reFallingItems);
   },
 
   resetFallingItem(optionWrapper) {
@@ -488,7 +490,7 @@ export default {
     optionWrapper.setAttribute('column', currentColumnId);
 
     //let delay = this.refallingDelay();
-    //console.log("delay", delay, itemLength);
+    //logController.log("delay", delay, itemLength);
     setTimeout(() => {
       optionWrapper.style.left = optionWrapper.x + 'px';
       optionWrapper.style.setProperty('--bottom-height', `${View.canvas.height + this.optionSize}px`);
@@ -539,7 +541,7 @@ export default {
     if (this.randomQuestionId === 0) {
       questions = questions.sort(() => Math.random() - 0.5);
     }
-    console.log("questions", questions);
+    logController.log("questions", questions);
     const _type = questions[this.randomQuestionId].questionType;
     const _QID = questions[this.randomQuestionId].qid;
     const _question = questions[this.randomQuestionId].question;
@@ -557,18 +559,7 @@ export default {
       this.randomQuestionId = 0;
     }
 
-    if (this.answeredNum < this.totalQuestions) {
-      this.answeredNum += 1;
-    }
-    else {
-      if (this.apiManager.isLogined) {
-        console.log("finished question");
-        this.finishedGame();
-        return null;
-      }
-    }
-
-    //console.log("answered count", this.answeredNum);
+    //logController.log("answered count", this.answeredNum);
     return {
       QuestionType: _type,
       QID: _QID,
@@ -598,7 +589,7 @@ export default {
   },
 
   randomOptions() {
-    console.log('question class', this.randomQuestion);
+    logController.log('question class', this.randomQuestion);
     switch (this.randomQuestion.QuestionType) {
       case 'spelling':
       case 'audio':
@@ -615,7 +606,7 @@ export default {
   },
   setQuestions() {
     this.randomQuestion = this.randQuestion();
-    console.log(this.randomQuestion);
+    logController.log(this.randomQuestion);
     if (this.randomQuestion === null)
       return;
 
@@ -741,7 +732,7 @@ export default {
           QuestionManager.preloadedImagesItem.forEach((img) => {
             if (img.id === this.randomQuestion.QID) {
               imageFile = img.src;
-              //console.log("imageFile", imageFile);
+              //logController.log("imageFile", imageFile);
             }
           });
 
@@ -758,7 +749,7 @@ export default {
         break;
     }
 
-    console.log("this.randomQuestion.Answers", this.randomQuestion.Answers);
+    logController.log("this.randomQuestion.Answers", this.randomQuestion.Answers);
     if (this.randomQuestion.Answers === undefined ||
       this.randomQuestion.Answers === null ||
       this.randomQuestion.Answers.length === 0
@@ -808,7 +799,7 @@ export default {
 
     if (this.randomQuestion.QID && this.randomQuestion.QID.trim() !== '') {
       this.playWordAudio(this.randomQuestion.QID);
-      console.log('audio', this.randomQuestion.QID);
+      logController.log('audio', this.randomQuestion.QID);
     }
 
     this.answerWrapper.classList.add('answerWrapper');
@@ -850,7 +841,7 @@ export default {
       this.reFallingItems.splice(0);
       View.optionArea.innerHTML = '';
       this.fallingId = 0;
-      console.log("::::::::::::::::::::::::::::", this.typedItems);
+      logController.log("::::::::::::::::::::::::::::", this.typedItems);
     }
   },
   finishedGame() {
@@ -871,7 +862,7 @@ export default {
         }
         else {
           option.classList.remove('show');
-          console.log("deduct:", option);
+          logController.log("deduct:", option);
           this.typedItems.push(option);
         }
 
@@ -910,7 +901,7 @@ export default {
       let lastOption = null;
       if (this.typedItems.length > 0) {
         lastOption = this.typedItems[this.typedItems.length - 1];
-        console.log('lastOption', lastOption);
+        logController.log('lastOption', lastOption);
 
         if (lastOption && !lastOption.classList.contains('show')) {
           this.reFallingItems.push(lastOption);
@@ -920,7 +911,7 @@ export default {
 
       //let hiddenedOption = this.fallingItems.filter(item => item.optionWrapper.getAttribute('word') === lastChar);
       setTimeout(() => {
-        //console.log("this.typedItems", this.typedItems);
+        //logController.log("this.typedItems", this.typedItems);
         this.isTriggeredBackSpace = false;
       }, delay);
     }
@@ -967,6 +958,12 @@ export default {
       State.changeState('playing', 'ansWrong');
     }
 
+    this.updateAnsweredProgressBar(() => {
+      logController.log("finished question");
+      this.finishedGame();
+      return null;
+    });
+
     this.uploadAnswerToAPI(answer, this.randomQuestion, eachQAScore); ////submit answer api//////
   },
   getScoreForQuestion() {
@@ -978,7 +975,7 @@ export default {
   },
   uploadAnswerToAPI(answer, currentQuestion, eachMark) {
     if (!this.apiManager || !this.apiManager.isLogined || answer === '') return;
-    console.log(`Game Time: ${this.remainingTime}, Remaining Time: ${this.time}`);
+    logController.log(`Game Time: ${this.remainingTime}, Remaining Time: ${this.time}`);
     const currentTime = this.calculateCurrentTime();
     const progress = this.calculateProgress();
     const { correctId, score, currentQAPercent } = this.calculateAnswerMetrics(answer, currentQuestion, eachMark);
@@ -1015,12 +1012,56 @@ export default {
       score = eachMark;
       currentQAPercent = 100;
     }
-    console.log("Corrected Answer Number: ", this.correctedAnswerNumber);
+    logController.log("Corrected Answer Number: ", this.correctedAnswerNumber);
     return { correctId, score, currentQAPercent };
   },
   calculateAnsweredPercentage() {
     return this.correctedAnswerNumber < this.totalQuestions
       ? this.answeredPercentage(this.totalQuestions)
       : 100;
+  },
+  updateAnsweredProgressBar(onCompleted = null) {
+    if (this.apiManager.isLogined) {
+      let progress = 0;
+      if (this.answeredNum < this.totalQuestions) {
+        this.answeredNum += 1;
+        progress = this.answeredNum / this.totalQuestions;
+      }
+      else {
+        progress = 1;
+      }
+
+      let progressColorBar = document.getElementById("progressColorBar");
+      let progressText = document.querySelector('.progressText');
+
+      if (progressColorBar) {
+        let rightPosition = (100 - (progress * 100)) + "%";
+        progressColorBar.style.setProperty('--progress-right', rightPosition);
+
+        const targetPercentage = Math.round(progress * 100);
+        this.countUp(progressText, Number(progressText.innerText.replace('%', '')) || 0, targetPercentage, 500, false, "%");
+
+        if (progress >= 1) {
+          setTimeout(() => {
+            if (onCompleted) onCompleted();
+          }, 500);
+        }
+      }
+    }
+  },
+  resetProgressBar() {
+    if (this.apiManager.isLogined) {
+      this.answeredNum = 0; // Reset answered questions
+      let progressColorBar = document.getElementById("progressColorBar");
+      let progressText = document.querySelector('.progressText');
+
+      if (progressColorBar) {
+        progressColorBar.style.setProperty('--progress-right', "100%"); // Reset position
+      }
+
+      if (progressText) {
+        progressText.textContent = "0%"; // Reset text
+      }
+    }
   }
 }
