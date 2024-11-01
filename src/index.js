@@ -195,6 +195,36 @@ function setAPIImage(imageElement, url) {
     });
 }
 
+function gameSetup() {
+  if (apiManager.isLogined) {
+    let previewImageUrl = (apiManager.settings.previewGameImageUrl && apiManager.settings.previewGameImageUrl !== '') ? apiManager.settings.previewGameImageUrl : null;
+    State.gameTime = apiManager.settings.gameTime;
+    State.fallSpeed = apiManager.settings.fallSpeed;
+    logController.log("settings gameTime:", State.gameTime);
+    logController.log("settings object speed:", apiManager.settings.fallSpeed);
+    logController.log("settings removal:", apiManager.settings.removal);
+    logController.log("settings detectionModel:", apiManager.settings.detectionModel);
+
+    removal = apiManager.settings.removal === 1 ? '1' : '0';
+    model = apiManager.settings.detectionModel === 1 ? 'full' : 'lite';
+
+    if (removal === '1') {
+      let bgUrl = (apiManager.settings.backgroundImageUrl && apiManager.settings.backgroundImageUrl !== '') ? apiManager.settings.backgroundImageUrl : bgImage;
+      setAPIImage(document.getElementById('bgImage'), bgUrl);
+    }
+    setAPIImage(document.getElementById('previewImg'), previewImageUrl);
+    View.setPlayerIcon(apiManager.iconDataUrl);
+    View.setPlayerName(apiManager.loginName);
+    View.setInstructionContent(apiManager.settings.instructionContent);
+    logController.log("Completed load files!!!!!!!!!!!!!!!!");
+  }
+  else {
+    if (removal === '1') {
+      setAPIImage(document.getElementById('bgImage'), bgImage);
+    }
+  }
+}
+
 async function init() {
   logController.log('in init()');
   Util.loadingStart();
@@ -215,34 +245,11 @@ async function init() {
       id,
       levelKey,
       () => {
-        if (apiManager.isLogined) {
-          let previewImageUrl = (apiManager.settings.previewGameImageUrl && apiManager.settings.previewGameImageUrl !== '') ? apiManager.settings.previewGameImageUrl : null;
-          State.gameTime = apiManager.settings.gameTime;
-          State.fallSpeed = apiManager.settings.fallSpeed;
-          logController.log("settings gameTime:", State.gameTime);
-          logController.log("settings object speed:", apiManager.settings.fallSpeed);
-          logController.log("settings removal:", apiManager.settings.removal);
-          logController.log("settings detectionModel:", apiManager.settings.detectionModel);
-
-          removal = apiManager.settings.removal === 1 ? '1' : '0';
-          model = apiManager.settings.detectionModel === 1 ? 'full' : 'lite';
-
-          if (removal === '1') {
-            let bgUrl = (apiManager.settings.backgroundImageUrl && apiManager.settings.backgroundImageUrl !== '') ? apiManager.settings.backgroundImageUrl : bgImage;
-            setAPIImage(document.getElementById('bgImage'), bgUrl);
-          }
-          setAPIImage(document.getElementById('previewImg'), previewImageUrl);
-          View.setPlayerIcon(apiManager.iconDataUrl);
-          View.setPlayerName(apiManager.loginName);
-        }
-        else {
-          if (removal === '1') {
-            setAPIImage(document.getElementById('bgImage'), bgImage);
-          }
-        }
+        gameSetup();
         resolve();
       },
-      () => {
+      (error) => {
+        logController.error("An error occurred while loading questions:", error);
         View.showLoginErrorPopup();
         reject();
       }
@@ -258,6 +265,8 @@ async function init() {
 
   // Add onbeforeunload event handler
   window.onbeforeunload = function (e) {
+    if (State.state === 'leave') return;
+
     logController.log("Calling OnClose from Browser!");
     apiManager.exitGameRecord(
       () => {
@@ -287,12 +296,19 @@ async function init() {
     ['lastTen', require('./audio/dingding.wav')],
   ];
 
-  const additionalAudios = audioFiles;
-  const filteredAdditionalAudios = levelKey
-    ? additionalAudios.filter(([key]) => key.includes(levelKey))
-    : additionalAudios;
+  let questionsAudio = [];
 
-  const audiosToPreload = [...defaultAudios, ...filteredAdditionalAudios];
+  if (apiManager.isLogined) {
+    questionsAudio = QuestionManager.questionType === 'audio' ? QuestionManager.apiMedia : [];
+  }
+  else {
+    const additionalAudios = audioFiles;
+    questionsAudio = levelKey
+      ? additionalAudios.filter(([key]) => key.includes(levelKey))
+      : additionalAudios;
+  }
+
+  const audiosToPreload = [...defaultAudios, ...questionsAudio];
 
   await Promise.all([
     Sound.preloadAudios(audiosToPreload),
@@ -317,9 +333,14 @@ function handleButtonClick(e) {
       State.gamePauseData.state = State.state;
       State.gamePauseData.stateType = State.stateType;
       //State.changeState('pause');
-      setTimeout(() => {
-        State.changeState('leave');
-      }, 500);
+      apiManager.exitGameRecord(
+        () => {
+          logController.log("Quit Game");
+          setTimeout(() => {
+            State.changeState('leave');
+          }, 500);
+        }
+      );
       break;
     case View.motionBtn:
       if (State.isSoundOn) {

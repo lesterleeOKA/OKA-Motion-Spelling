@@ -547,10 +547,10 @@ export default {
     const _question = questions[this.randomQuestionId].question;
     const _answers = questions[this.randomQuestionId].answers;
     const _correctAnswer = questions[this.randomQuestionId].correctAnswer;
-    const _star = questions[this.randomQuestionId].star;
-    const _score = questions[this.randomQuestionId].score;
-    const _correctAnswerIndex = questions[this.randomQuestionId].correctAnswerIndex;
-    const _media = questions[this.randomQuestionId].media;
+    const _star = this.apiManager.isLogined ? questions[this.randomQuestionId].star : null;
+    const _score = this.apiManager.isLogined ? questions[this.randomQuestionId].score.full : null;
+    const _correctAnswerIndex = this.apiManager.isLogined ? questions[this.randomQuestionId].correctAnswerIndex : null;
+    const _media = this.apiManager.isLogined ? questions[this.randomQuestionId].media : null;
 
     if (this.randomQuestionId < this.totalQuestions - 1) {
       this.randomQuestionId += 1;
@@ -568,7 +568,6 @@ export default {
       CorrectAnswer: _correctAnswer,
       Star: _star,
       Score: _score,
-      CorrectAnswer: _correctAnswer,
       CorrectAnswerId: _correctAnswerIndex,
       Media: _media,
     };
@@ -596,6 +595,8 @@ export default {
       case 'fillInBlank':
       case 'reorder':
       case 'picture':
+        if (this.randomQuestion.CorrectAnswer === null || this.randomQuestion.CorrectAnswer === undefined)
+          this.randomQuestion.CorrectAnswer = this.randomQuestion.Question;
         var array = this.generateCharArray(this.randomQuestion.CorrectAnswer);
         this.answerLength = array.length;
         return array;
