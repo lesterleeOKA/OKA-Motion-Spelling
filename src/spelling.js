@@ -471,7 +471,7 @@ export default {
 
   animationEnd(optionWrapper) {
     this.reFallingItems.push(optionWrapper);
-    logController.log("re falling item", this.reFallingItems);
+    //logController.log("re falling item", this.reFallingItems);
   },
 
   resetFallingItem(optionWrapper) {
@@ -800,7 +800,7 @@ export default {
 
     if (this.randomQuestion.QID && this.randomQuestion.QID.trim() !== '') {
       this.playWordAudio(this.randomQuestion.QID);
-      logController.log('audio', this.randomQuestion.QID);
+      logController.log('play audio', this.randomQuestion.QID);
     }
 
     this.answerWrapper.classList.add('answerWrapper');
@@ -1022,7 +1022,7 @@ export default {
       ? this.answeredPercentage(this.totalQuestions)
       : 100;
   },
-  updateAnsweredProgressBar(onCompleted = null) {
+  /*updateAnsweredProgressBar(onCompleted = null) {
     if (this.apiManager.isLogined) {
       let progress = 0;
       if (this.answeredNum < this.totalQuestions) {
@@ -1063,6 +1063,52 @@ export default {
 
       if (progressText) {
         progressText.textContent = "0%"; // Reset text
+      }
+    }
+  }*/
+
+  updateAnsweredProgressBar(onCompleted = null) {
+    if (this.apiManager.isLogined) {
+      let progress = 0;
+
+      // Increment answered questions and calculate progress
+      if (this.answeredNum < this.totalQuestions) {
+        this.answeredNum += 1;
+        progress = this.answeredNum / this.totalQuestions;
+      } else {
+        progress = 1;
+      }
+
+      let progressColorBar = document.getElementById("progressColorBar");
+      let progressText = document.querySelector('.progressText');
+
+      if (progressColorBar) {
+        let rightPosition = (100 - (progress * 100)) + "%";
+        progressColorBar.style.setProperty('--progress-right', rightPosition);
+        // Show the progress in the format "answered/total"
+        progressText.innerText = `${this.answeredNum}/${this.totalQuestions}`;
+
+        if (progress >= 1) {
+          setTimeout(() => {
+            if (onCompleted) onCompleted();
+          }, 500);
+        }
+      }
+    }
+  },
+
+  resetProgressBar() {
+    if (this.apiManager.isLogined) {
+      this.answeredNum = 0; // Reset answered questions
+      let progressColorBar = document.getElementById("progressColorBar");
+      let progressText = document.querySelector('.progressText');
+
+      if (progressColorBar) {
+        progressColorBar.style.setProperty('--progress-right', "100%"); // Reset position
+      }
+
+      if (progressText) {
+        progressText.textContent = "0/20"; // Reset text to show answered/total format
       }
     }
   }

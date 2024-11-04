@@ -299,7 +299,7 @@ async function init() {
   let questionsAudio = [];
 
   if (apiManager.isLogined) {
-    questionsAudio = QuestionManager.questionType === 'audio' ? QuestionManager.apiMedia : [];
+    questionsAudio = QuestionManager.mediaType === 'audio' ? QuestionManager.apiMedia : [];
   }
   else {
     const additionalAudios = audioFiles;
