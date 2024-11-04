@@ -30,6 +30,7 @@ export default {
   answerLength: 0,
   questionWrapper: null,
   answerWrapper: null,
+  answerTextField: null,
   fillwordTime: 0,
   redBoxX: 0,
   redBoxY: 0,
@@ -61,7 +62,7 @@ export default {
     this.questionType = QuestionManager.questionField;
     this.randomQuestion = null;
     this.question = '';
-    this.totalQuestions = 0;
+    this.totalQuestions = this.questionType.questions ? this.questionType.questions.length : 0;
     this.score = 0;
     this.time = 0;
     this.timerRunning = false;
@@ -76,6 +77,7 @@ export default {
     this.fillwordTime = 0;
     this.questionWrapper = null;
     this.answerWrapper = null;
+    this.answerTextField = null;
     View.scoreBoard.className = "scoreBoard";
     this.randomQuestionId = 0;
     this.answeredNum = 0;
@@ -616,7 +618,7 @@ export default {
     this.selectedCount = Math.floor(Math.random() * this.numberOfColumns);
     this.questionWrapper = document.createElement('div');
     let questionBg = document.createElement('div');
-    this.answerWrapper = document.createElement('span');
+    this.answerTextField = document.createElement('div');
 
     switch (this.randomQuestion.QuestionType) {
       case 'spelling':
@@ -629,7 +631,7 @@ export default {
         this.questionWrapper.appendChild(questionText);
         var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
-        this.answerWrapper.classList.add('textType');
+        this.answerTextField.classList.add('textType');
         //View.stageImg.appendChild(questionText);
         break;
       case 'text':
@@ -642,8 +644,7 @@ export default {
         var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.questionWrapper.style.top = "-15%";
-        this.answerWrapper.classList.add('audioType');
-
+        this.answerTextField.classList.add('audioType');
         break;
       case 'audio':
         this.questionWrapper.classList.add('questionAudioWrapper');
@@ -675,7 +676,7 @@ export default {
           this.buttonWrapper.classList.add('not-clicked');
         });
         this.questionWrapper.appendChild(this.buttonWrapper);
-        this.answerWrapper.classList.add('audioType');
+        this.answerTextField.classList.add('audioType');
         break;
       case 'fillInBlank':
       case 'reorder':
@@ -719,7 +720,7 @@ export default {
         });
         this.questionWrapper.appendChild(this.buttonWrapper);
 
-        this.answerWrapper.classList.add('pictureType');
+        this.answerTextField.classList.add('pictureType');
         break;
       case 'picture':
         this.questionWrapper.classList.add('questionImageWrapper');
@@ -746,7 +747,7 @@ export default {
             this.questionWrapper.appendChild(imageElement);
           }
         }
-        this.answerWrapper.classList.add('pictureType');
+        this.answerTextField.classList.add('pictureType');
         break;
     }
 
@@ -803,11 +804,34 @@ export default {
       logController.log('play audio', this.randomQuestion.QID);
     }
 
-    this.answerWrapper.classList.add('answerWrapper');
+    this.answerTextField.classList.add('answerWrapper');
+    this.answerWrapper = document.createElement('span');
+    this.answerWrapper.classList.add('answerText');
+    this.answerTextField.appendChild(this.answerWrapper);
     View.stageImg.appendChild(this.questionWrapper);
-    View.stageImg.appendChild(this.answerWrapper);
+    View.stageImg.appendChild(this.answerTextField);
     View.stageImg.classList.add('fadeIn');
     View.stageImg.style.opacity = 1;
+  },
+  adjustAnswerTextFontSize(answer) {
+    if (this.answerWrapper) {
+      const textLength = answer.length;
+      let fontSize;
+      // Base font size
+      const baseFontSize = 26; // Adjust this value as needed
+
+      // Set font size based on text length
+      if (textLength <= 10) {
+        fontSize = baseFontSize; // Maximum size for short text
+      } else if (textLength <= 20) {
+        fontSize = baseFontSize * 0.8; // Scale down for medium-length text
+      } else if (textLength <= 30) {
+        fontSize = baseFontSize * 0.6; // Further scale down for longer text
+      } else {
+        fontSize = baseFontSize * 0.4; // Minimum size for very long text
+      }
+      this.answerWrapper.style.fontSize = `${fontSize}px`;
+    }
   },
 
   motionTriggerPlayAudio(_play) {
@@ -855,6 +879,7 @@ export default {
     if (this.answerWrapper) {
       if (this.fillwordTime < this.answerLength) {
         this.answerWrapper.textContent += option.getAttribute('word');
+        this.adjustAnswerTextFontSize(this.answerWrapper.textContent);
 
         if (this.questionType.QuestionType === "Text") {
           if (View.optionArea.contains(option)) {
@@ -921,8 +946,8 @@ export default {
     this.fallingId = 0;
     this.leftCount = 0;
     this.rightCount = 0;
-    this.answerWrapper.classList.remove('correct');
-    this.answerWrapper.classList.remove('wrong');
+    this.answerTextField.classList.remove('correct');
+    this.answerTextField.classList.remove('wrong');
     this.answerWrapper.textContent = '';
     this.fillwordTime = 0;
     this.fallingItems.splice(0);
@@ -950,12 +975,12 @@ export default {
     if (isCorrect) {
       //答岩1分，答錯唔扣分
       this.addScore(eachQAScore);
-      this.answerWrapper.classList.add('correct');
+      this.answerTextField.classList.add('correct');
       State.changeState('playing', 'ansCorrect');
       View.showCorrectEffect(true);
     } else {
       //this.addScore(-1);
-      this.answerWrapper.classList.add('wrong');
+      this.answerTextField.classList.add('wrong');
       State.changeState('playing', 'ansWrong');
       View.showWrongEffect(true);
     }
@@ -1108,7 +1133,7 @@ export default {
       }
 
       if (progressText) {
-        progressText.textContent = "0/20"; // Reset text to show answered/total format
+        progressText.textContent = "0/" + this.totalQuestions; // Reset text to show answered/total format
       }
     }
   }
