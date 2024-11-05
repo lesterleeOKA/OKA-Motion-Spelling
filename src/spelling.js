@@ -548,11 +548,15 @@ export default {
     const _QID = questions[this.randomQuestionId].qid;
     const _question = questions[this.randomQuestionId].question;
     const _answers = questions[this.randomQuestionId].answers;
-    const _correctAnswer = questions[this.randomQuestionId].correctAnswer;
+    let _correctAnswer = questions[this.randomQuestionId].correctAnswer;
     const _star = this.apiManager.isLogined ? questions[this.randomQuestionId].star : null;
     const _score = this.apiManager.isLogined ? questions[this.randomQuestionId].score.full : null;
     const _correctAnswerIndex = this.apiManager.isLogined ? questions[this.randomQuestionId].correctAnswerIndex : null;
     const _media = this.apiManager.isLogined ? questions[this.randomQuestionId].media : null;
+
+    if ((_correctAnswer === null || _correctAnswer === undefined) && _correctAnswerIndex !== null && _answers.length > 0) {
+      _correctAnswer = _answers[_correctAnswerIndex];
+    }
 
     if (this.randomQuestionId < this.totalQuestions - 1) {
       this.randomQuestionId += 1;
