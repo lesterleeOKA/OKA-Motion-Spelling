@@ -1,6 +1,7 @@
 import Game from './spelling';
 import State from './state';
 import Util from './util';
+import { logController } from './logController';
 
 export default {
   //-----------------------------------------------------------------------------------------------
@@ -70,7 +71,33 @@ export default {
     require("./images/spelling/fruit4.png"),
     require("./images/spelling/fruit5.png"),
   ],
-  preloadUsedImages() {
+  toAPIImageUrl(url) {
+    if (url === null) return;
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.blob(); // Get the image as a Blob
+      })
+      .then(blob => {
+        Util.updateLoadingStatus("Loading Images");
+        let successUrl = URL.createObjectURL(blob);
+        logController.log("success blob", successUrl);
+        this.preloadedFallingImages.push(successUrl);
+      })
+      .catch(error => {
+        logController.error("Error loading image:", error);
+      });
+  },
+  preloadUsedImages(option_images = null) {
+    let logined = option_images !== null ? true : false;
+    let _optionImages = logined ? option_images : this.optionImages;
+    _optionImages.forEach((path) => {
+      this.toAPIImageUrl(path);
+    });
+  },
+  /*preloadUsedImages() {
     this.optionImages.forEach((path) => {
       const img = new Image();
       img.src = path;
@@ -78,7 +105,7 @@ export default {
     });
 
     Util.updateLoadingStatus("Loading Images");
-  },
+  },*/
 
   showInstruction() {
     this.instructionWrapper.style.top = 0;
