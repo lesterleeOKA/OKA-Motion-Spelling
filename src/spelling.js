@@ -438,7 +438,7 @@ export default {
     optionWrapper.style.width = `${this.optionSize}px`;
     optionWrapper.style.height = `${this.optionSize}px`;
     if (optionImage !== '' && optionImage !== 'undefined')
-      optionWrapper.style.backgroundImage = `url(${optionImage.src})`;
+      optionWrapper.style.backgroundImage = `url(${optionImage})`;
     optionWrapper.id = id;
     optionWrapper.setAttribute('word', text);
     optionWrapper.setAttribute('column', columnId);
@@ -554,8 +554,8 @@ export default {
     const _correctAnswerIndex = this.apiManager.isLogined ? questions[this.randomQuestionId].correctAnswerIndex : null;
     const _media = this.apiManager.isLogined ? questions[this.randomQuestionId].media : null;
 
-    if ((_correctAnswer === null || _correctAnswer === undefined) && _correctAnswerIndex !== null && _answers.length > 0) {
-      _correctAnswer = _answers[_correctAnswerIndex];
+    if ((_correctAnswer === null || _correctAnswer === undefined) && _correctAnswerIndex && _answers) {
+      if (_answers.length > 0) _correctAnswer = _answers[_correctAnswerIndex];
     }
 
     if (this.randomQuestionId < this.totalQuestions - 1) {
