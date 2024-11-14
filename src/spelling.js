@@ -625,6 +625,17 @@ export default {
     this.answerTextField = document.createElement('div');
 
     switch (this.randomQuestion.QuestionType) {
+      case 'text':
+        this.questionWrapper.classList.add('questionFillBlankWrapper');
+        questionBg.classList.add('questionImgBg');
+        View.stageImg.appendChild(questionBg);
+        var questionText = document.createElement('span');
+        questionText.textContent = this.randomQuestion.Question;
+        this.questionWrapper.appendChild(questionText);
+        var fontSize = `calc(min(max(4vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
+        this.questionWrapper.style.setProperty('--question-font-size', fontSize);
+        this.answerTextField.classList.add('pictureType');
+        break;
       case 'spelling':
         this.questionWrapper.classList.add('questionWrapper');
         questionBg.classList.add('questionBg');
@@ -637,18 +648,6 @@ export default {
         this.questionWrapper.style.setProperty('--question-font-size', fontSize);
         this.answerTextField.classList.add('textType');
         //View.stageImg.appendChild(questionText);
-        break;
-      case 'text':
-        this.questionWrapper.classList.add('questionAudioWrapper');
-        questionBg.classList.add('questionAudioBg');
-        View.stageImg.appendChild(questionBg);
-        var questionText = document.createElement('span');
-        questionText.textContent = this.randomQuestion.Question;
-        this.questionWrapper.appendChild(questionText);
-        var fontSize = `calc(min(max(3vh, 6vh - ${this.randomQuestion.Question.length} * 0.1vh), 6vh))`;
-        this.questionWrapper.style.setProperty('--question-font-size', fontSize);
-        this.questionWrapper.style.top = "-15%";
-        this.answerTextField.classList.add('audioType');
         break;
       case 'audio':
         this.questionWrapper.classList.add('questionAudioWrapper');
