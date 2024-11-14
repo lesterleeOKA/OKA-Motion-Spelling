@@ -225,6 +225,8 @@ function gameSetup() {
       setAPIImage(document.getElementById('bgImage'), bgImage);
     }
   }
+  if (gameTime) State.gameTime = gameTime;
+  if (fallSpeed) State.fallSpeed = fallSpeed;
 }
 
 async function init() {
@@ -237,8 +239,6 @@ async function init() {
   ]);
 
   Util.updateLoadingStatus("Loading Data");
-  State.gameTime = gameTime;
-  State.fallSpeed = fallSpeed;
   // Load question data and handle callbacks
   await new Promise((resolve, reject) => {
     QuestionManager.checkIsLogin(
