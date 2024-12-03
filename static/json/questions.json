@@ -1,126 +1,6 @@
 {
    "questions":[
       {
-        "qid":"p1u1-b1",
-        "questionType":"spelling",
-        "question":"Classmate",
-        "correctAnswer":"Classmate"
-      },
-      {
-        "qid":"p1u1-b2",
-        "questionType":"spelling",
-        "question":"Goodbye",
-        "correctAnswer":"Goodbye"
-      },
-      {
-        "qid":"p1u1-b5",
-        "questionType":"spelling",
-        "question":"Greet",
-        "correctAnswer":"Greet"
-      },
-      {
-         "qid":"p1u1-b6",
-         "questionType":"spelling",
-         "question":"Hello",
-         "correctAnswer":"Hello"
-      },
-      {
-        "qid":"p1u1-b7",
-        "questionType":"spelling",
-        "question":"Monitor",
-        "correctAnswer":"Monitor"
-      },
-      {
-        "qid":"p1u1-b8",
-        "questionType":"spelling",
-        "question":"Teacher",
-        "correctAnswer":"Teacher"
-      },
-      {
-        "qid":"p1u1-b9",
-        "questionType":"spelling",
-        "question":"Friend",
-        "correctAnswer":"Friend"
-      },
-      {
-        "qid":"p1u1-b10",
-        "questionType":"spelling",
-        "question":"Gardener",
-        "correctAnswer":"Gardener"
-      },
-      {
-        "qid":"p1u1-b11",
-        "questionType":"spelling",
-        "question":"Driver",
-        "correctAnswer":"Driver"
-      },
-      {
-        "qid":"p1u1-b12",
-        "questionType":"spelling",
-        "question":"Coach",
-        "correctAnswer":"Coach"
-      },
-      {
-        "qid":"p1u1-b13",
-        "questionType":"spelling",
-        "question":"Leader",
-        "correctAnswer":"Leader"
-      },
-      {
-        "qid":"p1u2-a1",
-        "questionType":"spelling",
-        "question":"Family",
-        "correctAnswer":"Family"
-      },
-      {
-         "qid":"p1u2-a2",
-         "questionType":"spelling",
-         "question":"Sister",
-         "correctAnswer":"Sister"
-      },
-      {
-         "qid":"p1u2-a3",
-         "questionType":"spelling",
-         "question":"Father",
-         "correctAnswer":"Father"
-      },
-      {
-         "qid":"p1u2-a4",
-         "questionType":"spelling",
-         "question":"Mother",
-         "correctAnswer":"Mother"
-      },
-      {
-         "qid":"p1u2-a5",
-         "questionType":"spelling",
-         "question":"Brother",
-         "correctAnswer":"Brother"
-      },
-      {
-        "qid":"p1u2-a6",
-        "questionType":"spelling",
-        "question":"Grandmother",
-        "correctAnswer":"Grandmother"
-      },
-      {
-        "qid":"p1u2-a7",
-        "questionType":"spelling",
-        "question":"Grandfather",
-        "correctAnswer":"Grandfather"
-      },
-      {
-        "qid":"p1u2-a8",
-        "questionType":"spelling",
-        "question":"Parents",
-        "correctAnswer":"Parents"
-      },
-      {
-        "qid":"p1u2-a9",
-        "questionType":"spelling",
-        "question":"Children",
-        "correctAnswer":"Children"
-      },
-      {
         "qid":"p1u3-a2",
         "questionType":"audio",
         "question":"Book",
@@ -414,6 +294,126 @@
         "question":"trihd",
         "correctAnswer":"third"
       },
+      {
+        "qid": "p2u6-c1",
+        "questionType": "picture",
+        "question": "vet",
+        "correctAnswer": "vet"
+    },
+    {
+        "qid": "p2u6-c2",
+        "questionType": "picture",
+        "question": "policewoman",
+        "correctAnswer": "policewoman"
+    },
+    {
+        "qid": "p2u6-c3",
+        "questionType": "picture",
+        "question": "artist",
+        "correctAnswer": "artist"
+    },
+    {
+        "qid": "p2u6-c4",
+        "questionType": "picture",
+        "question": "waitress",
+        "correctAnswer": "waitress"
+    },
+    {
+        "qid": "p2u6-c5",
+        "questionType": "picture",
+        "question": "teacher",
+        "correctAnswer": "teacher"
+    },
+    {
+        "qid": "p2u6-c6",
+        "questionType": "picture",
+        "question": "postman",
+        "correctAnswer": "postman"
+    },
+    {
+        "qid": "p2u6-c7",
+        "questionType": "picture",
+        "question": "shopkeeper",
+        "correctAnswer": "shopkeeper"
+    },
+    {
+        "qid": "p2u6-c8",
+        "questionType": "picture",
+        "question": "serve",
+        "correctAnswer": "serve"
+    },
+    {
+        "qid": "p2u6-c9",
+        "questionType": "picture",
+        "question": "take care of",
+        "correctAnswer": "take care of"
+    },
+    {
+        "qid": "p2u6-c10",
+        "questionType": "picture",
+        "question": "pilot",
+        "correctAnswer": "pilot"
+    },
+    {
+        "qid": "p2u6-c11",
+        "questionType": "picture",
+        "question": "singer",
+        "correctAnswer": "singer"
+    },
+    {
+        "qid": "p2u6-c12",
+        "questionType": "picture",
+        "question": "parcels",
+        "correctAnswer": "parcels"
+    },
+    {
+        "qid": "p2u6-c13",
+        "questionType": "picture",
+        "question": "nurse",
+        "correctAnswer": "nurse"
+    },
+    {
+        "qid": "p2u6-c14",
+        "questionType": "picture",
+        "question": "doctor",
+        "correctAnswer": "doctor"
+    },
+    {
+        "qid": "p2u6-c15",
+        "questionType": "picture",
+        "question": "sick people",
+        "correctAnswer": "sick people"
+    },
+    {
+        "qid": "p2u6-c16",
+        "questionType": "picture",
+        "question": "waiter",
+        "correctAnswer": "waiter"
+    },
+    {
+        "qid": "p2u6-c17",
+        "questionType": "picture",
+        "question": "housewife",
+        "correctAnswer": "housewife"
+    },
+    {
+        "qid": "p2u6-c18",
+        "questionType": "picture",
+        "question": "chef",
+        "correctAnswer": "chef"
+    },
+    {
+        "qid": "p2u6-c19",
+        "questionType": "picture",
+        "question": "policeman",
+        "correctAnswer": "policeman"
+    },
+    {
+        "qid": "p2u6-c20",
+        "questionType": "picture",
+        "question": "thieves",
+        "correctAnswer": "thieves"
+    },
       {
         "qid":"p3u1-e1",
         "questionType":"text",
