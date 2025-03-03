@@ -20,68 +20,77 @@ export class RendererCanvas2d {
   }
 
   draw(rendererParams) {
-    const [video, poses, isFPSMode, bodySegmentationCanvas] = rendererParams;
+      const [video, poses, isFPSMode, bodySegmentationCanvas] = rendererParams;
+      this.updateCanvasDimensions(video);
+      this.drawCtx(video, bodySegmentationCanvas);
+
+      if (this.isStateActive()) {
+        let isCurPoseValid = false;
+        if (poses && poses.length > 0) {
+          const ratio = video.width / video.videoWidth;
+          this.drawResults(poses, ratio, isFPSMode);
+          isCurPoseValid = this.isPoseValid(poses);
+          if (isCurPoseValid && State.bodyInsideRedBox.value) {
+            this.handleStateTransitions();
+          }
+        }
+        this.drawBox(isCurPoseValid);
+      }
+  }
+
+  updateCanvasDimensions(video) {
     this.videoWidth = video.width;
     this.videoHeight = video.height;
     this.ctx.canvas.width = this.videoWidth;
     this.ctx.canvas.height = this.videoHeight;
-
     this.redBoxX = this.videoWidth / 3;
-    this.redBoxY = this.videoHeight / 5 * 1;
+    this.redBoxY = this.videoHeight / 5;
     this.redBoxWidth = this.videoWidth / 3;
-    this.redBoxHeight = this.videoHeight / 5 * 4;
-
-    this.drawCtx(video, bodySegmentationCanvas);
-    if (['prepare', 'counting3', 'counting2', 'counting1', 'counting0', 'playing', 'outBox'].includes(State.state)) {
-      let isCurPoseValid = false;
-      if (poses && poses.length > 0) {
-        let ratio = video.width / video.videoWidth;
-        this.drawResults(poses, ratio, isFPSMode);
-        //this.isPoseValid(poses, video.width / video.videoWidth);
-        isCurPoseValid = this.isPoseValid(poses, video.width / video.videoWidth);
-        if (isCurPoseValid && State.bodyInsideRedBox.value == true) {
-          if (State.state == 'prepare' && State.getStateLastFor() > 3500) {
-            State.changeState('counting3');
-          } else if (State.state == 'counting3' && State.getStateLastFor() > 1000) {
-            State.changeState('counting2');
-          } else if (State.state == 'counting2' && State.getStateLastFor() > 1000) {
-            State.changeState('counting1');
-          } else if (State.state == 'counting1' && State.getStateLastFor() > 1000) {
-            State.changeState('counting0');
-          } else if (State.state == 'counting0' && State.getStateLastFor() > 1000) {
-            State.changeState('playing', 'showStage');
-          } else if (State.state == 'playing') {
-
-            if (State.stageType == 'showStage' && State.getStateLastFor() > 1000) {
-              //State.changeState('playing', 'showQstImg');
-            } else if (State.stateType == 'waitAns') {
-              if (State.selectedImg.value && State.selectedImg.lastFor > 1000) {
-                //1秒掂到就得，唔駛倒數
-                //State.changeState('playing', Game.checkAnswer() ? 'ansCorrect' : 'ansWrong');
-                //State.changeState('playing', 'touched1');
-              }
-            } else if (State.stateType == 'touched1') {
-              if (State.selectedImg.value && State.selectedImg.lastFor > 2000) {
-                State.changeState('playing', 'touched2');
-              } else if (!State.selectedImg.value) {
-                State.changeState('playing', 'waitAns');
-              }
-            } else if (State.stateType == 'touched2') {
-              if (State.selectedImg.value && State.selectedImg.lastFor > 3000) {
-                //let isCorrect = Game.checkAnswer();
-                // State.changeState('playing', isCorrect ? 'ansCorrect' : 'ansWrong');
-              } else if (!State.selectedImg.value) {
-                State.changeState('playing', 'waitAns');
-              }
-            }
-          } else if (State.state == 'outBox' && State.bodyInsideRedBox.lastFor > 2000) {
-            State.changeState('playing', 'waitAns');
-          }
-        }
-      }
-      this.drawBox(isCurPoseValid);
-    }
+    this.redBoxHeight = (this.videoHeight / 5) * 4;
   }
+
+  isStateActive() {
+    return ['prepare', 'counting3', 'counting2', 'counting1', 'counting0', 'playing', 'outBox'].includes(State.state);
+  }
+
+  handleStateTransitions() {
+      if (State.state === 'prepare' && State.getStateLastFor() > 3500) {
+        State.changeState('counting3');
+      } else if (State.state === 'counting3' && State.getStateLastFor() > 1000) {
+        State.changeState('counting2');
+      } else if (State.state === 'counting2' && State.getStateLastFor() > 1000) {
+        State.changeState('counting1');
+      } else if (State.state === 'counting1' && State.getStateLastFor() > 1000) {
+        State.changeState('counting0');
+      } else if (State.state === 'counting0' && State.getStateLastFor() > 1000) {
+        State.changeState('playing', 'showStage');
+      } else if (State.state === 'playing') {
+        this.handlePlayingState();
+      } else if (State.state === 'outBox' && State.bodyInsideRedBox.lastFor > 2000) {
+        State.changeState('playing', 'waitAns');
+      }
+  }
+
+    handlePlayingState() {
+      if (State.stageType === 'showStage' && State.getStateLastFor() > 1000) {
+        // Handle stage transition if necessary
+      } else if (State.stateType === 'waitAns') {
+        this.handleWaitAnsState();
+      } else if (State.stateType === 'touched1' && State.selectedImg.lastFor > 2000) {
+        State.changeState('playing', 'touched2');
+      } else if (State.stateType === 'touched2' && State.selectedImg.lastFor > 3000) {
+        // Handle answer checking if necessary
+      } else if (!State.selectedImg.value) {
+        State.changeState('playing', 'waitAns');
+      }
+    }
+
+    handleWaitAnsState() {
+      if (State.selectedImg.value && State.selectedImg.lastFor > 1000) {
+        // Handle answer checking if necessary
+      }
+    }
+
   isOutOfBounds(keypoint) {
     return (
       keypoint.x < this.redBoxX ||
@@ -90,25 +99,28 @@ export class RendererCanvas2d {
       keypoint.y > (this.redBoxY + this.redBoxHeight)
     );
   }
-  isPoseValid(poses) {
-    if (!poses[0]) return false;
-    let pose = poses[0];
-    let passScore = this.scoreThreshold;
-    let isBodyOutBox;
 
-    if (pose.keypoints != null) {
-      //我建議膊頭兩點，腰兩點，膝頭兩點，手肘兩點，手腕兩點入框就可以玩
-      //nose, left_eye_inner, left_eye, left_eye_outer, right_eye_inner, right_eye, right_eye_outer, left_ear, right_ear, mouth_left, mouth_right, left_shoulder, right_shoulder, left_elbow, right_elbow, left_wrist, right_wrist, left_pinky, right_pinky, left_index, right_index, left_thumb, right_thumb, left_hip, right_hip, left_knee, right_knee, left_ankle, right_ankle, left_heel, right_heel, left_foot_index, right_foot_index
-      //let checkKeypoints = pose.keypoints.filter(k=>['left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist', 'left_hip', 'right_hip', 'left_knee', 'right_knee'].includes(k.name) && k.score>0.65);
+  checkBodyInBounds(pose, passScore) {
       const isNoseOutBox = pose.keypoints
         .filter(k => k.name === 'nose' && k.score > passScore)
         .some(keypoint => this.isOutOfBounds(keypoint));
       const isShoulderOutBox = this.center_shoulder && this.isOutOfBounds(this.center_shoulder);
-      isBodyOutBox = this.center_shoulder ? (isShoulderOutBox && isNoseOutBox) : isNoseOutBox;
+      const isBodyOutBox = this.center_shoulder ? (isShoulderOutBox && isNoseOutBox) : isNoseOutBox;
 
       State.setPoseState('bodyInsideRedBox', !isBodyOutBox);
-      if (isBodyOutBox) {
-        if (State.state == 'playing') State.changeState('outBox', 'outBox');
+      if (isBodyOutBox && State.state === 'playing') {
+        State.changeState('outBox', 'outBox');
+      }
+      return !isBodyOutBox;
+  }
+
+  isPoseValid(poses) {
+    if (!poses[0]) return false;
+    let pose = poses[0];
+    let passScore = this.scoreThreshold;
+
+    if (pose.keypoints != null) {
+      if (!this.checkBodyInBounds(pose, passScore)) {
         return false;
       }
 

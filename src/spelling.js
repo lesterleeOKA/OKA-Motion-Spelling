@@ -16,6 +16,7 @@ export default {
   remainingTime: 0,
   fallingSpeed: 0,
   optionSize: 0,
+  columnSize: 0,
   fallingOption: null,
   timer: null,
   timerRunning: false,
@@ -52,7 +53,6 @@ export default {
   apiManager: null,
 
   init(gameTime = null, fallSpeed = null) {
-    //View.showTips('tipsReady');
     this.startedGame = false;
     this.fallingId = 0;
     this.remainingTime = gameTime !== null ? gameTime : 300;
@@ -83,7 +83,8 @@ export default {
     this.answeredNum = 0;
     this.correctedAnswerNumber = 0;
     this.answerLength = 0;
-    this.optionSize = View.canvas.width / 7.5;
+    this.optionSize = View.canvas.width / 12;
+    this.columnSize = View.canvas.width / 7;
     this.redBoxX = View.canvas.width / 3;
     this.redBoxY = (View.canvas.height / 5) * 3;
     this.redBoxWidth = View.canvas.width / 3;
@@ -164,7 +165,6 @@ export default {
     }
 
     this.score = newScore;
-    //View.scoreText.innerText = this.score;
     this.countUp(View.scoreText, currentScore, this.score, 1000);
   },
 
@@ -404,31 +404,33 @@ export default {
   },
 
   generatePositionX(columnId) {
-    if (this.wholeScreenColumnSeperated) {
-      const offset = 20;
-      // Calculate the X position based on the columnId
-      let positionX = columnId * this.columnWidth + offset; // Center the position within the column
+      if (this.wholeScreenColumnSeperated) {
+        const offset = 20;
+        // Calculate the X position based on the columnId
+        let positionX = columnId * this.columnWidth + offset; // Center the position within the column
 
-      if (positionX + this.columnWidth / 2 > View.canvas.width - offset) {
-        positionX = View.canvas.width - offset - this.columnWidth / 2;
+        if (positionX + this.columnWidth / 2 > View.canvas.width - offset) {
+          positionX = View.canvas.width - offset - this.columnWidth / 2;
+        }
+        return positionX;
       }
-      return positionX;
-    }
-    else {
-      const isLeft = columnId < Math.floor(this.redBoxX / this.optionSize);
-      let numColumns, columnWidth;
+      else {
+        const isLeft = columnId < Math.floor(this.redBoxX / this.columnSize);
+        let numColumns = 2, columnWidth;
+        let leftMargin = this.columnSize / 2, rightMargin = this.columnSize / 2;
 
-      if (isLeft) {
-        numColumns = Math.floor(this.redBoxX / this.optionSize);
-        columnWidth = this.redBoxX / numColumns;
-        return columnId * columnWidth + 15;
-      } else {
-        numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / this.optionSize);
-        columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - 10) / numColumns;
-        return this.redBoxX + this.redBoxWidth + (columnId - Math.floor(this.redBoxX / this.optionSize)) * columnWidth + 30;
+        if (isLeft) {
+          //numColumns = Math.floor(this.redBoxX / this.optionSize);
+          columnWidth = (this.redBoxX - leftMargin) / numColumns;
+          return columnId * columnWidth + leftMargin;
+        } else {
+          //numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / this.optionSize);
+          columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / numColumns;
+          return this.redBoxX + this.redBoxWidth + (rightMargin / 2) + (columnId - Math.floor(this.redBoxX / this.columnSize)) * columnWidth;
+        }
       }
-    }
   },
+
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },

@@ -8,7 +8,7 @@
 .canvasWrapper > .handCursor{
   position: absolute;
   display: none;
-  width: calc(min(10vh, 10vw));
+  width: calc(min(8vh, 8vw));
   height: auto;
   z-index: 2;
 }
