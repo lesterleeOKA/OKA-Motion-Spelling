@@ -51,12 +51,14 @@ export default {
   starNum: 0,
   touchBtn: false,
   apiManager: null,
+  engFontSize: null,
 
-  init(gameTime = null, fallSpeed = null) {
+  init(gameTime = null, fallSpeed = null, engFontSize=null) {
     this.startedGame = false;
     this.fallingId = 0;
     this.remainingTime = gameTime !== null ? gameTime : 300;
     this.fallingSpeed = fallSpeed !== null ? fallSpeed : 8;
+    this.engFontSize = engFontSize !== null ? engFontSize : 60;
     this.fallingDelay = this.fallingSpeed * 250;
     this.updateTimerDisplay(this.remainingTime);
     this.questionType = QuestionManager.questionField;
@@ -451,12 +453,12 @@ export default {
     /* let fontSize = `calc(min(max(4vh, 20vh - ${text.length} * 5.2vh), 8vh))`;
      option.style.setProperty('--font-size', fontSize);*/
 
-    let containerWidth = this.optionSize;
-    let maxFontSize = 60; // Maximum font size in px
-    let minFontSize = 10; // Minimum font size in px
-    let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.65)));
+    //let containerWidth = this.optionSize;
+    //let maxFontSize = 60; // Maximum font size in px
+    //let minFontSize = 10; // Minimum font size in px
+    //let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.65)));
+    let fontSize = this.engFontSize;
     option.style.fontSize = `${fontSize}px`;
-
     optionWrapper.appendChild(option);
     return optionWrapper;
   },

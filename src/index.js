@@ -24,7 +24,7 @@ let drawContour = false;
 let foregroundThresold = 0.65;
 const bgImage = require('./images/spelling/bg.jpg');
 const fpsDebug = document.getElementById('stats');
-let { jwt, id, levelKey, model, removal, fps, gameTime, fallSpeed } = parseUrlParams();
+let { jwt, id, levelKey, model, removal, fps, gameTime, fallSpeed, engFontSize} = parseUrlParams();
 let holdTimeout = null;
 //const ctx = canvas.getContext('2d');
 
@@ -227,6 +227,7 @@ function gameSetup() {
   }
   if (gameTime) State.gameTime = gameTime;
   if (fallSpeed) State.fallSpeed = fallSpeed;
+  if (engFontSize) State.engFontSize = engFontSize;
 }
 
 async function init() {

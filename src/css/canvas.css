@@ -29,7 +29,7 @@
   left: 0px;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
-  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 1));
   transition: opacity 0.1s ease;
   opacity: 0;
   background: url(../images/spelling/fruit1.png);
@@ -271,7 +271,7 @@
   background: transparent;
   border: none;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
   filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
 }
 
