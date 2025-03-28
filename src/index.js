@@ -24,7 +24,7 @@ let drawContour = false;
 let foregroundThresold = 0.65;
 const bgImage = require('./images/spelling/bg.jpg');
 const fpsDebug = document.getElementById('stats');
-let { jwt, id, levelKey, model, removal, fps, gameTime, fallSpeed, engFontSize} = parseUrlParams();
+let { jwt, id, levelKey, model, removal, fps, gameTime, fallSpeed, engFontSize, gameMode } = parseUrlParams();
 let holdTimeout = null;
 //const ctx = canvas.getContext('2d');
 
@@ -204,9 +204,11 @@ function gameSetup() {
     logController.log("settings object speed:", apiManager.settings.fallSpeed);
     logController.log("settings removal:", apiManager.settings.removal);
     logController.log("settings detectionModel:", apiManager.settings.detectionModel);
+    logController.log("settings gameMode:", apiManager.settings.gameMode);
 
     removal = apiManager.settings.removal === 1 ? '1' : '0';
     model = apiManager.settings.detectionModel === 1 ? 'full' : 'lite';
+    gameMode = apiManager.settings.gameMode === 1 ? '1' : '0';
 
     if (removal === '1') {
       let bgUrl = (apiManager.settings.backgroundImageUrl && apiManager.settings.backgroundImageUrl !== '') ? apiManager.settings.backgroundImageUrl : bgImage;
@@ -228,6 +230,7 @@ function gameSetup() {
   if (gameTime) State.gameTime = gameTime;
   if (fallSpeed) State.fallSpeed = fallSpeed;
   if (engFontSize) State.engFontSize = engFontSize;
+  if (gameMode) State.gameMode = gameMode;
 }
 
 async function init() {
@@ -285,10 +288,9 @@ async function init() {
     ['btnClick', require('./audio/btnClick.wav')],
     ['countDown', require('./audio/countDown.mp3')],
     ['score', require('./audio/score.mp3')],
-    //['instruction', require('./audio/instruction.mp3')],
+    ['splatter', require('./audio/splatter.mp3')],
     ['prepare', require('./audio/prepare.mp3')],
     ['start', require('./audio/start.mp3')],
-    /*['finished', require('./audio/finished.mp3')],*/
     ['passGame', require('./audio/passgame.mp3')],
     ['failGame', require('./audio/failgame.mp3')],
     ['outBox', require('./audio/outBox.mp3')],

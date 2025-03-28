@@ -35,6 +35,9 @@ function parseUrlParams() {
     const engFontSizeParam = params.find(param => param.startsWith('engfs='));
     const engFontSizeValue = engFontSizeParam ? engFontSizeParam.split('=')[1] : null;
     logController.log("engFontSizeValue:", engFontSizeValue);
+    const gameModeParam = params.find(param => param.startsWith('gameMode='));
+    const gameModeValue = gameModeParam ? gameModeParam.split('=')[1] : null;
+    logController.log("gameModeValue:", gameModeValue);
 
     return {
       jwt: jwtValue,
@@ -45,7 +48,8 @@ function parseUrlParams() {
       removal: removalValue !== null ? removalValue : 0,
       fps: fpsValue !== null ? fpsValue : 0,
       model: modelValue,
-      engFontSize: engFontSizeValue
+      engFontSize: engFontSizeValue,
+      gameMode: gameModeValue
     };
   }
 
@@ -58,7 +62,8 @@ function parseUrlParams() {
     removal: 0,
     fps: 0,
     model: null,
-    engFontSize: null
+    engFontSize: null,
+    gameMode: 0
   };
 }
 
