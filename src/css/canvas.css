@@ -25,13 +25,14 @@
 }
 
 .canvasWrapper > .optionArea > .optionWrapper {
-  position: relative;
+  position: absolute;
   left: 0px;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 1));
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.8));
   transition: opacity 0.1s ease;
-  opacity: 0;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: url(../images/spelling/fruit1.png);
   background-position: center;
   background-size: cover;
@@ -246,14 +247,57 @@
 }
 
 .canvasWrapper > .optionArea > .optionWrapper.show {
-  position: absolute;
-  opacity: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   animation-name: fallingAnimation;
   animation-duration: var(--fallingSpeed);
   animation-timing-function: linear;
+}
+
+.sliced  {
+  animation-name: sliceAnimation;
+  animation-duration: var(--slice-speed);
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+}
+
+.sub-image {
+  position: absolute;
+  overflow: hidden;
+  opacity: 0;
+  transition: transform 0.5s ease-out;
+  width: 100%;
+  height: 100%;
+}
+
+.left {
+  background: url(../images/fruits/apple-1.png);
+  background-position: center;
+  background-size: cover;
+  left: 0;
+  transform-origin: right; /* Rotate around the right edge */
+}
+
+.right {
+  background: url(../images/fruits/apple-2.png);
+  background-position: center;
+  background-size: cover;
+  right: 0;
+  transform-origin: left; /* Rotate around the left edge */
+}
+
+.cutLeft {
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0% 100%);
+}
+
+.cutRight {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+.slice-left {
+  opacity: 1;
+}
+
+.slice-right {
+  opacity: 1;
 }
 
 .canvasWrapper > .optionArea > .optionWrapper > .option {
@@ -281,6 +325,8 @@
   --bottom-height: 200px;
   --font-size: 3vh;
   --question-font-size:3vh;
+  --optionPositionY:0px;
+  --slice-speed:0s;
 }
 
 .fadeIn {
@@ -291,6 +337,18 @@
 .fadeOut {
   animation: fade-Out;
   animation-duration: 1s;
+}
+
+@keyframes sliceAnimation {
+  0% {
+    transform: translateY(var(--optionPositionY));
+  }
+  20% {
+    transform: translateY(calc(var(--optionPositionY) - 100px));
+  }
+  100% {
+    transform: translateY(var(--bottom-height));
+  }
 }
 
 @keyframes fallingAnimation {

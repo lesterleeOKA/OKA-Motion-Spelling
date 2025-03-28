@@ -17,6 +17,7 @@ class Settings {
     this.detectionModel = null;
     this.fallSpeed = 0;
     this.option_item_images = null;
+    this.gameMode = 0;
   }
 }
 
@@ -118,6 +119,7 @@ const apiManager = {
             this.settings.fallSpeed = this.gameSettingJson.object_speed;
             this.settings.removal = this.gameSettingJson.background_removal;
             this.settings.detectionModel = this.gameSettingJson.detection_model;
+            this.settings.gameMode = this.gameSettingJson.game_mode;
           }
 
           if (photoJsonUrl) {

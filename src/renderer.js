@@ -3,6 +3,7 @@ import State from './state';
 import Sound from './sound';
 import Camera from './camera';
 import Game from './spelling';
+import Sword from './swords';
 
 
 export class RendererCanvas2d {
@@ -16,26 +17,40 @@ export class RendererCanvas2d {
     this.center_shoulder = null;
     this.triggeredAudio = false;
     this.canvasWrapperRect = null;
+    this.leftHandSword = new Sword({ r: 255, g: 255, b: 255, a: 0.7 });
+    this.rightHandSword = new Sword({ r: 255, g: 255, b: 255, a: 0.7 });
     this.showSkeleton = false;
   }
 
   draw(rendererParams) {
-      const [video, poses, isFPSMode, bodySegmentationCanvas] = rendererParams;
-      this.updateCanvasDimensions(video);
-      this.drawCtx(video, bodySegmentationCanvas);
+    const [video, poses, isFPSMode, bodySegmentationCanvas] = rendererParams;
+    this.updateCanvasDimensions(video);
+    this.drawCtx(video, bodySegmentationCanvas);
 
-      if (this.isStateActive()) {
-        let isCurPoseValid = false;
-        if (poses && poses.length > 0) {
-          const ratio = video.width / video.videoWidth;
-          this.drawResults(poses, ratio, isFPSMode);
-          isCurPoseValid = this.isPoseValid(poses);
-          if (isCurPoseValid && State.bodyInsideRedBox.value) {
-            this.handleStateTransitions();
+    if (this.isStateActive()) {
+      let isCurPoseValid = false;
+      if (poses && poses.length > 0) {
+        const ratio = video.width / video.videoWidth;
+        this.drawResults(poses, ratio, isFPSMode);
+        isCurPoseValid = this.isPoseValid(poses);
+        if (isCurPoseValid && State.bodyInsideRedBox.value) {
+          this.handleStateTransitions();
+        }
+        else {
+          if (Game.gameMode === "1") {
+            this.leftHandSword.clearSwipes();
+            this.rightHandSword.clearSwipes();
           }
         }
-        this.drawBox(isCurPoseValid);
       }
+      if (Game.gameMode === "1") {
+        this.leftHandSword.update();
+        this.leftHandSword.draw(this.ctx);
+        this.rightHandSword.update();
+        this.rightHandSword.draw(this.ctx);
+      }
+      this.drawBox(isCurPoseValid);
+    }
   }
 
   updateCanvasDimensions(video) {
@@ -54,42 +69,42 @@ export class RendererCanvas2d {
   }
 
   handleStateTransitions() {
-      if (State.state === 'prepare' && State.getStateLastFor() > 3500) {
-        State.changeState('counting3');
-      } else if (State.state === 'counting3' && State.getStateLastFor() > 1000) {
-        State.changeState('counting2');
-      } else if (State.state === 'counting2' && State.getStateLastFor() > 1000) {
-        State.changeState('counting1');
-      } else if (State.state === 'counting1' && State.getStateLastFor() > 1000) {
-        State.changeState('counting0');
-      } else if (State.state === 'counting0' && State.getStateLastFor() > 1000) {
-        State.changeState('playing', 'showStage');
-      } else if (State.state === 'playing') {
-        this.handlePlayingState();
-      } else if (State.state === 'outBox' && State.bodyInsideRedBox.lastFor > 2000) {
-        State.changeState('playing', 'waitAns');
-      }
+    if (State.state === 'prepare' && State.getStateLastFor() > 3500) {
+      State.changeState('counting3');
+    } else if (State.state === 'counting3' && State.getStateLastFor() > 1000) {
+      State.changeState('counting2');
+    } else if (State.state === 'counting2' && State.getStateLastFor() > 1000) {
+      State.changeState('counting1');
+    } else if (State.state === 'counting1' && State.getStateLastFor() > 1000) {
+      State.changeState('counting0');
+    } else if (State.state === 'counting0' && State.getStateLastFor() > 1000) {
+      State.changeState('playing', 'showStage');
+    } else if (State.state === 'playing') {
+      this.handlePlayingState();
+    } else if (State.state === 'outBox' && State.bodyInsideRedBox.lastFor > 2000) {
+      State.changeState('playing', 'waitAns');
+    }
   }
 
-    handlePlayingState() {
-      if (State.stageType === 'showStage' && State.getStateLastFor() > 1000) {
-        // Handle stage transition if necessary
-      } else if (State.stateType === 'waitAns') {
-        this.handleWaitAnsState();
-      } else if (State.stateType === 'touched1' && State.selectedImg.lastFor > 2000) {
-        State.changeState('playing', 'touched2');
-      } else if (State.stateType === 'touched2' && State.selectedImg.lastFor > 3000) {
-        // Handle answer checking if necessary
-      } else if (!State.selectedImg.value) {
-        State.changeState('playing', 'waitAns');
-      }
+  handlePlayingState() {
+    if (State.stageType === 'showStage' && State.getStateLastFor() > 1000) {
+      // Handle stage transition if necessary
+    } else if (State.stateType === 'waitAns') {
+      this.handleWaitAnsState();
+    } else if (State.stateType === 'touched1' && State.selectedImg.lastFor > 2000) {
+      State.changeState('playing', 'touched2');
+    } else if (State.stateType === 'touched2' && State.selectedImg.lastFor > 3000) {
+      // Handle answer checking if necessary
+    } else if (!State.selectedImg.value) {
+      State.changeState('playing', 'waitAns');
     }
+  }
 
-    handleWaitAnsState() {
-      if (State.selectedImg.value && State.selectedImg.lastFor > 1000) {
-        // Handle answer checking if necessary
-      }
+  handleWaitAnsState() {
+    if (State.selectedImg.value && State.selectedImg.lastFor > 1000) {
+      // Handle answer checking if necessary
     }
+  }
 
   isOutOfBounds(keypoint) {
     return (
@@ -101,17 +116,17 @@ export class RendererCanvas2d {
   }
 
   checkBodyInBounds(pose, passScore) {
-      const isNoseOutBox = pose.keypoints
-        .filter(k => k.name === 'nose' && k.score > passScore)
-        .some(keypoint => this.isOutOfBounds(keypoint));
-      const isShoulderOutBox = this.center_shoulder && this.isOutOfBounds(this.center_shoulder);
-      const isBodyOutBox = this.center_shoulder ? (isShoulderOutBox && isNoseOutBox) : isNoseOutBox;
+    const isNoseOutBox = pose.keypoints
+      .filter(k => k.name === 'nose' && k.score > passScore)
+      .some(keypoint => this.isOutOfBounds(keypoint));
+    const isShoulderOutBox = this.center_shoulder && this.isOutOfBounds(this.center_shoulder);
+    const isBodyOutBox = this.center_shoulder ? (isShoulderOutBox && isNoseOutBox) : isNoseOutBox;
 
-      State.setPoseState('bodyInsideRedBox', !isBodyOutBox);
-      if (isBodyOutBox && State.state === 'playing') {
-        State.changeState('outBox', 'outBox');
-      }
-      return !isBodyOutBox;
+    State.setPoseState('bodyInsideRedBox', !isBodyOutBox);
+    if (isBodyOutBox && State.state === 'playing') {
+      State.changeState('outBox', 'outBox');
+    }
+    return !isBodyOutBox;
   }
 
   isPoseValid(poses) {
@@ -171,13 +186,30 @@ export class RendererCanvas2d {
     rightHandImg.style.display = 'none';
     leftHandImg.style.display = 'none';
 
+    if (keypoints.length === 0 && Game.gameMode === "1") {
+      this.leftHandSword.clearSwipes();
+      this.rightHandSword.clearSwipes();
+      return;
+    }
+
     keypoints.forEach(point => {
       const { x: wristX, y: wristY, name } = point;
       const handImg = name === 'right_wrist' ? rightHandImg : leftHandImg;
       const handAdjustedWristX = this.handAdjustWristX(name, wristX);
+
       handImg.style.left = `${(handAdjustedWristX / window.innerWidth) * 95}vw`;
       handImg.style.top = `${wristY - (window.innerWidth / 12)}px`;
       handImg.style.display = 'block';
+
+      if (Game.gameMode === "1") {
+        const adjustedWristX = this.adjustWristX(name, wristX);
+        const movementThreshold = 4;
+        this.handleSwipe(name, adjustedWristX, wristY, movementThreshold);
+        handImg.style.opacity = '0';
+      }
+      else {
+        handImg.style.opacity = '1';
+      }
 
       this.handleBackSpaceBtnDetection(optionWrappers, resetBtn, wristX, wristY);
     });
@@ -188,18 +220,45 @@ export class RendererCanvas2d {
   handAdjustWristX(handName, wristX) {
     return handName === 'right_wrist' ? wristX - 20 : wristX;
   }
+  adjustWristX(handName, wristX) {
+    return handName === 'right_wrist' ? wristX - 20 : wristX + 30;
+  }
+  handleSwipe(handName, adjustedWristX, wristY, movementThreshold) {
+    const sword = handName === 'right_wrist' ? this.rightHandSword : this.leftHandSword;
+    const lastSwipe = sword.swipes[sword.swipes.length - 1];
+
+    // Calculate targetY based on viewport height
+    const targetY = wristY - (window.innerHeight * 0.1); // Adjust the factor as needed (e.g., 0.2 for 20%)
+
+    if (lastSwipe) {
+      const distance = sword.distance(lastSwipe.x, lastSwipe.y, adjustedWristX, targetY);
+      distance > movementThreshold ? sword.swipe(adjustedWristX, targetY) : sword.clearSwipes();
+    } else {
+      sword.swipe(adjustedWristX, targetY);
+    }
+  }
   checkTouchingWords(optionWrappers, rightHandImg, leftHandImg) {
     const touchingWords = [];
     const rightHandBounds = rightHandImg.getBoundingClientRect();
     const leftHandBounds = leftHandImg.getBoundingClientRect();
+    const isGameModeOne = Game.gameMode === "1";
+    const isNotTriggeredBackSpace = !Game.isTriggeredBackSpace;
 
     optionWrappers.forEach(option => {
       const optionRect = option.getBoundingClientRect();
-      if (this.isTouching(rightHandBounds, optionRect) && !Game.isTriggeredBackSpace) {
-        touchingWords.push(option);
+      const isTouchingRight = this.isTouching(rightHandBounds, optionRect);
+      const isTouchingLeft = this.isTouching(leftHandBounds, optionRect);
+
+      if (isGameModeOne) {
+        const rightHandSwipes = this.rightHandSword.swipes.length > 5;
+        const leftHandSwipes = this.leftHandSword.swipes.length > 5;
+
+        if (isTouchingRight && isNotTriggeredBackSpace && rightHandSwipes) touchingWords.push(option);
+        if (isTouchingLeft && isNotTriggeredBackSpace && leftHandSwipes) touchingWords.push(option);
       }
-      if (this.isTouching(leftHandBounds, optionRect) && !Game.isTriggeredBackSpace) {
-        touchingWords.push(option);
+      else {
+        if (isTouchingRight && isNotTriggeredBackSpace) touchingWords.push(option);
+        if (isTouchingLeft && isNotTriggeredBackSpace) touchingWords.push(option);
       }
     });
 

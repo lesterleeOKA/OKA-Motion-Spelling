@@ -74,6 +74,22 @@ export default {
     require("./images/spelling/fruit4.png"),
     require("./images/spelling/fruit5.png"),
   ],
+  preloadedLeftSubImages: [],
+  leftSubImages: [
+    /*require("./images/fruits/apple-1.png"),
+    require("./images/fruits/banana-1.png"),
+    require("./images/fruits/peach-1.png"),
+    require("./images/fruits/strawberry-1.png"),
+    require("./images/fruits/watermelon-1.png"),*/
+  ],
+  preloadedRightSubImages: [],
+  rightSubImages: [
+    /*require("./images/fruits/apple-2.png"),
+    require("./images/fruits/banana-2.png"),
+    require("./images/fruits/peach-2.png"),
+    require("./images/fruits/strawberry-2.png"),
+    require("./images/fruits/watermelon-2.png"),*/
+  ],
   toAPIImageUrl(url) {
     if (url === null) return;
     fetch(url)

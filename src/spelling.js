@@ -52,13 +52,15 @@ export default {
   touchBtn: false,
   apiManager: null,
   engFontSize: null,
+  gameMode: "0",
 
-  init(gameTime = null, fallSpeed = null, engFontSize=null) {
+  init(gameTime = null, fallSpeed = null, engFontSize = null, gameMode = "0") {
     this.startedGame = false;
     this.fallingId = 0;
     this.remainingTime = gameTime !== null ? gameTime : 300;
     this.fallingSpeed = fallSpeed !== null ? fallSpeed : 8;
     this.engFontSize = engFontSize !== null ? engFontSize : 60;
+    this.gameMode = gameMode;
     this.fallingDelay = this.fallingSpeed * 250;
     this.updateTimerDisplay(this.remainingTime);
     this.questionType = QuestionManager.questionField;
@@ -288,7 +290,11 @@ export default {
               this.fallingId = 0;
             }
             var optionImageId = this.fallingId % View.preloadedFallingImages.length;
-            this.createRandomItem(this.randomPair[this.fallingId], View.preloadedFallingImages[optionImageId]);
+            this.createRandomItem(this.randomPair[this.fallingId],
+              View.preloadedFallingImages.length === 0 ? null : View.preloadedFallingImages[optionImageId],
+              View.preloadedLeftSubImages.length === 0 ? null : View.preloadedLeftSubImages[optionImageId],
+              View.preloadedRightSubImages.length === 0 ? null : View.preloadedRightSubImages[optionImageId],
+            );
           }
           else {
             this.finishedCreateOptions = true;
@@ -365,15 +371,17 @@ export default {
   generateUniqueId() {
     return Math.random().toString(16).slice(2);
   },
-  createRandomItem(char, optionImage) {
+  createRandomItem(char, optionImage, optionLeftImage, optionRightImage) {
     if (char && char.length !== 0) {
-      const columnId = this.getBalancedColumn();
+      const columnId = this.getNextSordOrder();
       const word = char;
 
       const generatePosition = () => {
         const x = this.generatePositionX(columnId);
         const id = this.generateUniqueId();
-        const optionWrapper = this.createOptionWrapper(word, id, optionImage, columnId);
+        const optionWrapper = this.gameMode === "1" ?
+          this.createFruitNinjaOptionWrapper(word, id, optionImage, optionLeftImage, optionRightImage, columnId) :
+          this.createDefaultOptionWrapper(word, id, optionImage, columnId);
         const newFallingItem = {
           x,
           size: this.optionSize,
@@ -406,37 +414,89 @@ export default {
   },
 
   generatePositionX(columnId) {
-      if (this.wholeScreenColumnSeperated) {
-        const offset = 20;
-        // Calculate the X position based on the columnId
-        let positionX = columnId * this.columnWidth + offset; // Center the position within the column
+    if (this.wholeScreenColumnSeperated) {
+      const offset = 20;
+      // Calculate the X position based on the columnId
+      let positionX = columnId * this.columnWidth + offset; // Center the position within the column
 
-        if (positionX + this.columnWidth / 2 > View.canvas.width - offset) {
-          positionX = View.canvas.width - offset - this.columnWidth / 2;
-        }
-        return positionX;
+      if (positionX + this.columnWidth / 2 > View.canvas.width - offset) {
+        positionX = View.canvas.width - offset - this.columnWidth / 2;
       }
-      else {
-        const isLeft = columnId < Math.floor(this.redBoxX / this.columnSize);
-        let numColumns = 2, columnWidth;
-        let leftMargin = this.columnSize / 2, rightMargin = this.columnSize / 2;
+      return positionX;
+    }
+    else {
+      const isLeft = columnId < Math.floor(this.redBoxX / this.columnSize);
+      let numColumns = 2, columnWidth;
+      let leftMargin = this.columnSize / 2, rightMargin = this.columnSize / 2;
 
-        if (isLeft) {
-          //numColumns = Math.floor(this.redBoxX / this.optionSize);
-          columnWidth = (this.redBoxX - leftMargin) / numColumns;
-          return columnId * columnWidth + leftMargin;
-        } else {
-          //numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / this.optionSize);
-          columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / numColumns;
-          return this.redBoxX + this.redBoxWidth + (rightMargin / 2) + (columnId - Math.floor(this.redBoxX / this.columnSize)) * columnWidth;
-        }
+      if (isLeft) {
+        //numColumns = Math.floor(this.redBoxX / this.optionSize);
+        columnWidth = (this.redBoxX - leftMargin) / numColumns;
+        return columnId * columnWidth + leftMargin;
+      } else {
+        //numColumns = Math.floor((View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / this.optionSize);
+        columnWidth = (View.canvas.width - this.redBoxX - this.redBoxWidth - rightMargin) / numColumns;
+        return this.redBoxX + this.redBoxWidth + (rightMargin / 2) + (columnId - Math.floor(this.redBoxX / this.columnSize)) * columnWidth;
       }
+    }
   },
 
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },
-  createOptionWrapper(text, id, optionImage, columnId) {
+  createFruitNinjaOptionWrapper(text, id, optionImage, optionLeftImage, optionRightImage, columnId) {
+    let optionWrapper = document.createElement('div');
+    optionWrapper.classList.add('optionWrapper');
+    optionWrapper.style.width = `${this.optionSize + 20}px`;
+    optionWrapper.style.height = `${this.optionSize + 20}px`;
+    if (optionImage !== '' && optionImage !== 'undefined') {
+      optionWrapper.style.backgroundImage = `url(${optionImage})`;
+      optionWrapper.style.backgroundSize = 'contain'; // Adjust size to maintain aspect ratio
+      optionWrapper.style.backgroundRepeat = 'no-repeat'; // Prevent repeating
+      optionWrapper.style.backgroundPosition = 'center'; // Center the image
+    }
+    optionWrapper.id = id;
+    optionWrapper.setAttribute('word', text);
+    optionWrapper.setAttribute('column', columnId);
+    let option = document.createElement('span');
+    option.classList.add('option');
+    const formattedText = text.split(' ').join('<br>'); // Replace spaces with <br>
+    option.innerHTML = formattedText; // Use innerHTML to include <br>
+
+    let fontSize = this.engFontSize;
+    option.style.fontSize = `${fontSize}px`;
+    let lineHeightMultiplier = 1; // You can change this value
+    option.style.lineHeight = `${fontSize * lineHeightMultiplier}px`;
+
+    const leftSubImage = document.createElement('div');
+    const rightSubImage = document.createElement('div');
+    if (optionLeftImage === null || optionRightImage === null) {
+      leftSubImage.classList.add('sub-image', 'left', 'cutLeft');
+      leftSubImage.style.backgroundImage = `url(${optionImage})`;
+      rightSubImage.classList.add('sub-image', 'right', 'cutRight');
+      rightSubImage.style.backgroundImage = `url(${optionImage})`;
+    }
+    else {
+      leftSubImage.classList.add('sub-image', 'left');
+      leftSubImage.style.backgroundImage = `url(${optionLeftImage})`;
+      rightSubImage.classList.add('sub-image', 'right');
+      rightSubImage.style.backgroundImage = `url(${optionRightImage})`;
+    }
+    leftSubImage.style.backgroundSize = 'contain'; // Adjust size to maintain aspect ratio
+    leftSubImage.style.backgroundRepeat = 'no-repeat'; // Prevent repeating
+    leftSubImage.style.backgroundPosition = 'center'; // Center the image
+    rightSubImage.style.backgroundSize = 'contain'; // Adjust size to maintain aspect ratio
+    rightSubImage.style.backgroundRepeat = 'no-repeat'; // Prevent repeating
+    rightSubImage.style.backgroundPosition = 'center'; // Center the image
+    option.append(leftSubImage);
+    option.append(rightSubImage);
+    optionWrapper.appendChild(option);
+    optionWrapper.setAttribute('image', optionImage);
+    optionWrapper.setAttribute('fontSize', fontSize);
+    optionWrapper.setAttribute('loop', 'true');
+    return optionWrapper;
+  },
+  createDefaultOptionWrapper(text, id, optionImage, columnId) {
     let optionWrapper = document.createElement('div');
     optionWrapper.classList.add('optionWrapper');
     optionWrapper.style.width = `${this.optionSize}px`;
@@ -446,22 +506,18 @@ export default {
     optionWrapper.id = id;
     optionWrapper.setAttribute('word', text);
     optionWrapper.setAttribute('column', columnId);
+    optionWrapper.setAttribute('loop', 'true');
+
     let option = document.createElement('span');
     option.classList.add('option');
-    //option.type = 'text';
     option.textContent = text;
-    /* let fontSize = `calc(min(max(4vh, 20vh - ${text.length} * 5.2vh), 8vh))`;
-     option.style.setProperty('--font-size', fontSize);*/
 
-    //let containerWidth = this.optionSize;
-    //let maxFontSize = 60; // Maximum font size in px
-    //let minFontSize = 10; // Minimum font size in px
-    //let fontSize = Math.max(minFontSize, Math.min(maxFontSize, containerWidth / (text.length * 0.65)));
     let fontSize = this.engFontSize;
     option.style.fontSize = `${fontSize}px`;
     optionWrapper.appendChild(option);
     return optionWrapper;
   },
+
   getRandomQuestions(string) {
     const randomIndex = Math.floor(Math.random() * string.length);
     return string[randomIndex];
@@ -476,12 +532,21 @@ export default {
   },
 
   animationEnd(optionWrapper) {
-    this.reFallingItems.push(optionWrapper);
-    //logController.log("re falling item", this.reFallingItems);
+    var loop = optionWrapper.getAttribute('loop');
+    if (loop === 'true') {
+      logController.log("loop", loop);
+      this.reFallingItems.push(optionWrapper);
+    }
   },
 
   resetFallingItem(optionWrapper) {
     optionWrapper.classList.remove('show');
+    if (this.gameMode === "1") {
+      const retrievedLeftSubImage = optionWrapper.querySelector('.sub-image.left');
+      const retrievedRightSubImage = optionWrapper.querySelector('.sub-image.right');
+      retrievedLeftSubImage.classList.remove('slice-left');
+      retrievedRightSubImage.classList.remove('slice-right');
+    }
     if (this.nextQuestion || State.stateType === 'ansWrong')
       return;
 
@@ -894,15 +959,22 @@ export default {
           }
         }
         else {
-          option.classList.remove('show');
           logController.log("deduct:", option);
           this.typedItems.push(option);
+          if (this.gameMode === "1") {
+            this.playSlicedEffect(option);
+          }
+          else {
+            option.classList.remove('show');
+            option.setAttribute('loop', 'false');
+          }
         }
 
         this.fillwordTime += 1;
         if (State.isSoundOn) {
           Sound.stopAll(['bgm', 'lastTen']);
-          Sound.play('btnClick');
+          let audioEffect = this.gameMode === "1" ? 'splatter' : 'btnClick';
+          Sound.play(audioEffect);
         }
         if (this.fillwordTime == this.answerLength) {
           setTimeout(() => {
@@ -910,6 +982,47 @@ export default {
           }, 300);
         }
       }
+    }
+  },
+  playSlicedEffect(option = null) {
+    if (option) {
+      let computedStyle = getComputedStyle(option);
+      let currentTransform = computedStyle.transform;
+      option.classList.remove('show');
+      option.style.backgroundImage = 'none';
+      let childSpan = option.querySelector('.option');
+      let retrievedLeftSubImage = option.querySelector('.sub-image.left');
+      let retrievedRightSubImage = option.querySelector('.sub-image.right');
+      let randomLeftTranslate = Math.random() * (-20 - -100) + -100;
+      let randomRightTranslate = Math.random() * (100 - 20) + 20;
+      let randomDeg = Math.floor(Math.random() * 61);
+      retrievedLeftSubImage.style.transform = `translate(${randomLeftTranslate}%) rotate(${randomDeg}deg)`;
+      retrievedRightSubImage.style.transform = `translate(${randomRightTranslate}%) rotate(${-randomDeg}deg)`;
+      retrievedLeftSubImage.classList.add('slice-left');
+      retrievedRightSubImage.classList.add('slice-right');
+      if (childSpan) {
+        childSpan.style.fontSize = `${0}px`;
+      }
+      option.classList.add('sliced');
+      let matrixValues = currentTransform.match(/matrix.*\((.+)\)/)[1].split(', ');
+      let translateY = parseFloat(matrixValues[5]);
+      option.style.setProperty('--optionPositionY', `${translateY}px`);
+      option.style.setProperty('--bottom-height', `${(View.canvas.height + this.optionSize + 100)}px`);
+      option.style.setProperty('--slice-speed', `${0.5}s`);
+      option.setAttribute('loop', 'false');
+
+      setTimeout(() => {
+        //reset
+        option.style.backgroundImage = `url(${option.getAttribute('image')})`;
+        retrievedLeftSubImage.style.transform = '';
+        retrievedRightSubImage.style.transform = '';
+        retrievedLeftSubImage.classList.remove('slice-left');
+        retrievedRightSubImage.classList.remove('slice-right');
+        if (childSpan) {
+          childSpan.style.fontSize = `${option.getAttribute('fontSize')}px`;
+        }
+        option.classList.remove('sliced');
+      }, 800);
     }
   },
   resetFillWord() {
@@ -934,6 +1047,7 @@ export default {
       let lastOption = null;
       if (this.typedItems.length > 0) {
         lastOption = this.typedItems[this.typedItems.length - 1];
+        lastOption.setAttribute('loop', 'true');
         logController.log('lastOption', lastOption);
 
         if (lastOption && !lastOption.classList.contains('show')) {
