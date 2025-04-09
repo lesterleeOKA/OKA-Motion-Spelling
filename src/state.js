@@ -197,9 +197,15 @@ export default {
           );
         }
         else {
-          homePageUrl = window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/';
-          //window.open(homePageUrl, '_self');
-          window.location.replace(homePageUrl);
+
+          if (window.self !== window.top) {
+            logController.log("This page is inside an iframe");
+            window.parent.postMessage("closeIframe", "*");
+          }
+          else {
+            homePageUrl = window.location.origin + '/RainbowOne/webapp/OKAGames/SelectGames/';
+            window.location.replace(homePageUrl);
+          }
         }
       }
       else if (hostname.includes('rainbowone.app')) {

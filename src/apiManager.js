@@ -119,7 +119,7 @@ const apiManager = {
             this.settings.fallSpeed = this.gameSettingJson.object_speed;
             this.settings.removal = this.gameSettingJson.background_removal;
             this.settings.detectionModel = this.gameSettingJson.detection_model;
-            this.settings.gameMode = this.gameSettingJson.game_mode;
+            this.settings.gameMode = this.gameSettingJson.fruitNinja_mode;
           }
 
           if (photoJsonUrl) {
