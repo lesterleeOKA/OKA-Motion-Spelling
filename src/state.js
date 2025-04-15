@@ -191,13 +191,11 @@ export default {
         if (this.apiManager.isLogined) {
           this.apiManager.exitGameRecord(
             () => {
-              logController.log("leave page, back to history");
-              window.history.back();
+              this.roWebExit();
             }
           );
         }
         else {
-
           if (window.self !== window.top) {
             logController.log("This page is inside an iframe");
             window.parent.postMessage("closeIframe", "*");
@@ -212,21 +210,15 @@ export default {
         if (this.apiManager.isLogined) {
           this.apiManager.exitGameRecord(
             () => {
-              logController.log("leave page, back to history");
-              window.history.back();
+              this.roWebExit();
             }
           );
         }
         else {
           homePageUrl = 'https://www.starwishparty.com';
-          //window.open(homePageUrl, '_self');
           window.location.replace(homePageUrl);
         }
       }
-      /*else if (hostname.includes('localhost')) {
-        homePageUrl ='https://localhost/SelectGames/';
-        window.open(homePageUrl, '_self');
-      }*/
       else if (hostname.includes('localhost')) {
         location.reload();
       }
@@ -249,6 +241,17 @@ export default {
       Game.stopCountTime();
     }
 
+  },
+
+  roWebExit(){
+    if (window.self !== window.top) {
+      logController.log("This page is inside an iframe");
+      window.parent.postMessage({ action: 'exit' }, "*");
+    }
+    else {
+      logController.log("leave page, back to history");
+      window.history.back();
+    }
   },
 
   setSound(status) {
