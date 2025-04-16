@@ -215,8 +215,14 @@ export default {
           );
         }
         else {
-          homePageUrl = 'https://www.starwishparty.com';
-          window.location.replace(homePageUrl);
+          if (window.self !== window.top) {
+            logController.log("This page is inside an iframe");
+            window.parent.postMessage("closeIframe", "*");
+          }
+          else {
+            homePageUrl = 'https://www.starwishparty.com';
+            window.location.replace(homePageUrl);
+          }
         }
       }
       else if (hostname.includes('localhost')) {
@@ -243,7 +249,7 @@ export default {
 
   },
 
-  roWebExit(){
+  roWebExit() {
     if (window.self !== window.top) {
       logController.log("This page is inside an iframe");
       window.parent.postMessage({ action: 'exit' }, "*");
